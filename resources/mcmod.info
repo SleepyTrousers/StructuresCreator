@@ -1,0 +1,21 @@
+[
+{
+  "modid": "StructuresCreator",
+  "name": "Ender Structures Creator",
+  "description": "In game tools for creating structures for use with the EnderStructures mod",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://enderio.com",
+  "updateUrl": "",
+  "authors": [
+    "crazypants"
+  ],
+  "credits": "By CrazyPants",
+  "logoFile": "",
+  "screenshots": [
+  ],
+  "parent":"",
+  "dependencies": [
+  ]
+}
+]
