@@ -18,9 +18,9 @@ import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
 import crazypants.structures.creator.item.ItemTemplateTool;
 
-@Mod(modid = MODID, name = MOD_NAME, version = VERSION, dependencies = "required-after:Forge@10.13.0.1150,)")
+@Mod(modid = MODID, name = MOD_NAME, version = VERSION, dependencies = "required-after:Forge@10.13.0.1150,);required-after:EnderStructures")
 public class EnderStructuresCreator {
-
+  
   public static final String MODID = "EnderStructuresCreator";
   public static final String MOD_NAME = "Ender Structures Creator";
   public static final String VERSION = "@VERSION@";
