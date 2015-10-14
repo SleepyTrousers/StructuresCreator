@@ -1,8 +1,8 @@
 package crazypants.structures.creator;
 
+import crazypants.structures.api.util.Point3i;
 import crazypants.structures.gen.structure.StructureBlock;
-import crazypants.structures.gen.structure.StructureComponent;
-import crazypants.vec.Point3i;
+import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -14,7 +14,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 public class CreatorUtil {
 
   
-  public static StructureComponent createComponent(String name, IBlockAccess world, AxisAlignedBB worldBnds, int surfaceOffset) {
+  public static StructureComponentNBT createComponent(String name, IBlockAccess world, AxisAlignedBB worldBnds, int surfaceOffset) {
     
     AxisAlignedBB bb = worldBnds.getOffsetBoundingBox(-worldBnds.minX, -worldBnds.minY, -worldBnds.minZ);
 
@@ -40,7 +40,7 @@ public class CreatorUtil {
         }
       }
     }
-    StructureComponent res = new StructureComponent(bb, size, name,  surfaceOffset, fb, sufb);
+    StructureComponentNBT res = new StructureComponentNBT(bb, size, name,  surfaceOffset, fb, sufb);
     
     int invNo = 0;
     int x;

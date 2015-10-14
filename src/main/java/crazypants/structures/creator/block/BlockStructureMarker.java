@@ -3,13 +3,14 @@ package crazypants.structures.creator.block;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import crazypants.structures.api.gen.IStructureComponent;
+import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.CreatorUtil;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureRegister;
-import crazypants.structures.gen.structure.StructureComponent;
-import crazypants.vec.Point3i;
+import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -62,8 +63,8 @@ public class BlockStructureMarker extends Block {
     return true;
   }
 
-  public StructureComponent generateAndExport(World world, int x, int y, int z, EntityPlayer entityPlayer) {
-    StructureComponent st = createComponentWithinMarkers(ExportManager.instance.getNextExportUid(), world, x, y, z, entityPlayer);
+  public IStructureComponent generateAndExport(World world, int x, int y, int z, EntityPlayer entityPlayer) {
+    StructureComponentNBT st = createComponentWithinMarkers(ExportManager.instance.getNextExportUid(), world, x, y, z, entityPlayer);
     if(st != null) {
       ExportManager.writeToFile(entityPlayer, st, true);
       StructureRegister.instance.registerStructureComponent(st);
@@ -72,7 +73,7 @@ public class BlockStructureMarker extends Block {
     return st;
   }
 
-  public static StructureComponent createComponentWithinMarkers(String name, IBlockAccess world, int x, int y, int z, EntityPlayer entityPlayer) {
+  public static StructureComponentNBT createComponentWithinMarkers(String name, IBlockAccess world, int x, int y, int z, EntityPlayer entityPlayer) {
     StructureBounds bb = getStructureBounds(world, x, y, z, entityPlayer);
     if(bb == null) {
       return null;

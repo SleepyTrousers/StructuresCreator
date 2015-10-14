@@ -1,9 +1,9 @@
 package crazypants.structures.creator.item;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
-import crazypants.vec.Point3i;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

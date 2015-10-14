@@ -16,6 +16,7 @@ import crazypants.structures.creator.block.BlockStructureMarker;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
+import crazypants.structures.creator.item.ItemDebugTool;
 import crazypants.structures.creator.item.ItemTemplateTool;
 
 @Mod(modid = MODID, name = MOD_NAME, version = VERSION, dependencies = "required-after:Forge@10.13.0.1150,);required-after:EnderStructures")
@@ -38,6 +39,7 @@ public class EnderStructuresCreator {
   public static ItemComponentTool itemComponentTool;
   public static ItemTemplateTool itemTemplateTool;
   public static ItemClearTool itemClearTool;
+  public static ItemDebugTool itemDebugTool;
 
   
   @EventHandler
@@ -51,6 +53,7 @@ public class EnderStructuresCreator {
     itemComponentTool = ItemComponentTool.create();
     itemTemplateTool = ItemTemplateTool.create();
     itemClearTool = ItemClearTool.create();
+    itemDebugTool = ItemDebugTool.create();
     
   }
   

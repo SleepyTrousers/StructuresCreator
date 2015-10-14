@@ -3,13 +3,13 @@ package crazypants.structures.creator.item;
 import java.util.Iterator;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import crazypants.structures.api.gen.IStructure;
+import crazypants.structures.api.gen.IStructureComponent;
+import crazypants.structures.api.gen.IStructureTemplate;
+import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.gen.StructureRegister;
-import crazypants.structures.gen.structure.Structure;
-import crazypants.structures.gen.structure.StructureComponent;
-import crazypants.structures.gen.structure.StructureTemplate;
-import crazypants.vec.Point3i;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -70,12 +70,12 @@ public class ItemTemplateTool extends Item {
   }
 
   private void buildComponent(World world, int x, int y, int z, int side, String uid) {
-    StructureTemplate st = StructureRegister.instance.getStructureTemplate(uid, true);
+    IStructureTemplate st = StructureRegister.instance.getStructureTemplate(uid, true);
     if(st != null) {
       ForgeDirection dir = ForgeDirection.getOrientation(side);
       Point3i origin = new Point3i(x + dir.offsetX, y + dir.offsetY - 1, z + dir.offsetZ);
       origin.y -= st.getSurfaceOffset();
-      Structure structure = st.createInstance();
+      IStructure structure = st.createInstance();
       structure.setOrigin(origin);
       structure.build(world, world.rand, null);                  
     }
@@ -86,9 +86,9 @@ public class ItemTemplateTool extends Item {
     if(curUid == null) {
       return setDefaultUid(stack);
     }
-    Iterator<StructureTemplate> it = StructureRegister.instance.getStructureTemplates().iterator();
+    Iterator<IStructureTemplate> it = StructureRegister.instance.getStructureTemplates().iterator();
     while (it.hasNext()) {
-      StructureTemplate template = it.next();
+      IStructureTemplate template = it.next();
       if (curUid.equals(template.getUid())) {
         if (it.hasNext()) {
           String uid = it.next().getUid();
@@ -129,7 +129,7 @@ public class ItemTemplateTool extends Item {
   }
   
   private String getFirstTemplateUid() {
-    Iterator<StructureComponent> it = StructureRegister.instance.getStructureComponents().iterator();
+    Iterator<IStructureComponent> it = StructureRegister.instance.getStructureComponents().iterator();
     if(it.hasNext()) {
       return it.next().getUid();
     }

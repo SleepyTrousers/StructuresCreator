@@ -3,15 +3,13 @@ package crazypants.structures.creator.item;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-
 import org.apache.commons.io.IOUtils;
 
-import crazypants.structures.Log;
 import crazypants.structures.gen.StructureRegister;
-import crazypants.structures.gen.io.StructureResourceManager;
-import crazypants.structures.gen.structure.StructureComponent;
+import crazypants.structures.gen.io.resource.StructureResourceManager;
+import crazypants.structures.gen.structure.StructureComponentNBT;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentText;
 
 public class ExportManager {
 
@@ -54,18 +52,18 @@ public class ExportManager {
 //      }
 //    }
     
-    for(File f : files) {
-      if(f != null && f.getName().endsWith(StructureResourceManager.COMPONENT_EXT)) {
-        try {
-          StructureComponent comp = StructureRegister.instance.getResourceManager().loadStructureComponent(f.getName());
-          if(comp != null) {
-            StructureRegister.instance.registerStructureComponent(comp);
-          }
-        } catch (Exception e) {
-          Log.warn("Could not load exported componnet: " + f.getAbsolutePath() + " Ex: " + e);
-        }    
-      }
-    }
+//    for(File f : files) {
+//      if(f != null && f.getName().endsWith(StructureResourceManager.COMPONENT_EXT)) {
+//        try {
+//          StructureComponentNBT comp = StructureRegister.instance.getResourceManager().loadStructureComponent(f.getName());
+//          if(comp != null) {
+//            StructureRegister.instance.registerStructureComponent(comp);
+//          }
+//        } catch (Exception e) {
+//          Log.warn("Could not load exported componnet: " + f.getAbsolutePath() + " Ex: " + e);
+//        }    
+//      }
+//    }
   }
 
   public String getNextExportUid() {
@@ -80,7 +78,7 @@ public class ExportManager {
     return res;
   }
 
-  public static void writeToFile(EntityPlayer entityPlayer, StructureComponent st, boolean createDefaultGenerator) {
+  public static void writeToFile(EntityPlayer entityPlayer, StructureComponentNBT st, boolean createDefaultGenerator) {
     EXPORT_DIR.mkdir();
     if(!EXPORT_DIR.exists()) {
       entityPlayer.addChatComponentMessage(new ChatComponentText("Could not make folder " + EXPORT_DIR.getAbsolutePath()));
@@ -123,7 +121,7 @@ public class ExportManager {
 //    return res;
 //  }
 
-  private static boolean doWriteToFile(EntityPlayer entityPlayer, StructureComponent st) {
+  private static boolean doWriteToFile(EntityPlayer entityPlayer, StructureComponentNBT st) {
     boolean saved = false;
     File file = new File(EXPORT_DIR, st.getUid() + StructureResourceManager.COMPONENT_EXT);
     FileOutputStream fos = null;
