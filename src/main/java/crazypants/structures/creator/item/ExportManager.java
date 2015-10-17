@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import org.apache.commons.io.IOUtils;
 
 import crazypants.structures.gen.StructureRegister;
+import crazypants.structures.gen.io.resource.DirectoryResourcePath;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,42 +29,18 @@ public class ExportManager {
   public static final ExportManager instance = new ExportManager();
 
   public ExportManager() {
-    StructureRegister.instance.getResourceManager().addResourcePath(EXPORT_DIR);            
+                
   }
 
-  public void loadExportFolder() {
+  public void loadExportFolder() {    
     if(!EXPORT_DIR.exists()) {
       return;
     }
-    File[] files = EXPORT_DIR.listFiles();
-    if(files == null) {
-      return;
-    }
-//    for(File f : files) {
-//      if(f != null && f.getName().endsWith(StructureResourceManager.GENERATOR_EXT)) {
-//        try {
-//          StructureGenerator gen = StructureRegister.instance.getResourceManager().loadGenerator(f);
-//          if(gen != null && gen.isValid()) {
-//            StructureRegister.instance.registerGenerator(gen);
-//          }
-//        } catch (Exception e) {
-//          Log.warn("Could not load exported generator: " + f.getAbsolutePath() + " Ex: " + e);
-//        }    
-//      }
-//    }
     
-//    for(File f : files) {
-//      if(f != null && f.getName().endsWith(StructureResourceManager.COMPONENT_EXT)) {
-//        try {
-//          StructureComponentNBT comp = StructureRegister.instance.getResourceManager().loadStructureComponent(f.getName());
-//          if(comp != null) {
-//            StructureRegister.instance.registerStructureComponent(comp);
-//          }
-//        } catch (Exception e) {
-//          Log.warn("Could not load exported componnet: " + f.getAbsolutePath() + " Ex: " + e);
-//        }    
-//      }
-//    }
+    StructureRegister.instance.getResourceManager().addResourceDirectory(EXPORT_DIR);
+    DirectoryResourcePath path = new DirectoryResourcePath(EXPORT_DIR);    
+    StructureRegister.instance.loadAndRegisterAllResources(path, false);
+
   }
 
   public String getNextExportUid() {

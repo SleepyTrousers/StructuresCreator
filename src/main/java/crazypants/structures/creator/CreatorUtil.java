@@ -46,12 +46,13 @@ public class CreatorUtil {
     int x;
     int y;
     int z;
+    Point3i origin = new Point3i((int) worldBnds.minX,(int) worldBnds.minY,(int) worldBnds.minZ);
     for (short xIndex = 0; xIndex < size.x; xIndex++) {
       for (short yIndex = 0; yIndex < size.y; yIndex++) {
         for (short zIndex = 0; zIndex < size.z; zIndex++) {
-          x = (int) worldBnds.minX + xIndex;
-          y = (int) worldBnds.minY + yIndex;
-          z = (int) worldBnds.minZ + zIndex;
+          x = origin.x + xIndex;
+          y = origin.y + yIndex;
+          z = origin.z + zIndex;
           Block blk = world.getBlock(x, y, z);
           StructureBlock sb = new StructureBlock(blk, world.getBlockMetadata(x, y, z), world.getTileEntity(x, y, z));
           if(!sb.isAir()) {
