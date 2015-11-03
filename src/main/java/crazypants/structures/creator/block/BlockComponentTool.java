@@ -4,6 +4,7 @@ import com.enderio.core.common.BlockEnder;
 
 import cpw.mods.fml.common.network.IGuiHandler;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
@@ -14,6 +15,7 @@ import crazypants.structures.creator.block.component.GuiComponentTool;
 import crazypants.structures.creator.block.component.PacketBuildComponent;
 import crazypants.structures.creator.block.component.PacketComponentToolGui;
 import crazypants.structures.creator.block.component.TileComponentTool;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -37,12 +39,18 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
     super(NAME, TileComponentTool.class);
     setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
     setLightOpacity(0);
-    setBlockTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
+    //setBlockTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
   }
   
   @Override
   public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_, int p_149668_3_, int p_149668_4_) {
     return null;
+  }
+  
+  @Override
+  @SideOnly(Side.CLIENT)
+  public void registerBlockIcons(IIconRegister iIconRegister) {
+    blockIcon = iIconRegister.registerIcon(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
   }
 
   @Override

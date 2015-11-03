@@ -14,8 +14,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentTool;
-import crazypants.structures.creator.block.BlockGroundLevelMarker;
-import crazypants.structures.creator.block.BlockStructureMarker;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
@@ -34,10 +32,8 @@ public class EnderStructuresCreator {
 
   @SidedProxy(clientSide = "crazypants.structures.creator.ClientProxy", serverSide = "crazypants.structures.creator.CommonProxy")
   public static CommonProxy proxy;
-  
-  public static BlockStructureMarker blockStructureMarker;
-  public static BlockClearMarker blockClearMarker;
-  public static BlockGroundLevelMarker blockGroundLevelMarker;
+    
+  public static BlockClearMarker blockClearMarker;  
   
   public static BlockComponentTool blockComponentTool;
   
@@ -53,10 +49,7 @@ public class EnderStructuresCreator {
 
     //Config.load(event);   
     
-    blockComponentTool = BlockComponentTool.create();
-    
-    blockStructureMarker = BlockStructureMarker.create();
-    blockGroundLevelMarker = BlockGroundLevelMarker.create();
+    blockComponentTool = BlockComponentTool.create();        
     blockClearMarker = BlockClearMarker.create();
     
     itemComponentTool = ItemComponentTool.create();

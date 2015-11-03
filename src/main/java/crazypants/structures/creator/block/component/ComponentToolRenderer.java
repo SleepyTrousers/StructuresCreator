@@ -38,7 +38,7 @@ public class ComponentToolRenderer extends TileEntitySpecialRenderer {
     Tessellator.instance.startDrawingQuads();
     Tessellator.instance.addTranslation((float)x, (float)y, (float)z);    
     //CubeRenderer.render(bb, EnderStructuresCreator.blockComponentTool.getIcon(0, 0));
-    CubeRenderer.render(bb, EnderStructuresCreator.blockStructureMarker.getIcon(0, 0));
+    CubeRenderer.render(bb, EnderStructuresCreator.blockComponentTool.getIcon(0, 0));
     Tessellator.instance.addTranslation((float)-x, (float)-y, (float)-z);
     Tessellator.instance.draw();
     

@@ -9,7 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -167,7 +169,7 @@ public class DialogComponentTool extends JDialog {
     lengthTF = createTF(5, updateListener);
     grounLevelTF = createTF(3, updateListener);
 
-    clearB = new JButton("Clear");
+    clearB = new JButton("New");
     openB = new JButton("Open");
     importB = new JButton("Import");
     exportB = new JButton("Export");
@@ -246,8 +248,43 @@ public class DialogComponentTool extends JDialog {
   }
 
   private void importFromFile() {
-    // TODO Auto-generated method stub
-
+    File startDir = new File(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
+    JFileChooser fc = new JFileChooser(startDir);
+    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    //fc.setSelectedFile(new File(name + StructureResourceManager.COMPONENT_EXT));
+    fc.setDialogTitle("Select Component File");
+    int res = fc.showOpenDialog(this);    
+    if(res != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
+        
+    StructureComponentNBT sc = loadFromFile(fc.getSelectedFile());
+    if(sc != null) {
+      StructureGenRegister.instance.registerStructureComponent(sc);
+    } else {
+      JOptionPane.showMessageDialog(this, "Could not load component.", "Bottoms", JDialog.ERROR );
+    }
+    String name = sc.getUid();
+    
+    openComponent(name, sc);
+  }
+  
+  public StructureComponentNBT loadFromFile(File file) {
+    String name = file.getName();
+    if(name.endsWith(StructureResourceManager.COMPONENT_EXT)) {
+      name = name.substring(0, name.length() - StructureResourceManager.COMPONENT_EXT.length());
+    }
+    
+    InputStream stream = null;
+    try {
+      stream = new FileInputStream(file);      
+      return new StructureComponentNBT(name, stream);
+    } catch(Exception e) {
+      e.printStackTrace();
+    } finally {
+      IOUtils.closeQuietly(stream);
+    }
+    return null;
   }
 
   private void exportToFile() {
@@ -258,21 +295,37 @@ public class DialogComponentTool extends JDialog {
       return;
     }
 
-    JFileChooser fc = new JFileChooser(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
-    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    File startDir = new File(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
+    JFileChooser fc = new JFileChooser(startDir);
+    fc.setSelectedFile(new File(name + StructureResourceManager.COMPONENT_EXT));
     fc.setDialogTitle("Select Directory");
     int res = fc.showSaveDialog(this);
 
     if(res != JFileChooser.APPROVE_OPTION) {
       return;
     }
-    File dir = fc.getSelectedFile();
-    if(!dir.exists() || !dir.isDirectory()) {
+    File dir;
+    File file = fc.getSelectedFile();
+    if(file.isDirectory()) {
+      dir = file;
+      file = new File(dir, name + StructureResourceManager.COMPONENT_EXT);
+    } else {
+      dir = file.getParentFile();
+      if(!file.exists() && !file.getName().endsWith(StructureResourceManager.COMPONENT_EXT)) {
+        file = new File(dir, file.getName() + StructureResourceManager.COMPONENT_EXT);
+      }
+    }
+    if(!dir.exists()) {
+      dir.mkdirs();
+    }
+    if(!dir.exists()) {
       return;
     }
-    File f = new File(dir, name + StructureResourceManager.COMPONENT_EXT);
 
-    if(f.exists()) {
+    tile.setExportDir(dir.getPath());
+    sendUpdatePacket();
+
+    if(file.exists()) {
       res = JOptionPane.showConfirmDialog(this, "Replace existing file?");
       if(res != JFileChooser.APPROVE_OPTION) {
         return;
@@ -282,7 +335,7 @@ public class DialogComponentTool extends JDialog {
     StructureComponentNBT comp = CreatorUtil.createComponent(name, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
     if(comp != null) {
       StructureGenRegister.instance.registerStructureComponent(comp);
-      writeToFile(f, comp, Minecraft.getMinecraft().thePlayer);
+      writeToFile(file, comp, Minecraft.getMinecraft().thePlayer);
     }
 
   }
@@ -307,13 +360,11 @@ public class DialogComponentTool extends JDialog {
   }
 
   private void openComponent(String name, IStructureComponent component) {
-
     if(name == null || component == null) {
       return;
     }
-
+    
     clearBounds();
-
     tile.setComponent(name, component);
     updateFieldsFromTE();
 
@@ -329,9 +380,9 @@ public class DialogComponentTool extends JDialog {
   private void onClose() {
     openDialogs.remove(position);
     Mouse.setCursorPosition(Display.getX() - Display.getWidth() / 2, Display.getY() - Display.getHeight() / 2);
-    if(Minecraft.getMinecraft().currentScreen instanceof GuiComponentTool) {
-      Minecraft.getMinecraft().thePlayer.closeScreen();
-    }
+    //    if(Minecraft.getMinecraft().currentScreen instanceof GuiComponentTool) {
+    //      Minecraft.getMinecraft().thePlayer.closeScreen();
+    //    }
   }
 
   private boolean checkClear() {
@@ -375,6 +426,7 @@ public class DialogComponentTool extends JDialog {
       @Override
       public void actionPerformed(ActionEvent e) {
         if(checkClear()) {
+          nameTF.setText("PaulTheNew");
           clearBounds();
         }
       }

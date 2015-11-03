@@ -1,16 +1,9 @@
 package crazypants.structures.creator.item;
 
 import java.io.File;
-import java.io.FileOutputStream;
-
-import org.apache.commons.io.IOUtils;
 
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.DirectoryResourcePath;
-import crazypants.structures.gen.io.resource.StructureResourceManager;
-import crazypants.structures.gen.structure.StructureComponentNBT;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
 
 public class ExportManager {
 
@@ -45,79 +38,50 @@ public class ExportManager {
 
   }
 
-  public String getNextExportUid() {
-    String res = STRUCT_NAME;
-    File file = new File(EXPORT_DIR, res + StructureResourceManager.COMPONENT_EXT);
-    int num = 1;
-    while (file.exists() && num < 100) {
-      res = STRUCT_NAME + "_" + num;
-      file = new File(EXPORT_DIR, res + StructureResourceManager.COMPONENT_EXT);
-      num++;
-    }
-    return res;
-  }
-
-  public static void writeToFile(EntityPlayer entityPlayer, StructureComponentNBT st, boolean createDefaultGenerator) {
-    EXPORT_DIR.mkdir();
-    if(!EXPORT_DIR.exists()) {
-      entityPlayer.addChatComponentMessage(new ChatComponentText("Could not make folder " + EXPORT_DIR.getAbsolutePath()));
-      return;
-    }
-    boolean saved = doWriteToFile(entityPlayer, st);
-    if(!createDefaultGenerator || !saved) {
-      return;
-    }
-//    String txt = createDefaultGenFor(st.getUid());
-//    File f = new File(EXPORT_DIR, st.getUid() + StructureResourceManager.GENERATOR_EXT);
-//    if(txt != null) {
-//      try {
-//        IoUtil.writeToFile(txt, f);
-//        entityPlayer.addChatComponentMessage(new ChatComponentText("Saved to " + f.getAbsolutePath()));
-//      } catch (IOException e) {
-//        entityPlayer.addChatComponentMessage(new ChatComponentText("Could not write generator to " + f.getAbsolutePath()));
-//        e.printStackTrace();
-//      }
+//  public String getNextExportUid() {
+//    String res = STRUCT_NAME;
+//    File file = new File(EXPORT_DIR, res + StructureResourceManager.COMPONENT_EXT);
+//    int num = 1;
+//    while (file.exists() && num < 100) {
+//      res = STRUCT_NAME + "_" + num;
+//      file = new File(EXPORT_DIR, res + StructureResourceManager.COMPONENT_EXT);
+//      num++;
 //    }
-
-  }
-
-//  private static String createDefaultGenFor(String uid) {
-//    String res = MIN_TEMPLATE;
-//    
-//    InputStream stream = ExportManager.class.getResourceAsStream(DefaultStructures.RESOURCE_PATH + "defaultTemplate.gen");
-//    if(stream == null) {
-//      return res;
-//    }    
-//    try {
-//      res = IoUtil.readStream(stream);
-//    } catch (IOException e) {    
-//      e.printStackTrace();
-//    }
-//    if(res != null) {
-//      res = res.replaceAll("TEMPLATE_UID", uid);
-//      res = res.replaceAll("GENERATOR_UID", uid);
-//    }    
 //    return res;
 //  }
 
-  private static boolean doWriteToFile(EntityPlayer entityPlayer, StructureComponentNBT st) {
-    boolean saved = false;
-    File file = new File(EXPORT_DIR, st.getUid() + StructureResourceManager.COMPONENT_EXT);
-    FileOutputStream fos = null;
-    try {
-      fos = new FileOutputStream(file, false);
-      st.write(fos);
-      fos.flush();
-      fos.close();
-      saved = true;
-      entityPlayer.addChatComponentMessage(new ChatComponentText("Saved to " + file.getAbsolutePath()));
-    } catch (Exception e) {
-      e.printStackTrace();
-      entityPlayer.addChatComponentMessage(new ChatComponentText("Could not save to " + file.getAbsolutePath()));
-    } finally {
-      IOUtils.closeQuietly(fos);
-    }
-    return saved;
-  }
+//  public static void writeToFile(EntityPlayer entityPlayer, StructureComponentNBT st, boolean createDefaultGenerator) {
+//    EXPORT_DIR.mkdir();
+//    if(!EXPORT_DIR.exists()) {
+//      entityPlayer.addChatComponentMessage(new ChatComponentText("Could not make folder " + EXPORT_DIR.getAbsolutePath()));
+//      return;
+//    }
+//    boolean saved = doWriteToFile(entityPlayer, st);
+//    if(!createDefaultGenerator || !saved) {
+//      return;
+//    }
+//  }
+//
+//
+//
+//  private static boolean doWriteToFile(EntityPlayer entityPlayer, StructureComponentNBT st) {
+//    boolean saved = false;
+//    File file = new File(EXPORT_DIR, st.getUid() + StructureResourceManager.COMPONENT_EXT);
+//    FileOutputStream fos = null;
+//    try {
+//      fos = new FileOutputStream(file, false);
+//      st.write(fos);
+//      fos.flush();
+//      fos.close();
+//      saved = true;
+//      entityPlayer.addChatComponentMessage(new ChatComponentText("Saved to " + file.getAbsolutePath()));
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      entityPlayer.addChatComponentMessage(new ChatComponentText("Could not save to " + file.getAbsolutePath()));
+//    } finally {
+//      IOUtils.closeQuietly(fos);
+//    }
+//    return saved;
+//  }
 
 }

@@ -20,7 +20,7 @@ public class TileComponentTool extends TileEntityEnder {
   
 
   private String name = "Component";
-  private String exportDir = ".";
+  private String exportDir;
 
   @Override
   protected boolean shouldUpdate() {
@@ -42,7 +42,7 @@ public class TileComponentTool extends TileEntityEnder {
       root.setString("name", name);
     }
     if(exportDir != null && exportDir.length() > 0) {
-      root.setString("location", exportDir);
+      root.setString("exportDir", exportDir);
     }
     root.setInteger("width", width);
     root.setInteger("height", height);
@@ -57,7 +57,10 @@ public class TileComponentTool extends TileEntityEnder {
   @Override
   protected void readCustomNBT(NBTTagCompound root) {
     name = root.getString("name");
-    exportDir = root.getString("location");
+    exportDir = root.getString("exportDir");
+    if(exportDir != null && exportDir.length() == 0) {
+      exportDir = null;
+    }
     width = root.getInteger("width");
     height = root.getInteger("height");
     length = root.getInteger("length");

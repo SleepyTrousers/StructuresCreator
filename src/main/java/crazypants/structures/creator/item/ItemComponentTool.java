@@ -54,9 +54,7 @@ public class ItemComponentTool extends Item {
   @Override
   public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
 
-    if (world.getBlock(x, y, z) == EnderStructuresCreator.blockStructureMarker) {
-      return true;
-    }
+    
     if (world.isRemote) {
       return true;
     }
@@ -68,25 +66,13 @@ public class ItemComponentTool extends Item {
         ForgeDirection dir = ForgeDirection.getOrientation(side);
         Point3i origin = new Point3i(x + dir.offsetX, y + dir.offsetY - 1, z + dir.offsetZ);
         origin.y -= st.getSurfaceOffset();
-        st.build(world, origin.x,origin.y,origin.z, Rotation.DEG_0, null);
-        addMarkers(world, st, origin);             
+        st.build(world, origin.x,origin.y,origin.z, Rotation.DEG_0, null);                    
       }
     }
     return true;
   }
 
-  private void addMarkers(World world, IStructureComponent st, Point3i origin) {
-    Point3i sz = st.getSize();
-    world.setBlock(origin.x - 1, origin.y - 1, origin.z - 1, EnderStructuresCreator.blockStructureMarker);
-    world.setBlock(origin.x - 1, origin.y  + sz.y, origin.z - 1, EnderStructuresCreator.blockStructureMarker);    
-    world.setBlock(origin.x + sz.x, origin.y - 1, origin.z - 1, EnderStructuresCreator.blockStructureMarker);
-    world.setBlock(origin.x - 1, origin.y - 1, origin.z + sz.z, EnderStructuresCreator.blockStructureMarker);
-    
-    if(st.getSurfaceOffset() > 0) {
-      world.setBlock(origin.x - 1, origin.y + st.getSurfaceOffset(), origin.z - 1, EnderStructuresCreator.blockGroundLevelMarker);
-    }
-  }
-
+  
   private String setNextUid(ItemStack stack) {
     String curUid = getGenUid(stack, false);
     if(curUid == null) {
