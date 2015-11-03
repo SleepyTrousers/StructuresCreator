@@ -9,7 +9,7 @@ import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
-import crazypants.structures.gen.StructureRegister;
+import crazypants.structures.gen.StructureGenRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -70,7 +70,7 @@ public class ItemTemplateTool extends Item {
   }
 
   private void buildComponent(World world, int x, int y, int z, int side, String uid) {
-    IStructureTemplate st = StructureRegister.instance.getStructureTemplate(uid, true);
+    IStructureTemplate st = StructureGenRegister.instance.getStructureTemplate(uid, true);
     if(st != null) {
       ForgeDirection dir = ForgeDirection.getOrientation(side);
       Point3i origin = new Point3i(x + dir.offsetX, y + dir.offsetY - 1, z + dir.offsetZ);
@@ -86,7 +86,7 @@ public class ItemTemplateTool extends Item {
     if(curUid == null) {
       return setDefaultUid(stack);
     }
-    Iterator<IStructureTemplate> it = StructureRegister.instance.getStructureTemplates().iterator();
+    Iterator<IStructureTemplate> it = StructureGenRegister.instance.getStructureTemplates().iterator();
     while (it.hasNext()) {
       IStructureTemplate template = it.next();
       if (curUid.equals(template.getUid())) {
@@ -129,7 +129,7 @@ public class ItemTemplateTool extends Item {
   }
   
   private String getFirstTemplateUid() {
-    Iterator<IStructureComponent> it = StructureRegister.instance.getStructureComponents().iterator();
+    Iterator<IStructureComponent> it = StructureGenRegister.instance.getStructureComponents().iterator();
     if(it.hasNext()) {
       return it.next().getUid();
     }

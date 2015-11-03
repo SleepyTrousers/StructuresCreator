@@ -9,7 +9,7 @@ import crazypants.structures.creator.CreatorUtil;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.item.ExportManager;
-import crazypants.structures.gen.StructureRegister;
+import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -67,7 +67,7 @@ public class BlockStructureMarker extends Block {
     StructureComponentNBT st = createComponentWithinMarkers(ExportManager.instance.getNextExportUid(), world, x, y, z, entityPlayer);
     if(st != null) {
       ExportManager.writeToFile(entityPlayer, st, true);
-      StructureRegister.instance.registerStructureComponent(st);
+      StructureGenRegister.instance.registerStructureComponent(st);
       //      StructureRegister.instance.getGenerator(st.getUid(), true);
     }
     return st;

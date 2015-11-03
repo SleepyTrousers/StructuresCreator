@@ -7,10 +7,13 @@ import static crazypants.structures.creator.EnderStructuresCreator.VERSION;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
+import crazypants.structures.creator.block.BlockComponentTool;
 import crazypants.structures.creator.block.BlockGroundLevelMarker;
 import crazypants.structures.creator.block.BlockStructureMarker;
 import crazypants.structures.creator.item.ExportManager;
@@ -29,23 +32,29 @@ public class EnderStructuresCreator {
   @Instance(MODID)
   public static EnderStructuresCreator instance;
 
-//  @SidedProxy(clientSide = "crazypants.structures.ClientProxy", serverSide = "crazypants.structures.CommonProxy")
-//  public static CommonProxy proxy;
+  @SidedProxy(clientSide = "crazypants.structures.creator.ClientProxy", serverSide = "crazypants.structures.creator.CommonProxy")
+  public static CommonProxy proxy;
   
   public static BlockStructureMarker blockStructureMarker;
   public static BlockClearMarker blockClearMarker;
   public static BlockGroundLevelMarker blockGroundLevelMarker;
   
+  public static BlockComponentTool blockComponentTool;
+  
   public static ItemComponentTool itemComponentTool;
   public static ItemTemplateTool itemTemplateTool;
   public static ItemClearTool itemClearTool;
   public static ItemDebugTool itemDebugTool;
+  public static GuiHandler guiHandler = new GuiHandler();
 
   
   @EventHandler
   public void preInit(FMLPreInitializationEvent event) {
 
     //Config.load(event);   
+    
+    blockComponentTool = BlockComponentTool.create();
+    
     blockStructureMarker = BlockStructureMarker.create();
     blockGroundLevelMarker = BlockGroundLevelMarker.create();
     blockClearMarker = BlockClearMarker.create();
@@ -59,14 +68,14 @@ public class EnderStructuresCreator {
   
   @EventHandler
   public void load(FMLInitializationEvent event) {
-    instance = this;    
+    instance = this;        
+    NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler);    
+    proxy.load();
   }
 
   @EventHandler
-  public void postInit(FMLPostInitializationEvent event) {
-   
-    addRecipes();
-        
+  public void postInit(FMLPostInitializationEvent event) {  
+    addRecipes();        
     ExportManager.instance.loadExportFolder();
   }
   

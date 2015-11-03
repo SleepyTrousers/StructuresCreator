@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 
 import org.apache.commons.io.IOUtils;
 
-import crazypants.structures.gen.StructureRegister;
+import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.DirectoryResourcePath;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureComponentNBT;
@@ -24,12 +24,14 @@ public class ExportManager {
 
   static final String STRUCT_NAME = "structure";
 
-  static final File EXPORT_DIR = new File("exportedStructureData");
+  public static final File EXPORT_DIR = new File("exportedStructureData");
 
   public static final ExportManager instance = new ExportManager();
 
   public ExportManager() {
-                
+    if(EXPORT_DIR.exists()) {
+      EXPORT_DIR.mkdir();      
+    }            
   }
 
   public void loadExportFolder() {    
@@ -37,9 +39,9 @@ public class ExportManager {
       return;
     }
     
-    StructureRegister.instance.getResourceManager().addResourceDirectory(EXPORT_DIR);
+    StructureGenRegister.instance.getResourceManager().addResourceDirectory(EXPORT_DIR);
     DirectoryResourcePath path = new DirectoryResourcePath(EXPORT_DIR);    
-    StructureRegister.instance.loadAndRegisterAllResources(path, false);
+    StructureGenRegister.instance.loadAndRegisterAllResources(path, false);
 
   }
 
