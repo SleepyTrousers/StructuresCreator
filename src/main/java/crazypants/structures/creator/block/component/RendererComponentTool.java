@@ -1,8 +1,7 @@
 package crazypants.structures.creator.block.component;
 
 import java.awt.Color;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
@@ -11,6 +10,7 @@ import com.enderio.core.client.render.BoundingBox;
 import com.enderio.core.client.render.ColorUtil;
 import com.enderio.core.client.render.CubeRenderer;
 import com.enderio.core.client.render.RenderUtil;
+import com.google.common.collect.Multimap;
 
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
@@ -66,14 +66,10 @@ public class RendererComponentTool extends TileEntitySpecialRenderer {
     Tessellator.instance.startDrawingQuads();
     Tessellator.instance.addTranslation((float)wldX, (float)wldY, (float)wldZ);    
     
-    Map<String, List<Point3i>> tl = ct.getTaggedLocations();
-    for (Entry<String, List<Point3i>> e : tl.entrySet()) {
-      if(e.getValue() != null) {
-        for(Point3i loc : e.getValue()) {
-           Point3i bc = VecUtil.transformStructureCoodToWorld(0, 0, 0, Rotation.DEG_0, ct.getSize(), loc);
-           renderTag(ct, e.getKey(), bc);
-        }
-      }
+    Multimap<Point3i, String> tags = ct.getTagsAtLocations();    
+    for(Entry<Point3i, Collection<String>> e : tags.asMap().entrySet()) {
+      Point3i bc = VecUtil.transformStructureCoodToWorld(0, 0, 0, Rotation.DEG_0, ct.getSize(), e.getKey());
+      renderTag(ct, bc, e.getValue());
     }
     
     Tessellator.instance.addTranslation(-(float)wldX, -(float)wldY, -(float)wldZ);
@@ -81,13 +77,10 @@ public class RendererComponentTool extends TileEntitySpecialRenderer {
     
   }
 
-  private void renderTag(TileComponentTool te, String key, Point3i bc) {
+  private void renderTag(TileComponentTool te, Point3i bc, Collection<String> tags) {
     BoundingBox bb = BoundingBox.UNIT_CUBE.scale(1.02, 1.02, 1.02);
     bb = bb.translate(te.getOffsetX() + bc.x, te.getOffsetY() + bc.y, te.getOffsetZ() + bc.z);        
-    CubeRenderer.render(bb, EnderStructuresCreator.blockComponentTool.getIcon(0, 0));
-    
-    
-    
+    CubeRenderer.render(bb, EnderStructuresCreator.blockComponentTool.getIcon(0, 0));    
   }
 
   private void renderGroundLevel(TileComponentTool ct, double wldX, double wldY, double wldZ) {

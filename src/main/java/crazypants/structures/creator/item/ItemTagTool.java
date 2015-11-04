@@ -57,24 +57,16 @@ public class ItemTagTool  extends Item {
     int localZ = z - tile.zCoord - tile.getOffsetZ();
         
     Point3i offset = new Point3i(localX,localY,localZ);    
-    String tag = "Tag";
-    
-    System.out.println("ItemTagTool.onItemUseFirst: " + offset);
-    
+           
     if(tile.hasTagAt(offset)) {
       System.out.println("ItemTagTool.onItemUseFirst: Edit tag");
  
     } else {
+      String tag = "Tag";
       tile.addTag(tag, offset);
       PacketHandler.INSTANCE.sendToServer(new PacketTaggedLocation(tile, tag, offset, true));
     }
-     
-    
-//    TileEntity foo = world.getTileEntity(tile.xCoord, tile.yCoord, tile.zCoord);
-//    System.out.println("ItemTagTool.onItemUseFirst: " + tile.getWorldObj().isRemote + " : " + foo.getWorldObj().isRemote);
-//    System.out.println("ItemTagTool.onItemUseFirst: Total locations: " + tile.getTaggedLocationsCount() + " : " + System.identityHashCode(tile) + " : " + System.identityHashCode(foo) + " : " + world.isRemote);
-//    
-    
+  
     return true;
   }
 

@@ -1,13 +1,11 @@
 package crazypants.structures.creator.block.component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Collection;
 
 import com.enderio.core.common.TileEntityEnder;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import crazypants.structures.StructureUtils;
 import crazypants.structures.api.gen.IStructureComponent;
@@ -29,7 +27,7 @@ public class TileComponentTool extends TileEntityEnder {
   private String name = "Component";
   private String exportDir;
 
-  private final Map<String, List<Point3i>> taggedLocations = new HashMap<String, List<Point3i>>();
+  private final HashMultimap<String, Point3i> taggedLocations =  HashMultimap.create();
   
   private boolean doneInit = false;
 
@@ -181,22 +179,14 @@ public class TileComponentTool extends TileEntityEnder {
     if(tag == null || loc == null) {
       return;
     }
-    List<Point3i> res = taggedLocations.get(tag);
-    if(res == null) {
-      res = new ArrayList<Point3i>();
-      taggedLocations.put(tag, res);
-    }
-    res.add(loc);
+    taggedLocations.put(tag, loc);
   }
 
   public void removeTag(String tag, Point3i loc) {
     if(tag == null) {
       return;
     }
-    List<Point3i> locs = taggedLocations.get(tag);
-    if(locs != null) {
-      locs.remove(loc);
-    }
+    taggedLocations.remove(tag, loc);
   }
 
   public void removeTags(String tag) {
@@ -205,15 +195,11 @@ public class TileComponentTool extends TileEntityEnder {
     }
   }
 
-  public List<Point3i> getTaggedLocations(String tag) {
-    List<Point3i> res = taggedLocations.get(tag);
-    if(res == null) {
-      return Collections.emptyList();
-    }
-    return res;
+  public Collection<Point3i> getTaggedLocations(String tag) {
+    return taggedLocations.get(tag);    
   }
 
-  public Map<String, List<Point3i>> getTaggedLocations() {
+  public Multimap<String, Point3i> getTaggedLocations() {
     return taggedLocations;
   }
 
@@ -231,20 +217,22 @@ public class TileComponentTool extends TileEntityEnder {
   }
 
   public boolean hasTagAt(Point3i loc) {    
-    return getTagAt(loc) != null;
+    return !getTagsAtLocation(loc).isEmpty();
   }
 
-  public String getTagAt(Point3i loc) {
-    if(loc == null) {
-      return null;
-    }
-    for (Entry<String, List<Point3i>> e : taggedLocations.entrySet()) {
-      List<Point3i> locs = e.getValue();
-      if(locs != null && locs.contains(loc)) {
-        return e.getKey();
+  public Collection<String> getTagsAtLocation(Point3i loc) {
+    return StructureUtils.getTagsAtLocation(taggedLocations, loc);    
+  }
+  
+  public Multimap<Point3i, String> getTagsAtLocations() {
+    Multimap<Point3i, String> res = ArrayListMultimap.create(); 
+    for(Point3i loc : taggedLocations.values()) {
+      if(loc != null) {
+        Collection<String> tags = getTagsAtLocation(loc);
+        res.putAll(loc, tags);
       }
     }
-    return null;
+    return res;
   }
 
   public Point3i getSize() {
@@ -252,13 +240,7 @@ public class TileComponentTool extends TileEntityEnder {
   }
 
   public int getTaggedLocationsCount() {
-    int res = 0;
-    for(List<Point3i> coords : taggedLocations.values()) {
-      if(coords != null) {
-        res += coords.size();
-      }
-    }
-    return res;
+   return taggedLocations.size();
   }
   
 }
