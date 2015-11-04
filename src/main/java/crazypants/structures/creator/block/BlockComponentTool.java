@@ -14,6 +14,7 @@ import crazypants.structures.creator.block.component.DialogComponentTool;
 import crazypants.structures.creator.block.component.GuiComponentTool;
 import crazypants.structures.creator.block.component.PacketBuildComponent;
 import crazypants.structures.creator.block.component.PacketComponentToolGui;
+import crazypants.structures.creator.block.component.PacketTaggedLocation;
 import crazypants.structures.creator.block.component.TileComponentTool;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +29,8 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
   public static BlockComponentTool create() {
     
     PacketHandler.INSTANCE.registerMessage(PacketComponentToolGui.class, PacketComponentToolGui.class, PacketHandler.nextID(), Side.SERVER);
-    PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);    
+    PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);   
+    PacketHandler.INSTANCE.registerMessage(PacketTaggedLocation.class, PacketTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
     
     BlockComponentTool res = new BlockComponentTool();
     res.init();

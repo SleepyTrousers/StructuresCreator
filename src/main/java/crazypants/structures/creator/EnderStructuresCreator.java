@@ -11,13 +11,17 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentTool;
+import crazypants.structures.creator.block.component.ToolRegister;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
 import crazypants.structures.creator.item.ItemDebugTool;
+import crazypants.structures.creator.item.ItemTagTool;
 import crazypants.structures.creator.item.ItemTemplateTool;
 
 @Mod(modid = MODID, name = MOD_NAME, version = VERSION, dependencies = "required-after:Forge@10.13.0.1150,);required-after:EnderStructures")
@@ -41,6 +45,8 @@ public class EnderStructuresCreator {
   public static ItemTemplateTool itemTemplateTool;
   public static ItemClearTool itemClearTool;
   public static ItemDebugTool itemDebugTool;
+  
+  public static ItemTagTool itemTagTool; 
   public static GuiHandler guiHandler = new GuiHandler();
 
   
@@ -52,6 +58,7 @@ public class EnderStructuresCreator {
     blockComponentTool = BlockComponentTool.create();        
     blockClearMarker = BlockClearMarker.create();
     
+    itemTagTool = ItemTagTool.create();
     itemComponentTool = ItemComponentTool.create();
     itemTemplateTool = ItemTemplateTool.create();
     itemClearTool = ItemClearTool.create();
@@ -70,6 +77,16 @@ public class EnderStructuresCreator {
   public void postInit(FMLPostInitializationEvent event) {  
     addRecipes();        
     ExportManager.instance.loadExportFolder();
+  }
+  
+  @EventHandler
+  public void serverStarted(FMLServerStartedEvent event) {
+    ToolRegister.reset();
+  }
+
+  @EventHandler
+  public void serverStopped(FMLServerStoppedEvent event) {
+    ToolRegister.reset();
   }
   
   private void addRecipes() {  
