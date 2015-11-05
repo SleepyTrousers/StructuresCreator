@@ -27,11 +27,11 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
   public static final String NAME = "blockComponentTool";
 
   public static BlockComponentTool create() {
-    
+
     PacketHandler.INSTANCE.registerMessage(PacketComponentToolGui.class, PacketComponentToolGui.class, PacketHandler.nextID(), Side.SERVER);
-    PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);   
+    PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);
     PacketHandler.INSTANCE.registerMessage(PacketTaggedLocation.class, PacketTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
-    
+
     BlockComponentTool res = new BlockComponentTool();
     res.init();
     return res;
@@ -43,12 +43,17 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
     setLightOpacity(0);
     //setBlockTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
   }
-  
+
   @Override
   public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_, int p_149668_3_, int p_149668_4_) {
     return null;
   }
-  
+
+  @Override
+  public int getRenderBlockPass() {
+    return 0;
+  }
+
   @Override
   @SideOnly(Side.CLIENT)
   public void registerBlockIcons(IIconRegister iIconRegister) {
@@ -57,13 +62,13 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
 
   @Override
   protected boolean openGui(World world, int x, int y, int z, EntityPlayer entityPlayer, int side) {
-        if(!world.isRemote) {
-          entityPlayer.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_COMPONENT_TOOL, world, x, y, z);
-        }
+    if(!world.isRemote) {
+      entityPlayer.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_COMPONENT_TOOL, world, x, y, z);
+    }
     if(world.isRemote) {
       TileEntity te = world.getTileEntity(x, y, z);
       if(te instanceof TileComponentTool) {
-        DialogComponentTool.openDialog((TileComponentTool) te);                
+        DialogComponentTool.openDialog((TileComponentTool) te);
       }
     }
     return true;

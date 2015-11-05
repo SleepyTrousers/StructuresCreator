@@ -32,6 +32,11 @@ public class TileComponentTool extends TileEntityEnder {
   private boolean doneInit = false;
 
   @Override
+  public boolean shouldRenderInPass(int pass) {
+    return pass == 1;
+  }
+  
+  @Override
   protected boolean shouldUpdate() {
     return !doneInit;
   }
