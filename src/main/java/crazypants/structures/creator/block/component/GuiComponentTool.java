@@ -18,7 +18,7 @@ public class GuiComponentTool extends GuiContainerBase {
   private final int MARGIN = 5;
   
   public GuiComponentTool(EntityPlayer player, InventoryPlayer inventory, TileEntity te) {
-    super(new ContainerComponentTool(inventory, te));
+    super(new EmptyContainer());
     
 //    FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
 //    int x = MARGIN + fr.getStringWidth(nameLabel) + 6;

@@ -1,13 +1,11 @@
 package crazypants.structures.creator.block.component;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.tileentity.TileEntity;
 
-public class ContainerComponentTool extends Container  {
+public class EmptyContainer extends Container  {
 
-  public ContainerComponentTool(InventoryPlayer inventory, TileEntity te) {
+  public EmptyContainer() {
   }
 
   @Override

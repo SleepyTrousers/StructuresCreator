@@ -9,17 +9,17 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.api.util.Point3i;
 import io.netty.buffer.ByteBuf;
 
-public class PacketTaggedLocation extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketTaggedLocation, IMessage> {
+public class PacketAddRemoveTaggedLocation extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketAddRemoveTaggedLocation, IMessage> {
 
   private String tag;
   private Point3i loc;
   private boolean isAdd;
 
-  public PacketTaggedLocation() {
+  public PacketAddRemoveTaggedLocation() {
     super();
   }
 
-  public PacketTaggedLocation(TileComponentTool tile, String tag, Point3i loc, boolean isAdd) {
+  public PacketAddRemoveTaggedLocation(TileComponentTool tile, String tag, Point3i loc, boolean isAdd) {
     super(tile);
     this.tag= tag;
     this.loc = loc;
@@ -51,7 +51,7 @@ public class PacketTaggedLocation extends MessageTileEntity<TileComponentTool> i
   }
 
   @Override
-  public IMessage onMessage(PacketTaggedLocation message, MessageContext ctx) {
+  public IMessage onMessage(PacketAddRemoveTaggedLocation message, MessageContext ctx) {
     TileComponentTool te = message.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
     if(te == null) {
       return null;

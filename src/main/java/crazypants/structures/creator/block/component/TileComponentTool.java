@@ -1,6 +1,9 @@
 package crazypants.structures.creator.block.component;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import com.enderio.core.common.TileEntityEnder;
 import com.google.common.collect.ArrayListMultimap;
@@ -27,15 +30,15 @@ public class TileComponentTool extends TileEntityEnder {
   private String name = "Component";
   private String exportDir;
 
-  private final HashMultimap<String, Point3i> taggedLocations =  HashMultimap.create();
-  
+  private final HashMultimap<String, Point3i> taggedLocations = HashMultimap.create();
+
   private boolean doneInit = false;
 
   @Override
   public boolean shouldRenderInPass(int pass) {
     return pass == 1;
   }
-  
+
   @Override
   protected boolean shouldUpdate() {
     return !doneInit;
@@ -45,13 +48,13 @@ public class TileComponentTool extends TileEntityEnder {
   protected void doUpdate() {
     if(!doneInit) {
       doneInit = true;
-      ToolRegister.onLoad(this);            
+      ToolRegister.onLoad(this);
     }
   }
 
   @Override
   public void invalidate() {
-    super.invalidate();    
+    super.invalidate();
     ToolRegister.onUnload(this);
     doneInit = false;
   }
@@ -114,6 +117,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setWidth(int width) {
     this.width = width;
+    markDirty();
   }
 
   public int getHeight() {
@@ -122,6 +126,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setHeight(int height) {
     this.height = height;
+    markDirty();
   }
 
   public int getLength() {
@@ -130,6 +135,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setLength(int length) {
     this.length = length;
+    markDirty();
   }
 
   public int getSurfaceOffset() {
@@ -138,6 +144,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setSurfaceOffset(int surfaceOffset) {
     this.surfaceOffset = surfaceOffset;
+    markDirty();
   }
 
   public String getName() {
@@ -146,6 +153,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setName(String name) {
     this.name = name;
+    markDirty();
   }
 
   public String getExportDir() {
@@ -154,6 +162,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setExportDir(String exportDir) {
     this.exportDir = exportDir;
+    markDirty();
   }
 
   public int getOffsetX() {
@@ -162,6 +171,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setOffsetX(int offsetX) {
     this.offsetX = offsetX;
+    markDirty();
   }
 
   public int getOffsetY() {
@@ -170,6 +180,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setOffsetY(int offsetY) {
     this.offsetY = offsetY;
+    markDirty();
   }
 
   public int getOffsetZ() {
@@ -178,13 +189,15 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setOffsetZ(int offsetZ) {
     this.offsetZ = offsetZ;
+    markDirty();
   }
 
-  public void addTag(String tag, Point3i loc) {    
+  public void addTag(String tag, Point3i loc) {
     if(tag == null || loc == null) {
       return;
     }
     taggedLocations.put(tag, loc);
+    markDirty();
   }
 
   public void removeTag(String tag, Point3i loc) {
@@ -192,16 +205,18 @@ public class TileComponentTool extends TileEntityEnder {
       return;
     }
     taggedLocations.remove(tag, loc);
+    markDirty();
   }
 
   public void removeTags(String tag) {
     if(tag != null && taggedLocations.containsKey(tag)) {
       taggedLocations.put(tag, null);
+      markDirty();
     }
   }
 
   public Collection<Point3i> getTaggedLocations(String tag) {
-    return taggedLocations.get(tag);    
+    return taggedLocations.get(tag);
   }
 
   public Multimap<String, Point3i> getTaggedLocations() {
@@ -216,22 +231,24 @@ public class TileComponentTool extends TileEntityEnder {
     setWidth(size.x);
     setHeight(size.y);
     setLength(size.z);
-    
+
     taggedLocations.clear();
-    taggedLocations.putAll(component.getTaggedLocations());    
+    taggedLocations.putAll(component.getTaggedLocations());
+    
   }
 
-  public boolean hasTagAt(Point3i loc) {    
+  public boolean hasTagAt(Point3i loc) {
     return !getTagsAtLocation(loc).isEmpty();
   }
 
   public Collection<String> getTagsAtLocation(Point3i loc) {
-    return StructureUtils.getTagsAtLocation(taggedLocations, loc);    
+    return StructureUtils.getTagsAtLocation(taggedLocations, loc);
   }
-  
+
   public Multimap<Point3i, String> getTagsAtLocations() {
-    Multimap<Point3i, String> res = ArrayListMultimap.create(); 
-    for(Point3i loc : taggedLocations.values()) {
+    Multimap<Point3i, String> res = ArrayListMultimap.create();
+    Set<Point3i> uniqueLocs = new HashSet<Point3i>(taggedLocations.values());
+    for (Point3i loc : uniqueLocs) {
       if(loc != null) {
         Collection<String> tags = getTagsAtLocation(loc);
         res.putAll(loc, tags);
@@ -240,12 +257,35 @@ public class TileComponentTool extends TileEntityEnder {
     return res;
   }
 
+  public void setTagsAtPosition(Point3i loc, List<String> tags) {
+    //Clear current tags
+    Collection<String> curTags = getTagsAtLocation(loc);    
+    for(String tag : curTags) {
+      removeTag(tag, loc);
+    }
+    //set new ones
+    if(tags == null) {
+      return;
+    }
+    for(String tag : tags) {
+      addTag(tag, loc);
+    }    
+    curTags = getTagsAtLocation(loc);
+  }
+
   public Point3i getSize() {
-    return new Point3i(width,height,length);
+    return new Point3i(width, height, length);
   }
 
   public int getTaggedLocationsCount() {
-   return taggedLocations.size();
+    return taggedLocations.size();
   }
-  
+
+  public Point3i getStructureLocalPosition(Point3i blockCoord) {
+    int localX = blockCoord.x - xCoord - getOffsetX();
+    int localY = blockCoord.y - yCoord - getOffsetY();
+    int localZ = blockCoord.z - zCoord - getOffsetZ();
+    return new Point3i(localX, localY, localZ);
+  }
+
 }

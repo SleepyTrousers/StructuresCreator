@@ -9,12 +9,13 @@ import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.component.ContainerComponentTool;
 import crazypants.structures.creator.block.component.DialogComponentTool;
+import crazypants.structures.creator.block.component.EmptyContainer;
 import crazypants.structures.creator.block.component.GuiComponentTool;
+import crazypants.structures.creator.block.component.PacketAddRemoveTaggedLocation;
 import crazypants.structures.creator.block.component.PacketBuildComponent;
 import crazypants.structures.creator.block.component.PacketComponentToolGui;
-import crazypants.structures.creator.block.component.PacketTaggedLocation;
+import crazypants.structures.creator.block.component.PacketSetTaggedLocation;
 import crazypants.structures.creator.block.component.TileComponentTool;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,7 +31,8 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
 
     PacketHandler.INSTANCE.registerMessage(PacketComponentToolGui.class, PacketComponentToolGui.class, PacketHandler.nextID(), Side.SERVER);
     PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);
-    PacketHandler.INSTANCE.registerMessage(PacketTaggedLocation.class, PacketTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
+    PacketHandler.INSTANCE.registerMessage(PacketAddRemoveTaggedLocation.class, PacketAddRemoveTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
+    PacketHandler.INSTANCE.registerMessage(PacketSetTaggedLocation.class, PacketSetTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
 
     BlockComponentTool res = new BlockComponentTool();
     res.init();
@@ -84,7 +86,7 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
   public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
     TileEntity te = world.getTileEntity(x, y, z);
     if(te instanceof TileComponentTool) {
-      return new ContainerComponentTool(player.inventory, te);
+      return new EmptyContainer();
     }
     return null;
   }
