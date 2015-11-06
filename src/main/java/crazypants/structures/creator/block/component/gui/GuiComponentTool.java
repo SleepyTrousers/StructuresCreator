@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.component;
+package crazypants.structures.creator.block.component.gui;
 
 import com.enderio.core.client.gui.GuiContainerBase;
 import com.enderio.core.client.gui.widget.TextFieldEnder;

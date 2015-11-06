@@ -9,14 +9,14 @@ import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.component.DialogComponentTool;
-import crazypants.structures.creator.block.component.EmptyContainer;
-import crazypants.structures.creator.block.component.GuiComponentTool;
-import crazypants.structures.creator.block.component.PacketAddRemoveTaggedLocation;
-import crazypants.structures.creator.block.component.PacketBuildComponent;
-import crazypants.structures.creator.block.component.PacketComponentToolGui;
-import crazypants.structures.creator.block.component.PacketSetTaggedLocation;
 import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.gui.DialogComponentTool;
+import crazypants.structures.creator.block.component.gui.EmptyContainer;
+import crazypants.structures.creator.block.component.gui.GuiComponentTool;
+import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
+import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
+import crazypants.structures.creator.block.component.packet.PacketComponentToolGui;
+import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -43,7 +43,6 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
     super(NAME, TileComponentTool.class);
     setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
     setLightOpacity(0);
-    //setBlockTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
   }
 
   @Override
@@ -83,7 +82,7 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
   }
 
   @Override
-  public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+  public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {    
     TileEntity te = world.getTileEntity(x, y, z);
     if(te instanceof TileComponentTool) {
       return new EmptyContainer();

@@ -70,7 +70,7 @@ public class TileComponentTool extends TileEntityEnder {
   }
 
   @Override
-  protected void writeCustomNBT(NBTTagCompound root) {
+  public void writeCustomNBT(NBTTagCompound root) {
     if(name != null && name.length() > 0) {
       root.setString("name", name);
     }
@@ -92,7 +92,7 @@ public class TileComponentTool extends TileEntityEnder {
   }
 
   @Override
-  protected void readCustomNBT(NBTTagCompound root) {
+  public void readCustomNBT(NBTTagCompound root) {
     name = root.getString("name");
     exportDir = root.getString("exportDir");
     if(exportDir != null && exportDir.length() == 0) {

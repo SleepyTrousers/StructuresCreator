@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.component;
+package crazypants.structures.creator.block.component.gui;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -40,6 +40,9 @@ import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.CreatorUtil;
 import crazypants.structures.creator.PacketHandler;
+import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
+import crazypants.structures.creator.block.component.packet.PacketComponentToolGui;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
@@ -327,6 +330,7 @@ public class DialogComponentTool extends JDialog {
     }
 
     StructureComponentNBT comp = CreatorUtil.createComponent(name, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
+    comp.setTags(tile.getTaggedLocations());
     if(comp != null) {
       StructureGenRegister.instance.registerStructureComponent(comp);
       ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer);
@@ -349,6 +353,7 @@ public class DialogComponentTool extends JDialog {
   }
 
   private void clearBounds() {
+    tile.getTaggedLocations().clear();
     PacketBuildComponent packet = new PacketBuildComponent(tile, null);
     PacketHandler.INSTANCE.sendToServer(packet);
   }

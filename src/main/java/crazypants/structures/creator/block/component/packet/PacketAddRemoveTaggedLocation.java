@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.component;
+package crazypants.structures.creator.block.component.packet;
 
 import com.enderio.core.common.network.MessageTileEntity;
 
@@ -7,6 +7,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.api.util.Point3i;
+import crazypants.structures.creator.block.component.TileComponentTool;
 import io.netty.buffer.ByteBuf;
 
 public class PacketAddRemoveTaggedLocation extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketAddRemoveTaggedLocation, IMessage> {

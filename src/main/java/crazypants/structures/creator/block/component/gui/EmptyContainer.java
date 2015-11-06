@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.component;
+package crazypants.structures.creator.block.component.gui;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;

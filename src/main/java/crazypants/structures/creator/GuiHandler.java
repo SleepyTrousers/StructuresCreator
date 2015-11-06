@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 public class GuiHandler implements IGuiHandler {
 
   public static final int GUI_ID_COMPONENT_TOOL = 1;  
-  public static final int GUI_ID_TAG_EDITOR = 1;
+  public static final int GUI_ID_TAG_EDITOR = 2;
 
   protected final Map<Integer, IGuiHandler> guiHandlers = new HashMap<Integer, IGuiHandler>();
 
