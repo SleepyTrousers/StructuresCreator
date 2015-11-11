@@ -354,6 +354,7 @@ public class DialogComponentTool extends JDialog {
 
   private void clearBounds() {
     tile.getTaggedLocations().clear();
+    tile.markDirty();
     PacketBuildComponent packet = new PacketBuildComponent(tile, null);
     PacketHandler.INSTANCE.sendToServer(packet);
   }

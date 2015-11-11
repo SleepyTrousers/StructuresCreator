@@ -71,7 +71,7 @@ public class RendererComponentTool extends TileEntitySpecialRenderer {
     List<TagsAtLoc> taggedLocations = new ArrayList<TagsAtLoc>();
     Multimap<Point3i, String> tags = ct.getTagsAtLocations();
     for (Entry<Point3i, Collection<String>> e : tags.asMap().entrySet()) {
-      Point3i bc = VecUtil.transformStructureCoodToWorld(0, 0, 0, Rotation.DEG_0, ct.getSize(), e.getKey());
+      Point3i bc = VecUtil.transformLocationToWorld(0, 0, 0, Rotation.DEG_0, ct.getSize(), e.getKey());
       TagsAtLoc tag = renderTag(ct, bc, e.getValue());
       if(tag != null) {
         taggedLocations.add(tag);

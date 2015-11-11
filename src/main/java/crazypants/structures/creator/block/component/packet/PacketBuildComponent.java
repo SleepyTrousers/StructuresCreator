@@ -91,7 +91,7 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentTool> i
           List<Point3i> locs = blks.get(blk);
           if(locs != null) {            
             for(Point3i loc : locs) {
-              loc = VecUtil.getRotatedLocation(loc, component, rotation);
+              loc = VecUtil.rotatePosition(loc, component, rotation);
               wld.setBlock(x + loc.x, y + loc.y, z + loc.z, EnderStructuresCreator.blockClearMarker);    
             }
           }
