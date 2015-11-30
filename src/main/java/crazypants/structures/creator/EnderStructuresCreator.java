@@ -16,6 +16,7 @@ import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentTool;
+import crazypants.structures.creator.block.BlockTemplateEditor;
 import crazypants.structures.creator.block.component.ToolRegister;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.creator.item.ItemClearTool;
@@ -40,6 +41,7 @@ public class EnderStructuresCreator {
   public static BlockClearMarker blockClearMarker;  
   
   public static BlockComponentTool blockComponentTool;
+  public static BlockTemplateEditor blockTemplateEditor;
   
   public static ItemComponentTool itemComponentTool;
   public static ItemTemplateTool itemTemplateTool;
@@ -55,7 +57,8 @@ public class EnderStructuresCreator {
 
     //Config.load(event);   
     
-    blockComponentTool = BlockComponentTool.create();        
+    blockComponentTool = BlockComponentTool.create();    
+    blockTemplateEditor = BlockTemplateEditor.create();   
     blockClearMarker = BlockClearMarker.create();
     
     itemTagTool = ItemTagTool.create();
