@@ -8,10 +8,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
+import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.component.gui.EmptyContainer;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
 import crazypants.structures.creator.block.template.gui.DialogTemplateEditor;
 import crazypants.structures.creator.block.template.gui.GuiTemplateEditor;
+import crazypants.structures.creator.block.template.packet.PacketBuildTemplate;
+import crazypants.structures.creator.block.template.packet.PacketTemplateEditorGui;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -24,11 +27,9 @@ public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
 
   public static BlockTemplateEditor create() {
 
-//    PacketHandler.INSTANCE.registerMessage(PacketComponentToolGui.class, PacketComponentToolGui.class, PacketHandler.nextID(), Side.SERVER);
-//    PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);
-//    PacketHandler.INSTANCE.registerMessage(PacketAddRemoveTaggedLocation.class, PacketAddRemoveTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
-//    PacketHandler.INSTANCE.registerMessage(PacketSetTaggedLocation.class, PacketSetTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
-
+    PacketHandler.INSTANCE.registerMessage(PacketTemplateEditorGui.class, PacketTemplateEditorGui.class, PacketHandler.nextID(), Side.SERVER);
+    PacketHandler.INSTANCE.registerMessage(PacketBuildTemplate.class, PacketBuildTemplate.class, PacketHandler.nextID(), Side.SERVER);
+    
     BlockTemplateEditor res = new BlockTemplateEditor();
     res.init();
     return res;

@@ -3,6 +3,7 @@ package crazypants.structures.creator.block.template;
 import com.enderio.core.common.TileEntityEnder;
 
 import crazypants.structures.api.util.Point3i;
+import crazypants.structures.api.util.Rotation;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class TileTemplateEditor extends TileEntityEnder {
@@ -11,8 +12,10 @@ public class TileTemplateEditor extends TileEntityEnder {
   private int offsetY = 0;
   private int offsetZ = 1;
 
-  private String name = "Template";
+  private String name;
   private String exportDir;
+  
+  private Rotation rotation;
 
   private boolean doneInit = false;
 
@@ -59,18 +62,11 @@ public class TileTemplateEditor extends TileEntityEnder {
     if(exportDir != null && exportDir.length() > 0) {
       root.setString("exportDir", exportDir);
     }
-//    root.setInteger("width", width);
-//    root.setInteger("height", height);
-//    root.setInteger("length", length);
-//    root.setInteger("surfaceOffset", surfaceOffset);
-//
-//    root.setInteger("offsetX", offsetX);
-//    root.setInteger("offsetY", offsetY);
-//    root.setInteger("offsetZ", offsetZ);
-//
-//    if(!taggedLocations.isEmpty()) {
-//      StructureUtils.writeTaggedLocationToNBT(taggedLocations, root);
-//    }
+    root.setShort("rotation", (short)(rotation == null ? Rotation.DEG_0.ordinal() : rotation.ordinal()));
+    root.setInteger("offsetX", offsetX);
+    root.setInteger("offsetY", offsetY);
+    root.setInteger("offsetZ", offsetZ);
+
   }
 
   @Override
@@ -80,17 +76,15 @@ public class TileTemplateEditor extends TileEntityEnder {
     if(exportDir != null && exportDir.length() == 0) {
       exportDir = null;
     }
-//    width = root.getInteger("width");
-//    height = root.getInteger("height");
-//    length = root.getInteger("length");
-//    surfaceOffset = root.getInteger("surfaceOffset");
-//
-//    offsetX = root.getInteger("offsetX");
-//    offsetY = root.getInteger("offsetY");
-//    offsetZ = root.getInteger("offsetZ");
-//
-//    taggedLocations.clear();
-//    StructureUtils.readTaggedLocations(taggedLocations, root);
+    short rot = root.getShort("rotation");
+    if(rot < 0 || rot >= Rotation.values().length) {
+      rotation = Rotation.DEG_0;
+    } else {
+      rotation = Rotation.values()[rot];
+    }
+    offsetX = root.getInteger("offsetX");
+    offsetY = root.getInteger("offsetY");
+    offsetZ = root.getInteger("offsetZ");
   }
 
   public String getName() {
@@ -138,19 +132,13 @@ public class TileTemplateEditor extends TileEntityEnder {
     markDirty();
   }
 
-//  public void setComponent(String name, IStructureComponent component) {
-//    setName(name);
-//    setSurfaceOffset(component.getSurfaceOffset());
-//
-//    Point3i size = component.getSize();
-//    setWidth(size.x);
-//    setHeight(size.y);
-//    setLength(size.z);
-//
-//    taggedLocations.clear();
-//    taggedLocations.putAll(component.getTaggedLocations());
-//    
-//  }
+  public Rotation getRotation() {
+    return rotation;
+  }
+
+  public void setRotation(Rotation rotation) {
+    this.rotation = rotation;
+  }
 
   public Point3i getStructureLocalPosition(Point3i blockCoord) {
     int localX = blockCoord.x - xCoord - getOffsetX();

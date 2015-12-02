@@ -9,6 +9,7 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import crazypants.structures.StructureUtils;
 import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
@@ -19,7 +20,6 @@ import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.StructureBlock;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
@@ -109,21 +109,9 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentTool> i
     
     AxisAlignedBB bb = tile.getStructureBounds();
     World wld = tile.getWorldObj();
-    for (int x = (int) bb.minX; x < bb.maxX; x++) {
-      for (int y = (int) bb.minY; y < bb.maxY; y++) {
-        for (int z = (int) bb.minZ; z < bb.maxZ; z++) {
-          wld.setBlockToAir(x, y, z);;
-        }
-      }
-    }
-    @SuppressWarnings("unchecked")
-    List<EntityItem> ents = wld.getEntitiesWithinAABB(EntityItem.class, tile.getStructureBounds());
-    if(ents == null || ents.isEmpty()) {
-      return;
-    }    
-    for(EntityItem item : ents) {
-      item.setDead();
-    }
+    StructureUtils.clearBounds(bb, wld);
   }
+
+  
 
 }
