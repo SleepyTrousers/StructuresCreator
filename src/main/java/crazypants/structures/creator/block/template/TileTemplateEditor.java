@@ -2,8 +2,8 @@ package crazypants.structures.creator.block.template;
 
 import com.enderio.core.common.TileEntityEnder;
 
-import crazypants.structures.api.util.Point3i;
-import crazypants.structures.api.util.Rotation;
+import crazypants.structures.api.gen.IStructure;
+import crazypants.structures.gen.structure.Structure;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class TileTemplateEditor extends TileEntityEnder {
@@ -14,10 +14,9 @@ public class TileTemplateEditor extends TileEntityEnder {
 
   private String name;
   private String exportDir;
-  
-  private Rotation rotation;
+  private IStructure structure;
 
-  private boolean doneInit = false;
+  private boolean doneInit = false;  
 
   @Override
   public boolean shouldRenderInPass(int pass) {
@@ -33,26 +32,34 @@ public class TileTemplateEditor extends TileEntityEnder {
   protected void doUpdate() {
     if(!doneInit) {
       doneInit = true;
-//      ToolRegister.onLoad(this);
+      if(structure != null) {        
+        structure.onLoaded(worldObj, new NBTTagCompound());
+      }
     }
   }
 
   @Override
   public void invalidate() {
     super.invalidate();
-//    ToolRegister.onUnload(this);
+    onStructureOnload();
     doneInit = false;
   }
 
-//  @Override
-//  public AxisAlignedBB getRenderBoundingBox() {
-//    return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + width + offsetX, yCoord + height + offsetY, zCoord + length + offsetZ);
-//  }
+  protected void onStructureOnload() {
+    if(structure != null) {      
+      structure.onUnloaded(worldObj);
+    }
+  }
 
-//  public AxisAlignedBB getStructureBounds() {
-//    return AxisAlignedBB.getBoundingBox(xCoord + offsetX, yCoord + offsetY, zCoord + offsetZ, xCoord + width + offsetX, yCoord + height + offsetY,
-//        zCoord + length + offsetZ);
-//  }
+  //  @Override
+  //  public AxisAlignedBB getRenderBoundingBox() {
+  //    return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + width + offsetX, yCoord + height + offsetY, zCoord + length + offsetZ);
+  //  }
+
+  //  public AxisAlignedBB getStructureBounds() {
+  //    return AxisAlignedBB.getBoundingBox(xCoord + offsetX, yCoord + offsetY, zCoord + offsetZ, xCoord + width + offsetX, yCoord + height + offsetY,
+  //        zCoord + length + offsetZ);
+  //  }
 
   @Override
   public void writeCustomNBT(NBTTagCompound root) {
@@ -62,10 +69,16 @@ public class TileTemplateEditor extends TileEntityEnder {
     if(exportDir != null && exportDir.length() > 0) {
       root.setString("exportDir", exportDir);
     }
-    root.setShort("rotation", (short)(rotation == null ? Rotation.DEG_0.ordinal() : rotation.ordinal()));
+
     root.setInteger("offsetX", offsetX);
     root.setInteger("offsetY", offsetY);
     root.setInteger("offsetZ", offsetZ);
+
+    if(structure != null) {
+      NBTTagCompound strRoot = new NBTTagCompound();
+      structure.writeToNBT(strRoot);
+      root.setTag("structure", strRoot);
+    }
 
   }
 
@@ -76,15 +89,14 @@ public class TileTemplateEditor extends TileEntityEnder {
     if(exportDir != null && exportDir.length() == 0) {
       exportDir = null;
     }
-    short rot = root.getShort("rotation");
-    if(rot < 0 || rot >= Rotation.values().length) {
-      rotation = Rotation.DEG_0;
-    } else {
-      rotation = Rotation.values()[rot];
-    }
+
     offsetX = root.getInteger("offsetX");
     offsetY = root.getInteger("offsetY");
     offsetZ = root.getInteger("offsetZ");
+    
+    if(root.hasKey("structure")) {
+      structure = new Structure(root.getCompoundTag("structure"));
+    }
   }
 
   public String getName() {
@@ -132,19 +144,17 @@ public class TileTemplateEditor extends TileEntityEnder {
     markDirty();
   }
 
-  public Rotation getRotation() {
-    return rotation;
+  public IStructure getStructure() {
+    return structure;
   }
 
-  public void setRotation(Rotation rotation) {
-    this.rotation = rotation;
+  public void setStructure(IStructure structure) {
+    onStructureOnload();
+    this.structure = structure;
+    doneInit = false;    
+    markDirty();
   }
-
-  public Point3i getStructureLocalPosition(Point3i blockCoord) {
-    int localX = blockCoord.x - xCoord - getOffsetX();
-    int localY = blockCoord.y - yCoord - getOffsetY();
-    int localZ = blockCoord.z - zCoord - getOffsetZ();
-    return new Point3i(localX, localY, localZ);
-  }
+  
+  
 
 }

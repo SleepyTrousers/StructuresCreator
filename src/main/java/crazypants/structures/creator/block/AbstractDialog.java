@@ -51,7 +51,9 @@ public abstract class AbstractDialog extends JDialog {
 
   protected void onClose() {
     Mouse.setCursorPosition(Display.getX() - Display.getWidth() / 2, Display.getY() - Display.getHeight() / 2);
-    Minecraft.getMinecraft().thePlayer.closeScreen();
+    if(Minecraft.getMinecraft().thePlayer != null) {
+      Minecraft.getMinecraft().thePlayer.closeScreen();
+    }
   }
   
   protected boolean checkClear() {

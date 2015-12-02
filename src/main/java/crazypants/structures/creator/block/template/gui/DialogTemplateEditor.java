@@ -14,8 +14,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,10 +38,12 @@ import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.gen.PositionedComponent;
 import crazypants.structures.api.util.Point3i;
+import crazypants.structures.api.util.Rotation;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.AbstractDialog;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
-import crazypants.structures.creator.block.template.packet.PacketBuildTemplate;
+import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
+import crazypants.structures.creator.block.template.packet.PacketClearStructure;
 import crazypants.structures.creator.block.template.packet.PacketTemplateEditorGui;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
@@ -61,7 +65,6 @@ public class DialogTemplateEditor extends AbstractDialog {
       openDialogs.put(key, res);
     }
     res.open();
-
   }
 
   private final TileTemplateEditor tile;
@@ -70,7 +73,11 @@ public class DialogTemplateEditor extends AbstractDialog {
   private JButton openB;
   private JButton importB;
   private JButton exportB;
+  private JButton newB;
+
+  private JButton genB;
   private JButton clearB;
+  private JComboBox<Rotation> rotCB;
 
   private JPanel editorPan;
 
@@ -135,11 +142,6 @@ public class DialogTemplateEditor extends AbstractDialog {
     repaint();
   }
 
-  private void updateTileFromGui() {
-    tile.setName(curTemplate == null ? null : curTemplate.getUid());
-    sendUpdatePacket();
-  }
-
   private void sendUpdatePacket() {
     PacketTemplateEditorGui packet = new PacketTemplateEditorGui(tile);
     PacketHandler.INSTANCE.sendToServer(packet);
@@ -149,10 +151,15 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     editorPan = new JPanel(new BorderLayout());
 
-    clearB = new JButton("New");
+    newB = new JButton("New");
     openB = new JButton("Open");
     importB = new JButton("Import");
     exportB = new JButton("Export");
+
+    genB = new JButton("Generate");
+    clearB = new JButton("Clear");
+    rotCB = new JComboBox<Rotation>(Rotation.values());
+    rotCB.setSelectedIndex(0);
 
     rootNode = new DefaultMutableTreeNode();
     tree = new JTree(rootNode);
@@ -164,33 +171,40 @@ public class DialogTemplateEditor extends AbstractDialog {
 
   private void addComponents() {
     JPanel bPan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
-    bPan.add(clearB);
+    bPan.add(newB);
     bPan.add(openB);
     bPan.add(importB);
     bPan.add(exportB);
+
+    JPanel bPan2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    bPan2.add(clearB);
+    bPan2.add(new JLabel("Rot:"));
+    bPan2.add(rotCB);
+    bPan2.add(genB);
+
+    JPanel southPan = new JPanel(new BorderLayout());
+    southPan.add(editorPan, BorderLayout.CENTER);
+    southPan.add(bPan2, BorderLayout.SOUTH);
 
     Container cp = getContentPane();
     cp.setLayout(new BorderLayout());
     cp.add(bPan, BorderLayout.NORTH);
     cp.add(new JScrollPane(tree), BorderLayout.CENTER);
-    cp.add(editorPan, BorderLayout.SOUTH);   
+    cp.add(southPan, BorderLayout.SOUTH);
   }
-  
+
   private void addListeners() {
 
     openB.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         if(checkClear()) {
           openRegisteredTemplate();
         }
-
       }
     });
 
     importB.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         if(checkClear()) {
@@ -200,10 +214,34 @@ public class DialogTemplateEditor extends AbstractDialog {
     });
 
     exportB.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         exportToFile();
+      }
+    });
+
+    newB.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if(checkClear()) {
+          clearBounds();          
+          tile.setName("NewTemplate");
+          sendUpdatePacket();
+          curTemplate = null;
+          buildTree();
+        }
+      }
+
+    });
+
+    tree.addTreeSelectionListener(new TreeSelectionListener() {
+
+      @Override
+      public void valueChanged(TreeSelectionEvent e) {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        Object nodeInfo = node == null ? null : node.getUserObject();
+        selectionChanged(nodeInfo);
       }
 
     });
@@ -213,36 +251,35 @@ public class DialogTemplateEditor extends AbstractDialog {
       @Override
       public void actionPerformed(ActionEvent e) {
         if(checkClear()) {
-          curTemplate = null;
           clearBounds();
-          buildTree();
+        }
+      }
+    });
+
+    genB.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if(checkClear()) {
+          clearBounds();
+          if(rotCB.getSelectedIndex() >= 0) {
+            generate(rotCB.getItemAt(rotCB.getSelectedIndex()));
+          }
         }
       }
 
     });
-    
-    tree.addTreeSelectionListener(new TreeSelectionListener() {
-      
-      @Override
-      public void valueChanged(TreeSelectionEvent e) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-            tree.getLastSelectedPathComponent();
-        Object nodeInfo = node == null ? null : node.getUserObject();
-        selectionChanged(nodeInfo);
-      }
-      
-    });
-    
+
   }
-  
+
   private void selectionChanged(Object nodeInfo) {
-    Component editor = getEditorForSelection(nodeInfo);    
+    Component editor = getEditorForSelection(nodeInfo);
     editorPan.removeAll();
     if(editor != null) {
       editorPan.add(editor, BorderLayout.CENTER);
     }
     revalidate();
-    repaint();         
+    repaint();
   }
 
   private Component getEditorForSelection(Object nodeInfo) {
@@ -360,8 +397,7 @@ public class DialogTemplateEditor extends AbstractDialog {
         return;
       }
     }
-    
-    
+
     ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer);
     StructureGenRegister.instance.registerTemplate(curTemplate);
   }
@@ -371,25 +407,31 @@ public class DialogTemplateEditor extends AbstractDialog {
       return;
     }
 
+    clearBounds();
     tile.setName(name);
-    PacketBuildTemplate packet = new PacketBuildTemplate(tile, false);
-    PacketHandler.INSTANCE.sendToServer(packet);
-
+    sendUpdatePacket();    
     curTemplate = template;
-    buildTree();    
+    buildTree();
 
   }
 
-  private void clearBounds() {
-    tile.markDirty();
-    PacketBuildTemplate packet = new PacketBuildTemplate(tile, true);
+  private void generate(Rotation rot) {    
+    sendUpdatePacket();
+    PacketBuildStructure packet = new PacketBuildStructure(tile, rot);
     PacketHandler.INSTANCE.sendToServer(packet);
+  }
+
+  private void clearBounds() {
+    if(tile != null) {
+      PacketClearStructure packet = new PacketClearStructure(tile);
+      PacketHandler.INSTANCE.sendToServer(packet);
+    }
   }
 
   @Override
   protected void onClose() {
     openDialogs.remove(position);
-    super.onClose();        
+    super.onClose();
   }
 
 }
