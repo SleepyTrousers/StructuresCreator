@@ -34,9 +34,7 @@ import javax.swing.tree.TreeSelectionModel;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.opengl.Display;
 
-import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.gen.IStructureTemplate;
-import crazypants.structures.api.gen.PositionedComponent;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.creator.PacketHandler;
@@ -117,26 +115,26 @@ public class DialogTemplateEditor extends AbstractDialog {
     if(curTemplate == null) {
       curTemplate = new StructureTemplate(name);
     }
-    rootNode = new DefaultMutableTreeNode(name == null ? "NewTemplate" : name);
-
-    DefaultMutableTreeNode comps = new DefaultMutableTreeNode("Components");
-    rootNode.add(comps);
-    for (PositionedComponent pc : curTemplate.getComponents()) {
-      IStructureComponent comp = pc.getComponent();
-      String uid = comp == null ? "" : comp.getUid();
-      Point3i offset = pc.getOffset();
-      if(offset == null) {
-        offset = new Point3i();
-      }
-
-      DefaultMutableTreeNode pcN = new DefaultMutableTreeNode("Component");
-      DefaultMutableTreeNode compN = new DefaultMutableTreeNode(uid);
-      DefaultMutableTreeNode offsetN = new DefaultMutableTreeNode(offset);
-      pcN.add(compN);
-      pcN.add(offsetN);
-      comps.add(pcN);
-
-    }
+    rootNode = new MyTreeNode(null, curTemplate);
+//    rootNode = new DefaultMutableTreeNode(name == null ? "NewTemplate" : name);
+//
+//    DefaultMutableTreeNode comps = new DefaultMutableTreeNode("Components");
+//    rootNode.add(comps);
+//    for (PositionedComponent pc : curTemplate.getComponents()) {
+//      IStructureComponent comp = pc.getComponent();
+//      String uid = comp == null ? "" : comp.getUid();
+//      Point3i offset = pc.getOffset();
+//      if(offset == null) {
+//        offset = new Point3i();
+//      }
+//
+//      DefaultMutableTreeNode pcN = new DefaultMutableTreeNode("Component");
+//      DefaultMutableTreeNode compN = new DefaultMutableTreeNode(uid);
+//      DefaultMutableTreeNode offsetN = new DefaultMutableTreeNode(offset);
+//      pcN.add(compN);
+//      pcN.add(offsetN);
+//      comps.add(pcN);
+//    }
     tree.setModel(new DefaultTreeModel(rootNode));
     revalidate();
     repaint();
@@ -167,6 +165,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     tree.setEditable(true);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setShowsRootHandles(true);
+    tree.setCellRenderer(new MyTreeNode.MyRenderer());
   }
 
   private void addComponents() {
