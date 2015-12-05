@@ -7,22 +7,25 @@ import java.util.Collection;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 import com.google.gson.annotations.Expose;
 
 import crazypants.structures.api.ITyped;
 import crazypants.structures.api.gen.IStructureComponent;
-import crazypants.structures.api.gen.IStructureTemplate;
 
 public class MyTreeNode extends DefaultMutableTreeNode {
 
-  private NodeData data;
+  private static final long serialVersionUID = 1L;
+  private final NodeData data;
+  private final DefaultTreeModel treeModel;
 
-  public MyTreeNode(AttributeAccessor<?> aa, Object val) {
-    data = new NodeData(aa, val);
+  public MyTreeNode(Object owner, AttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel) {
+    this.treeModel = treeModel;
+    data = new NodeData(owner, aa, currentValue, this);
     setUserObject(data);
-    if(val != null) {
-      addChildren(val);
+    if(currentValue != null) {
+      addChildren(currentValue, treeModel);
     }
 
   }
@@ -31,14 +34,14 @@ public class MyTreeNode extends DefaultMutableTreeNode {
     return data;
   }
 
-  public void setData(NodeData data) {
-    this.data = data;
+  public void dataChanged() {
+    treeModel.nodeChanged(this);
   }
 
-  private void addChildren(Object obj) {
+  private void addChildren(Object obj, DefaultTreeModel treeModel) {
 
     if(obj instanceof Collection<?>) {
-      addChildren((Collection<?>) obj);
+      addChildren((Collection<?>) obj, treeModel);
       return;
     }
 
@@ -48,42 +51,75 @@ public class MyTreeNode extends DefaultMutableTreeNode {
     }
     for (Field field : fields) {
       if(field.getAnnotation(Expose.class) != null) {
-        AttributeAccessor<?> aa = new AttributeAccessor<Object>(field);
+        AttributeAccessor aa = new AttributeAccessor(field);
         if(aa.isValid()) {
-          add(new MyTreeNode(aa, aa.get(obj)));
+          add(new MyTreeNode(obj, aa, aa.get(obj), treeModel));
         }
       }
     }
   }
 
-  private void addChildren(Collection<?> obj) {
+  private void addChildren(Collection<?> obj, DefaultTreeModel treeModel) {
     for (Object o : obj) {
-      add(new MyTreeNode(null, o));
+      add(new MyTreeNode(obj, null, o, treeModel));
     }
   }
 
   public static class NodeData {
 
-    private AttributeAccessor<?> aa;
-    private Object attributeVal;
+    private MyTreeNode treeNode;
 
-    public NodeData(AttributeAccessor<?> aa, Object attributeVal) {
+    private AttributeAccessor aa;
+    private Object attributeVal;
+    private Object owner;
+
+    public NodeData(Object owner, AttributeAccessor aa, Object attributeVal, MyTreeNode treeNode) {
+      this.treeNode = treeNode;
+      this.owner = owner;
       this.aa = aa;
       this.attributeVal = attributeVal;
+    }
+
+    public Class<?> getType() {
+      if(aa != null) {
+        return aa.getType();
+      }
+      if(attributeVal != null) {
+        return attributeVal.getClass();
+      }
+      return null;
+    }
+
+    public Object getValue() {
+      return attributeVal;
+    }
+
+    public void setValue(Object value) {
+      attributeVal = value;
+      if(aa != null && owner != null) {
+        aa.set(owner, value);
+      }
+      treeNode.dataChanged();
+    }
+
+    public String getLabel() {
+      if(aa != null) {
+        return aa.getAttribuiteName();
+      } else if(attributeVal != null) {
+        return attributeVal.getClass().getSimpleName();
+      }
+      return "";
     }
 
     @Override
     public String toString() {
       if(aa != null) {
-        return aa.getAttribuiteName();
+        return "NodeData: " + aa.getAttribuiteName();
       }
       if(attributeVal != null) {
-        //        if(attributeVal instanceof String || attributeVal instanceof Number || attributeVal instanceof Boolean) {
-        //          return attributeVal.toString();
-        //        }
-        return attributeVal.getClass().getSimpleName();
+        return "NodeData: " + attributeVal.getClass().getSimpleName();
       }
-      return "";
+      return "NodeData: ";
     }
 
   }
@@ -117,30 +153,17 @@ public class MyTreeNode extends DefaultMutableTreeNode {
       } else {
         if(nb.aa != null) {
           text = nb.aa.getAttribuiteName();
-          if(nb.attributeVal != null && !(nb.attributeVal instanceof Collection)){
+          if(nb.attributeVal != null && !(nb.attributeVal instanceof Collection)) {
             text += ": " + nb.attributeVal.getClass().getSimpleName();
           }
-        } else if(nb.attributeVal != null){
-          //text = getValueString(nb.attributeVal);
+        } else if(nb.attributeVal != null) {
           text = nb.attributeVal.getClass().getSimpleName();
+//          if(nb.attributeVal instanceof IStructureTemplate) {
+//            text = text + ": " + ((IStructureTemplate) nb.attributeVal).getUid();
+//          }
         }
-        
-//        if(nb.attributeVal instanceof Collection<?>) {
-//          text = nb.aa.getAttribuiteName();
-//        } else {
-//          
-//        }
       }
-
       setText(text);
-
-      //      if(leaf && isTutorialBook(value)) {
-      //        setIcon(tutorialIcon);
-      //        setToolTipText("This book is in the Tutorial series.");
-      //      } else {
-      //        setToolTipText(null); //no tool tip
-      //      }
-
       return this;
     }
 
@@ -154,13 +177,12 @@ public class MyTreeNode extends DefaultMutableTreeNode {
         if(val instanceof IStructureComponent) {
           return ((IStructureComponent) val).getUid();
         }
-        if(val instanceof IStructureTemplate) {
-          return ((IStructureTemplate) val).getUid();
-        } 
+//        if(val instanceof IStructureTemplate) {
+//          return ((IStructureTemplate) val).getUid();
+//        }
         if(val instanceof ITyped) {
-          return ((ITyped)val).getType();
+          return ((ITyped) val).getType();
         }
-        //return val.getClass().getSimpleName();
         return val.toString();
       }
     }

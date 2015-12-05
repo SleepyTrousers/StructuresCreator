@@ -2,15 +2,13 @@ package crazypants.structures.creator.block.template.gui;
 
 import java.lang.reflect.Field;
 
-public class AttributeAccessor<T> {
+public class AttributeAccessor {
 
-  //private final Class<?> clazz;
   private final String attribuiteName;
   private final Field field;
-  private final Class<T> typeClass;
+  private final Class<?> typeClass;
 
-  public AttributeAccessor(Class<?> objClass, Class<T> typeClass, String attribuiteName) {
-    //this.clazz = clazz;
+  public AttributeAccessor(Class<?> objClass, Class<?> typeClass, String attribuiteName) {
     this.attribuiteName = attribuiteName;
     this.typeClass = typeClass;
     Field f = null;
@@ -33,7 +31,7 @@ public class AttributeAccessor<T> {
     if(field != null) {
       field.setAccessible(true);
       attribuiteName = field.getName();
-      typeClass = (Class<T>) field.getType();
+      typeClass = field.getType();
     } else {
       attribuiteName = null;
       typeClass = null;
@@ -44,7 +42,7 @@ public class AttributeAccessor<T> {
     return attribuiteName;
   }
 
-  public Class<T> getType() {
+  public Class<?> getType() {
     return typeClass;
   }
   
@@ -52,7 +50,7 @@ public class AttributeAccessor<T> {
     return field != null;
   }
 
-  public void set(Object obj, T val) {
+  public void set(Object obj, Object val) {
     try {
       field.set(obj, val);
     } catch (Exception e) {
@@ -60,10 +58,9 @@ public class AttributeAccessor<T> {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public T get(Object obj) {
+  public Object get(Object obj) {
     try {
-      return (T) field.get(obj);
+      return field.get(obj);
     } catch (Exception e) {
 
       e.printStackTrace();

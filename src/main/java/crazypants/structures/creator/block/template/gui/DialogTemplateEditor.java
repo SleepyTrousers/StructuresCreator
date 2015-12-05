@@ -23,7 +23,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -40,6 +39,7 @@ import crazypants.structures.api.util.Rotation;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.AbstractDialog;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
+import crazypants.structures.creator.block.template.gui.MyTreeNode.NodeData;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
 import crazypants.structures.creator.block.template.packet.PacketTemplateEditorGui;
@@ -83,6 +83,8 @@ public class DialogTemplateEditor extends AbstractDialog {
   private DefaultMutableTreeNode rootNode;
   private IStructureTemplate curTemplate;
 
+  private DefaultTreeModel treeModel;
+
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
@@ -115,27 +117,13 @@ public class DialogTemplateEditor extends AbstractDialog {
     if(curTemplate == null) {
       curTemplate = new StructureTemplate(name);
     }
-    rootNode = new MyTreeNode(null, curTemplate);
-//    rootNode = new DefaultMutableTreeNode(name == null ? "NewTemplate" : name);
-//
-//    DefaultMutableTreeNode comps = new DefaultMutableTreeNode("Components");
-//    rootNode.add(comps);
-//    for (PositionedComponent pc : curTemplate.getComponents()) {
-//      IStructureComponent comp = pc.getComponent();
-//      String uid = comp == null ? "" : comp.getUid();
-//      Point3i offset = pc.getOffset();
-//      if(offset == null) {
-//        offset = new Point3i();
-//      }
-//
-//      DefaultMutableTreeNode pcN = new DefaultMutableTreeNode("Component");
-//      DefaultMutableTreeNode compN = new DefaultMutableTreeNode(uid);
-//      DefaultMutableTreeNode offsetN = new DefaultMutableTreeNode(offset);
-//      pcN.add(compN);
-//      pcN.add(offsetN);
-//      comps.add(pcN);
-//    }
-    tree.setModel(new DefaultTreeModel(rootNode));
+    treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+    rootNode = new MyTreeNode(curTemplate, null, curTemplate,treeModel);
+    MyTreeNode uidNode = new MyTreeNode(curTemplate, new AttributeAccessor(StructureTemplate.class, String.class, "uid"), curTemplate.getUid(),treeModel);
+    rootNode.insert(uidNode, 0);
+    treeModel.setRoot(rootNode);
+           
+    tree.setModel(treeModel);
     revalidate();
     repaint();
   }
@@ -237,10 +225,9 @@ public class DialogTemplateEditor extends AbstractDialog {
     tree.addTreeSelectionListener(new TreeSelectionListener() {
 
       @Override
-      public void valueChanged(TreeSelectionEvent e) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        Object nodeInfo = node == null ? null : node.getUserObject();
-        selectionChanged(nodeInfo);
+      public void valueChanged(TreeSelectionEvent e) {        
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();        
+        selectionChanged(node);
       }
 
     });
@@ -271,9 +258,11 @@ public class DialogTemplateEditor extends AbstractDialog {
 
   }
 
-  private void selectionChanged(Object nodeInfo) {
-    Component editor = getEditorForSelection(nodeInfo);
+  private void selectionChanged(DefaultMutableTreeNode node) {
+    
+    
     editorPan.removeAll();
+    Component editor = getEditorForSelection(node);
     if(editor != null) {
       editorPan.add(editor, BorderLayout.CENTER);
     }
@@ -281,11 +270,17 @@ public class DialogTemplateEditor extends AbstractDialog {
     repaint();
   }
 
-  private Component getEditorForSelection(Object nodeInfo) {
-    if(nodeInfo == null) {
+  private Component getEditorForSelection(DefaultMutableTreeNode node) {
+    Object userObj = node == null ? null : node.getUserObject();
+    if(! (userObj instanceof NodeData)) {
       return null;
     }
-    return new JTextField(nodeInfo.toString());
+    NodeData nd = (NodeData)userObj;
+    IAttributeEditor ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
+    if(ed != null) {
+      return ed.getComponent(nd);
+    }          
+    return null;
   }
 
   private void openRegisteredTemplate() {
@@ -410,7 +405,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     tile.setName(name);
     sendUpdatePacket();    
     curTemplate = template;
-    buildTree();
+    buildTree();        
 
   }
 
