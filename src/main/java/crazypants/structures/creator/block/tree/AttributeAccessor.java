@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.template.gui;
+package crazypants.structures.creator.block.tree;
 
 import java.lang.reflect.Field;
 

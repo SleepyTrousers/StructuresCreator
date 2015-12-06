@@ -1,13 +1,13 @@
-package crazypants.structures.creator.block.template.gui.editors;
+package crazypants.structures.creator.block.tree.editors;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JCheckBox;
+import javax.swing.SwingConstants;
 
-import crazypants.structures.creator.block.template.gui.AbstractAttributeEditor;
-import crazypants.structures.creator.block.template.gui.MyTreeNode.NodeData;
+import crazypants.structures.creator.block.tree.NodeData;
 
 public class BooleanEditor extends AbstractAttributeEditor {
   
@@ -16,6 +16,7 @@ public class BooleanEditor extends AbstractAttributeEditor {
   
   public BooleanEditor() {
     super(boolean.class);
+    cb.setHorizontalTextPosition(SwingConstants.LEADING);
     cb.addActionListener(new ActionListener() {
       
       @Override

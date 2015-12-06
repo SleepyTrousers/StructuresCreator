@@ -3,7 +3,11 @@ package crazypants.structures.creator.block.template.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -24,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -39,10 +44,15 @@ import crazypants.structures.api.util.Rotation;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.AbstractDialog;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
-import crazypants.structures.creator.block.template.gui.MyTreeNode.NodeData;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
 import crazypants.structures.creator.block.template.packet.PacketTemplateEditorGui;
+import crazypants.structures.creator.block.tree.AttributeAccessor;
+import crazypants.structures.creator.block.tree.AttributeEditors;
+import crazypants.structures.creator.block.tree.IAttributeEditor;
+import crazypants.structures.creator.block.tree.NodeData;
+import crazypants.structures.creator.block.tree.NodeRenderer;
+import crazypants.structures.creator.block.tree.StructuresTreeNode;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
@@ -84,6 +94,8 @@ public class DialogTemplateEditor extends AbstractDialog {
   private IStructureTemplate curTemplate;
 
   private DefaultTreeModel treeModel;
+  
+  
 
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
@@ -91,6 +103,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     setModal(false);
     setAlwaysOnTop(true);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    setTitle("Template Editor");
 
     initComponents();
     addComponents();
@@ -118,8 +131,8 @@ public class DialogTemplateEditor extends AbstractDialog {
       curTemplate = new StructureTemplate(name);
     }
     treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
-    rootNode = new MyTreeNode(curTemplate, null, curTemplate,treeModel);
-    MyTreeNode uidNode = new MyTreeNode(curTemplate, new AttributeAccessor(StructureTemplate.class, String.class, "uid"), curTemplate.getUid(),treeModel);
+    rootNode = new StructuresTreeNode(curTemplate, null, curTemplate,treeModel);
+    StructuresTreeNode uidNode = new StructuresTreeNode(curTemplate, new AttributeAccessor(StructureTemplate.class, String.class, "uid"), curTemplate.getUid(),treeModel);
     rootNode.insert(uidNode, 0);
     treeModel.setRoot(rootNode);
            
@@ -135,8 +148,9 @@ public class DialogTemplateEditor extends AbstractDialog {
 
   private void initComponents() {
 
-    editorPan = new JPanel(new BorderLayout());
-
+    editorPan = new JPanel(new GridBagLayout());
+    //editorPan.setBorder(new BevelBorder(BevelBorder.LOWERED));
+    
     newB = new JButton("New");
     openB = new JButton("Open");
     importB = new JButton("Import");
@@ -149,35 +163,38 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     rootNode = new DefaultMutableTreeNode();
     tree = new JTree(rootNode);
-    tree.setRootVisible(true);
-    tree.setEditable(true);
+    tree.setRootVisible(false);
+    tree.setEditable(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
     tree.setShowsRootHandles(true);
-    tree.setCellRenderer(new MyTreeNode.MyRenderer());
+    tree.setCellRenderer(new NodeRenderer());
   }
 
   private void addComponents() {
-    JPanel bPan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
-    bPan.add(newB);
-    bPan.add(openB);
-    bPan.add(importB);
-    bPan.add(exportB);
+    JPanel filePan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    filePan.add(newB);
+    filePan.add(openB);
+    filePan.add(importB);
+    filePan.add(exportB);
 
-    JPanel bPan2 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
-    bPan2.add(clearB);
-    bPan2.add(new JLabel("Rot:"));
-    bPan2.add(rotCB);
-    bPan2.add(genB);
+    JPanel generatePan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    generatePan.setBorder(new TitledBorder("Generate"));
+    generatePan.add(clearB);
+    generatePan.add(new JLabel("Rot:"));
+    generatePan.add(rotCB);
+    generatePan.add(genB);
 
-    JPanel southPan = new JPanel(new BorderLayout());
-    southPan.add(editorPan, BorderLayout.CENTER);
-    southPan.add(bPan2, BorderLayout.SOUTH);
-
+    JPanel treePan = new JPanel(new BorderLayout());
+    treePan.add(editorPan, BorderLayout.SOUTH);
+    JScrollPane sp = new JScrollPane(tree);        
+    sp.setPreferredSize(new Dimension(360, Math.min(Minecraft.getMinecraft().displayHeight - 20,500)));    
+    treePan.add(sp, BorderLayout.CENTER);
+    
     Container cp = getContentPane();
     cp.setLayout(new BorderLayout());
-    cp.add(bPan, BorderLayout.NORTH);
-    cp.add(new JScrollPane(tree), BorderLayout.CENTER);
-    cp.add(southPan, BorderLayout.SOUTH);
+    cp.add(filePan, BorderLayout.NORTH);
+    cp.add(treePan, BorderLayout.CENTER);
+    cp.add(generatePan, BorderLayout.SOUTH);
   }
 
   private void addListeners() {
@@ -264,7 +281,8 @@ public class DialogTemplateEditor extends AbstractDialog {
     editorPan.removeAll();
     Component editor = getEditorForSelection(node);
     if(editor != null) {
-      editorPan.add(editor, BorderLayout.CENTER);
+      //editorPan.add(editor, BorderLayout.CENTER);
+      editorPan.add(editor, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(2,6,2,6), 0, 0));
     }
     revalidate();
     repaint();
@@ -405,6 +423,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     tile.setName(name);
     sendUpdatePacket();    
     curTemplate = template;
+    //setTitle(curTemplate == null ? "" : curTemplate.getUid());
     buildTree();        
 
   }

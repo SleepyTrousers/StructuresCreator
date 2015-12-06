@@ -1,9 +1,7 @@
-package crazypants.structures.creator.block.template.gui;
+package crazypants.structures.creator.block.tree;
 
 
 import java.awt.Component;
-
-import crazypants.structures.creator.block.template.gui.MyTreeNode.NodeData;
 
 public interface IAttributeEditor {
 
