@@ -5,10 +5,10 @@ public class NodeData {
   private final StructuresTreeNode treeNode;
 
   private final Object owner;
-  final AttributeAccessor aa;
+  final IAttributeAccessor aa;
   Object currentValue;    
 
-  public NodeData(Object owner, AttributeAccessor aa, Object attributeVal, StructuresTreeNode treeNode) {
+  public NodeData(Object owner, IAttributeAccessor aa, Object attributeVal, StructuresTreeNode treeNode) {
     this.treeNode = treeNode;
     this.owner = owner;
     this.aa = aa;
@@ -59,8 +59,12 @@ public class NodeData {
     return treeNode;
   }
   
-  public AttributeAccessor getAttributeAccessor() {
+  public IAttributeAccessor getAttributeAccessor() {
     return aa;
+  }
+
+  public Object getOwner() {
+    return owner;
   }
 
   @Override

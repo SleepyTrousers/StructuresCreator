@@ -1,7 +1,7 @@
 package crazypants.structures.creator.block.tree;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
+import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -16,7 +16,7 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
   private final NodeData data;
   private final DefaultTreeModel treeModel;
 
-  public StructuresTreeNode(Object owner, AttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel) {
+  public StructuresTreeNode(Object owner, IAttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel) {
     this.treeModel = treeModel;
     data = new NodeData(owner, aa, currentValue, this);
     setUserObject(data);
@@ -40,8 +40,8 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
     if(obj == null) {
       return;
     }
-    if(obj instanceof Collection<?>) {
-      addChildren((Collection<?>) obj, treeModel);
+    if(obj instanceof List<?>) {
+      addChildren((List<?>) obj, treeModel);
       return;
     }
     Class<? extends Object> clz = obj.getClass();
@@ -62,17 +62,20 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
     }
     for (Field field : fields) {
       if(field.getAnnotation(Expose.class) != null) {
-        AttributeAccessor aa = new AttributeAccessor(field);
+        IAttributeAccessor aa = new FieldAccessor(field);
         if(aa.isValid() && (!skipUid || !"type".equals(aa.getAttribuiteName()))) {
           add(new StructuresTreeNode(obj, aa, aa.get(obj), treeModel));
         }
       }
-    }
+    }    
   }
 
-  private void addChildren(Collection<?> obj, DefaultTreeModel treeModel) {
+  private void addChildren(List<?> obj, DefaultTreeModel treeModel) {
+    int index = 0;
     for (Object o : obj) {
-      add(new StructuresTreeNode(obj, null, o, treeModel));
+      ListElementAccessor aa = new ListElementAccessor(index, o.getClass(), data.getAttributeAccessor().getAttribuiteName());
+      add(new StructuresTreeNode(obj, aa, o, treeModel));
+      index++;
     }
   }
 

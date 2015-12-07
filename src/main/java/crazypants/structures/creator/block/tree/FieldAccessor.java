@@ -2,13 +2,13 @@ package crazypants.structures.creator.block.tree;
 
 import java.lang.reflect.Field;
 
-public class AttributeAccessor {
+public class FieldAccessor implements IAttributeAccessor {
 
-  private final String attribuiteName;
-  private final Field field;
-  private final Class<?> typeClass;
+  protected final String attribuiteName;
+  protected final Field field;
+  protected final Class<?> typeClass;
 
-  public AttributeAccessor(Class<?> objClass, Class<?> typeClass, String attribuiteName) {
+  public FieldAccessor(Class<?> objClass, Class<?> typeClass, String attribuiteName) {
     this.attribuiteName = attribuiteName;
     this.typeClass = typeClass;
     Field f = null;
@@ -26,7 +26,7 @@ public class AttributeAccessor {
     field = f;
   }
 
-  public AttributeAccessor(Field field) {
+  public FieldAccessor(Field field) {
     this.field = field;
     if(field != null) {
       field.setAccessible(true);
@@ -38,18 +38,22 @@ public class AttributeAccessor {
     }
   }
 
+  @Override
   public String getAttribuiteName() {
     return attribuiteName;
   }
 
+  @Override
   public Class<?> getType() {
     return typeClass;
   }
   
+  @Override
   public boolean isValid() {
     return field != null;
   }
 
+  @Override
   public void set(Object obj, Object val) {
     try {
       field.set(obj, val);
@@ -58,6 +62,7 @@ public class AttributeAccessor {
     }
   }
 
+  @Override
   public Object get(Object obj) {
     try {
       return field.get(obj);
