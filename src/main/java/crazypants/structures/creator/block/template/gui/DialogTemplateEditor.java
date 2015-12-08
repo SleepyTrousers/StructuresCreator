@@ -54,6 +54,7 @@ import crazypants.structures.creator.block.tree.ListElementAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.creator.block.tree.NodeRenderer;
 import crazypants.structures.creator.block.tree.StructuresTreeNode;
+import crazypants.structures.creator.block.tree.editors.AddEditor;
 import crazypants.structures.creator.block.tree.editors.RemoveEditor;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
@@ -98,6 +99,7 @@ public class DialogTemplateEditor extends AbstractDialog {
   private DefaultTreeModel treeModel;
 
   private RemoveEditor removeEditor = new RemoveEditor();
+  private AddEditor addEditor = new AddEditor();
 
   private JPanel emptyEditor;
 
@@ -308,14 +310,11 @@ public class DialogTemplateEditor extends AbstractDialog {
   }
 
   private Component getEditorForSelection(DefaultMutableTreeNode node) {
-    Object userObj = node == null ? null : node.getUserObject();
-        
-    //Component res = new JLabel("  ");        
+    Object userObj = node == null ? null : node.getUserObject();             
     Component res = null;
     if(!(userObj instanceof NodeData)) {
       return res;    
-    }
-    
+    }    
     
     NodeData nd = (NodeData) userObj;
     IAttributeEditor ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
@@ -329,7 +328,11 @@ public class DialogTemplateEditor extends AbstractDialog {
       }
       p.add(removeEditor.getComponent(nd, (ListElementAccessor) nd.getAttributeAccessor()), BorderLayout.SOUTH);
       res = p;
-    }
+    } 
+//    else if(List.class.isAssignableFrom(nd.getType())) {    
+//      //res = new JLabel("Donkey");
+//      res = addEditor.getComponent(nd);
+//    }
     return res;
 
   }

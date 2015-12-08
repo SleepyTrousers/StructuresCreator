@@ -28,18 +28,25 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
     String text = "";
     if(leaf) {
       if(nb.getAttributeAccessor() != null) {
-        text = nb.getAttributeAccessor().getAttribuiteName() + ":";
+        if(nb.getAttributeAccessor() instanceof FieldAccessor) {
+          text = nb.getAttributeAccessor().getAttribuiteName();
+        }
         if(nb.getValue() != null) {
-          text = text + " " + getValueString(nb.getValue());
+          if(text.length() > 0) {
+            text +=  ": ";
+          }
+          text = text + getValueString(nb.getValue());
         }
       } else {
         text = getValueString(nb.getValue());
       }
     } else {
       if(nb.getAttributeAccessor() != null) {
-        text = nb.getAttributeAccessor().getAttribuiteName();
+        if(nb.getAttributeAccessor() instanceof FieldAccessor) {
+          text = nb.getAttributeAccessor().getAttribuiteName() + ": ";
+        }
         if(nb.getValue() != null && !(nb.getValue() instanceof Collection)) {
-          text += ": " + nb.getValue().getClass().getSimpleName();
+          text += nb.getValue().getClass().getSimpleName();
         }
       } else if(nb.getValue() != null) {
         text = nb.getValue().getClass().getSimpleName();

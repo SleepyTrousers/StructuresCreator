@@ -41,6 +41,7 @@ public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
     super(NAME, TileTemplateEditor.class);
     setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
     setLightOpacity(0);
+    setResistance(2000);
   }
 
   @Override

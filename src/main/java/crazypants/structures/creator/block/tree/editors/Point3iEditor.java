@@ -30,7 +30,7 @@ public class Point3iEditor extends AbstractAttributeEditor {
     super(Point3i.class);
     
     pan.setLayout(new GridBagLayout());
-    Insets insets = new Insets(1,5,1,1);
+    Insets insets = new Insets(5,5,1,1);
     pan.add(new JLabel("x:"), new GridBagConstraints(0,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
     pan.add(xf, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
     
@@ -66,26 +66,7 @@ public class Point3iEditor extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(NodeData data) {
-    
-    pan = new JPanel();
-    pan.setLayout(new GridBagLayout());
-    Insets insets = new Insets(5,5,1,1);
-    pan.add(new JLabel("x:"), new GridBagConstraints(0,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
-    pan.add(xf, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
-    
-    pan.add(new JLabel("y:"), new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
-    pan.add(yf, new GridBagConstraints(3,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
-    
-    pan.add(new JLabel("z:"), new GridBagConstraints(4,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
-    pan.add(zf, new GridBagConstraints(5,0,1,1,0,0,GridBagConstraints.NORTHEAST,GridBagConstraints.NONE,insets,0,0));
-    
-    insets.set(0, 0, 0, 0);
-    pan.add(new JPanel(), new GridBagConstraints(6,0,1,1,1,1,GridBagConstraints.NORTHEAST,GridBagConstraints.BOTH,insets,0,0));
-    
-    
-    
-    
+  public Component getComponent(NodeData data) {      
     this.data = data;
     
     ignoreUpdates = true;

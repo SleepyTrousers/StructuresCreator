@@ -33,7 +33,7 @@ public class ListElementAccessor implements IAttributeAccessor {
     }
     @SuppressWarnings("unchecked")
     List<Object> list = (List<Object>) obj;
-    if(list.size() >= index) {
+    if(index >= list.size()) {
       return;
     }
     list.set(index, val);

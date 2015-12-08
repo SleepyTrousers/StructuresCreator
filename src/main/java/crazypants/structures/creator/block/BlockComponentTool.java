@@ -43,6 +43,7 @@ public class BlockComponentTool extends BlockEnder implements IGuiHandler {
     super(NAME, TileComponentTool.class);
     setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
     setLightOpacity(0);
+    setResistance(2000);
   }
 
   @Override

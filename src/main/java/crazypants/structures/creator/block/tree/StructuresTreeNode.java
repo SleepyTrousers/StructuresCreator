@@ -9,6 +9,7 @@ import javax.swing.tree.DefaultTreeModel;
 import com.google.gson.annotations.Expose;
 
 import crazypants.structures.api.ITyped;
+import crazypants.structures.api.ListElementType;
 
 public class StructuresTreeNode extends DefaultMutableTreeNode {
 
@@ -56,16 +57,20 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
     if(fields == null) {
       return;
     }
-    boolean skipUid = false;
+    boolean skipType = false;
     if(ITyped.class.isAssignableFrom(clz)) {
-      skipUid = true;
+      skipType = true;
     }
     for (Field field : fields) {
-      if(field.getAnnotation(Expose.class) != null) {
-        IAttributeAccessor aa = new FieldAccessor(field);
-        if(aa.isValid() && (!skipUid || !"type".equals(aa.getAttribuiteName()))) {
-          add(new StructuresTreeNode(obj, aa, aa.get(obj), treeModel));
-        }
+      IAttributeAccessor aa = null;
+      ListElementType lt = field.getAnnotation(ListElementType.class);
+      if(lt != null) {
+        aa = new ListAccessor(field, lt.elementType());        
+      } else if(field.getAnnotation(Expose.class) != null) {
+        aa = new FieldAccessor(field);        
+      }
+      if(aa != null && aa.isValid() && (!skipType || !"type".equals(aa.getAttribuiteName()))) {
+        add(new StructuresTreeNode(obj, aa, aa.get(obj), treeModel));
       }
     }    
   }
