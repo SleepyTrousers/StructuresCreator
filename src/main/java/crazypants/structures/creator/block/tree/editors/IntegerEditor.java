@@ -23,7 +23,7 @@ public class IntegerEditor extends StringEditor {
   }
 
   @Override
-  protected void setVal(String tfTxt) {
+  protected void setVal(String tfTxt) {    
     if(getNodeData() == null) {
       return;
     }

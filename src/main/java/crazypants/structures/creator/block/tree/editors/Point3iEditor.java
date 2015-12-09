@@ -76,7 +76,7 @@ public class Point3iEditor extends AbstractAttributeEditor {
     xf.setBackground(IntegerEditor.ERROR_COL);
     yf.setBackground(IntegerEditor.ERROR_COL);
     zf.setBackground(IntegerEditor.ERROR_COL);
-    ignoreUpdates = false;
+    
     
     Object val = data.getValue();
     if(val instanceof Point3i) {
@@ -87,7 +87,9 @@ public class Point3iEditor extends AbstractAttributeEditor {
       xf.setBackground(Color.white);
       yf.setBackground(Color.white);
       zf.setBackground(Color.white);
-    } 
+    }
+    
+    ignoreUpdates = false;
     return pan;
   }
   

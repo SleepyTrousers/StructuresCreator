@@ -18,6 +18,8 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
   private final JLabel label = new JLabel();
   private final JComboBox<T> cb = new JComboBox<T>();
   private NodeData data;
+  
+  private boolean ignoreUpdate = false;
 
   protected ComboEditor(Class<T> type) {
     super(type);
@@ -43,8 +45,10 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
     } else {
       model = new DefaultComboBoxModel<T>(values);
     }    
+    ignoreUpdate = true;
     cb.setModel(model);
     cb.setSelectedItem(data.getValue());
+    ignoreUpdate = false;
     
     label.setText(data.getLabel());
     
@@ -54,6 +58,9 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
   protected abstract T[] getValues();
 
   protected void onValueChanged() {
+    if(ignoreUpdate) {
+      return;
+    }
     data.setValue(cb.getSelectedItem());
   }
   

@@ -20,6 +20,8 @@ public class StringEditor extends AbstractAttributeEditor {
   private JPanel pan = new JPanel();
   private NodeData nd;
   
+  protected boolean ignoreUpdate = false;
+  
   public StringEditor() {
     this(String.class);    
   }
@@ -30,17 +32,23 @@ public class StringEditor extends AbstractAttributeEditor {
 
       @Override
       public void insertUpdate(DocumentEvent e) {
-        setVal(tf.getText());
+        if(!ignoreUpdate) {
+          setVal(tf.getText());
+        }
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        setVal(tf.getText());
+        if(!ignoreUpdate) {
+          setVal(tf.getText());
+        }
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        setVal(tf.getText());
+        if(!ignoreUpdate) {
+          setVal(tf.getText());
+        }
       }
     };
     tf.getDocument().addDocumentListener(updateListener);
@@ -55,8 +63,11 @@ public class StringEditor extends AbstractAttributeEditor {
     if(data == null) {
       return null;
     }    
+    
     label.setText(nd.getLabel());
-    tf.setText(getVal());      
+    ignoreUpdate = true;
+    tf.setText(getVal());
+    ignoreUpdate = false;          
     return pan;
   }
   

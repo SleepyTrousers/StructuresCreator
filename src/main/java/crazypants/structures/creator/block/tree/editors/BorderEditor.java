@@ -96,8 +96,7 @@ public class BorderEditor extends AbstractAttributeEditor {
     wf.setBackground(IntegerEditor.ERROR_COL);
     uf.setBackground(IntegerEditor.ERROR_COL);
     df.setBackground(IntegerEditor.ERROR_COL);
-    ignoreUpdates = false;
-    
+        
     Object val = data.getValue();
     if(val instanceof Border) {
       Border b = (Border)val;
@@ -114,6 +113,8 @@ public class BorderEditor extends AbstractAttributeEditor {
       uf.setBackground(Color.white);
       df.setBackground(Color.white);
     }
+    
+    ignoreUpdates = false;
     
     return pan;
   }

@@ -61,11 +61,10 @@ public class ExportManager {
     return saved;
   }
 
-  public static void writeToFile(File file, IStructureTemplate curTemplate, EntityClientPlayerMP player) {
+  public static boolean writeToFile(File file, IStructureTemplate curTemplate, EntityClientPlayerMP player) {
 
     String json = null;
-    try {
-            
+    try {            
       ResourceWrapper rw = new ResourceWrapper();
       rw.setStructureTemplate(curTemplate);      
       json = GsonIO.INSTANCE.getGson().toJson(rw);
@@ -74,18 +73,19 @@ public class ExportManager {
       if(player != null) {
         player.addChatComponentMessage(new ChatComponentText("Could not generate json: " + e.getMessage()));
       }
-      return;
+      return false;
     }
 
     try {
       FileUtils.write(file, json);
+      return true;
     } catch (IOException e) {
       e.printStackTrace();
       if(player != null) {
         player.addChatComponentMessage(new ChatComponentText("Could not save to " + file.getAbsolutePath()));
       }
     }
-
+    return false;
   }
 
 }
