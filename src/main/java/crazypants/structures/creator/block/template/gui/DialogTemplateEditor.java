@@ -14,8 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,6 +29,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -54,7 +56,6 @@ import crazypants.structures.creator.block.tree.ListElementAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.creator.block.tree.NodeRenderer;
 import crazypants.structures.creator.block.tree.StructuresTreeNode;
-import crazypants.structures.creator.block.tree.editors.AddEditor;
 import crazypants.structures.creator.block.tree.editors.RemoveEditor;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
@@ -82,8 +83,7 @@ public class DialogTemplateEditor extends AbstractDialog {
   private final Point3i position;
 
   private JButton openB;
-  private JButton importB;
-  private JButton exportB;
+  private JButton saveB;
   private JButton newB;
 
   private JButton genB;
@@ -99,9 +99,9 @@ public class DialogTemplateEditor extends AbstractDialog {
   private DefaultTreeModel treeModel;
 
   private RemoveEditor removeEditor = new RemoveEditor();
-  private AddEditor addEditor = new AddEditor();
-
   private JPanel emptyEditor;
+
+  private final DirtMonitor dirtyMonitor = new DirtMonitor();
 
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
@@ -115,8 +115,14 @@ public class DialogTemplateEditor extends AbstractDialog {
     addComponents();
     addListeners();
 
-    if(tile.getName() != null && tile.getName().trim().length() > 0) {
-      curTemplate = StructureGenRegister.instance.getStructureTemplate(tile.getName(), true);
+    if(tile.getName() != null && tile.getName().trim().length() > 0 && tile.getExportDir() != null) {
+      try {
+        curTemplate = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.TEMPLATE_EXT));
+      } catch (Exception e) {
+        tile.setName("NewTemplate");
+        e.printStackTrace();
+      }
+
     } else {
       tile.setName("NewTemplate");
     }
@@ -136,14 +142,21 @@ public class DialogTemplateEditor extends AbstractDialog {
     if(curTemplate == null) {
       curTemplate = new StructureTemplate(name);
     }
+    if(treeModel != null) {
+      treeModel.removeTreeModelListener(dirtyMonitor);
+    }
+
     treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
     rootNode = new StructuresTreeNode(curTemplate, null, curTemplate, treeModel);
     StructuresTreeNode uidNode = new StructuresTreeNode(curTemplate, new FieldAccessor(StructureTemplate.class, String.class, "uid"), curTemplate.getUid(),
         treeModel);
     rootNode.insert(uidNode, 0);
     treeModel.setRoot(rootNode);
+    treeModel.addTreeModelListener(dirtyMonitor);
+    dirtyMonitor.setDirty(false);
 
     tree.setModel(treeModel);
+
     revalidate();
     repaint();
   }
@@ -157,8 +170,8 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     emptyEditor = new JPanel();
     emptyEditor.setPreferredSize(new Dimension(20, 50));
-    
-    editorPan = new JPanel(new GridBagLayout())  {
+
+    editorPan = new JPanel(new GridBagLayout()) {
 
       private static final long serialVersionUID = 1L;
 
@@ -170,15 +183,14 @@ public class DialogTemplateEditor extends AbstractDialog {
         }
         return res;
       }
-      
+
     };
-        
+
     //editorPan.setBorder(new BevelBorder(BevelBorder.LOWERED));
 
     newB = new JButton("New");
     openB = new JButton("Open");
-    importB = new JButton("Import");
-    exportB = new JButton("Export");
+    saveB = new JButton("Save");
 
     genB = new JButton("Generate");
     clearB = new JButton("Clear");
@@ -198,8 +210,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     JPanel filePan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     filePan.add(newB);
     filePan.add(openB);
-    filePan.add(importB);
-    filePan.add(exportB);
+    filePan.add(saveB);
 
     JPanel generatePan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     generatePan.setBorder(new TitledBorder("Generate"));
@@ -232,19 +243,10 @@ public class DialogTemplateEditor extends AbstractDialog {
       }
     });
 
-    importB.addActionListener(new ActionListener() {
+    saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(checkClear()) {
-          importFromFile();
-        }
-      }
-    });
-
-    exportB.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        exportToFile();
+        saveToFile();
       }
     });
 
@@ -310,12 +312,12 @@ public class DialogTemplateEditor extends AbstractDialog {
   }
 
   private Component getEditorForSelection(DefaultMutableTreeNode node) {
-    Object userObj = node == null ? null : node.getUserObject();             
+    Object userObj = node == null ? null : node.getUserObject();
     Component res = null;
     if(!(userObj instanceof NodeData)) {
-      return res;    
-    }    
-    
+      return res;
+    }
+
     NodeData nd = (NodeData) userObj;
     IAttributeEditor ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
     if(ed != null) {
@@ -328,29 +330,48 @@ public class DialogTemplateEditor extends AbstractDialog {
       }
       p.add(removeEditor.getComponent(nd, (ListElementAccessor) nd.getAttributeAccessor()), BorderLayout.SOUTH);
       res = p;
-    } 
-//    else if(List.class.isAssignableFrom(nd.getType())) {    
-//      //res = new JLabel("Donkey");
-//      res = addEditor.getComponent(nd);
-//    }
+    }
     return res;
 
   }
 
   private void openRegisteredTemplate() {
-    Map<String, IStructureTemplate> comps = StructureGenRegister.instance.getStructureTemplateMap();
+    StructureResourceManager resMan = StructureGenRegister.instance.getResourceManager();
+    List<File> files = resMan.getFilesWithExt(StructureResourceManager.TEMPLATE_EXT);
+
     JPopupMenu menu = new JPopupMenu();
-    for (Entry<String, IStructureTemplate> comp : comps.entrySet()) {
-      final Entry<String, IStructureTemplate> c = comp;
-      JMenuItem mi = new JMenuItem(comp.getKey());
-      mi.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          openTemplate(c.getKey(), c.getValue());
-        }
-      });
-      menu.add(mi);
+    for (File file : files) {
+
+      final String uid = file.getName().substring(0, file.getName().length() - StructureResourceManager.TEMPLATE_EXT.length());
+      if(uid != null && uid.startsWith("AAAA")) {
+        System.out.println("DialogTemplateEditor.openRegisteredTemplate: ");
+      }
+      final IStructureTemplate template = loadFromFile(file);
+      if(template != null) {
+        JMenuItem mi = new JMenuItem(file.getName());
+        mi.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            openTemplate(uid, template);
+          }
+        });
+        menu.add(mi);
+      } else {
+        System.out.println("DialogTemplateEditor.openRegisteredTemplate: Could not load template from file: " + file.getAbsolutePath());
+      }
+
     }
+
+    JMenuItem mi = new JMenuItem("...");
+    mi.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        importFromFile();
+      }
+    });
+    menu.add(mi);
+
     menu.show(openB, 0, 0);
   }
 
@@ -367,12 +388,12 @@ public class DialogTemplateEditor extends AbstractDialog {
     IStructureTemplate sc = loadFromFile(fc.getSelectedFile());
     if(sc != null) {
       StructureGenRegister.instance.registerTemplate(sc);
+      String name = sc.getUid();
+      openTemplate(name, sc);
     } else {
-      JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JDialog.ERROR);
+      JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
     }
-    String name = sc.getUid();
 
-    openTemplate(name, sc);
   }
 
   private IStructureTemplate loadFromFile(File file) {
@@ -384,7 +405,14 @@ public class DialogTemplateEditor extends AbstractDialog {
     InputStream stream = null;
     try {
       stream = new FileInputStream(file);
-      return StructureGenRegister.instance.getResourceManager().loadTemplate(name, stream);
+      System.out.println("DialogTemplateEditor.loadFromFile: " + file.getParentFile());
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
+      IStructureTemplate res = StructureGenRegister.instance.getResourceManager().loadTemplate(name, stream);
+      if(res != null) {
+        tile.setExportDir(file.getParentFile().getAbsolutePath());
+        sendUpdatePacket();
+      }
+      return res;
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -393,7 +421,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     return null;
   }
 
-  private void exportToFile() {
+  private void saveToFile() {
 
     if(curTemplate == null) {
       return;
@@ -447,6 +475,9 @@ public class DialogTemplateEditor extends AbstractDialog {
     }
 
     ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer);
+    dirtyMonitor.setDirty(false);
+
+    //TODO: ??
     StructureGenRegister.instance.registerTemplate(curTemplate);
   }
 
@@ -459,7 +490,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     tile.setName(name);
     sendUpdatePacket();
     curTemplate = template;
-    //setTitle(curTemplate == null ? "" : curTemplate.getUid());
+    onDirtyChanged(false);
     buildTree();
 
   }
@@ -481,6 +512,50 @@ public class DialogTemplateEditor extends AbstractDialog {
   protected void onClose() {
     openDialogs.remove(position);
     super.onClose();
+  }
+
+  private void onDirtyChanged(boolean dirty) {
+    String title = curTemplate == null ? "" : curTemplate.getUid();
+    title = title + StructureResourceManager.GENERATOR_EXT;
+    if(dirty) {
+      title += "*";
+    }
+    setTitle(title);
+    saveB.setEnabled(dirty);
+  }
+
+  private class DirtMonitor implements TreeModelListener {
+
+    private boolean dirty = false;
+
+    public void setDirty(boolean dirty) {
+      if(dirty == this.dirty) {
+        return;
+      }
+      this.dirty = dirty;
+      onDirtyChanged(dirty);
+    }
+
+    @Override
+    public void treeNodesChanged(TreeModelEvent e) {
+      setDirty(true);
+    }
+
+    @Override
+    public void treeNodesInserted(TreeModelEvent e) {
+      setDirty(true);
+    }
+
+    @Override
+    public void treeNodesRemoved(TreeModelEvent e) {
+      setDirty(true);
+    }
+
+    @Override
+    public void treeStructureChanged(TreeModelEvent e) {
+      setDirty(true);
+    }
+
   }
 
 }

@@ -21,7 +21,7 @@ import crazypants.structures.creator.block.tree.ListAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.gen.structure.TypeRegister;
 
-public class AddEditor extends AbstractAttributeEditor {
+public class AddElementEditor extends AbstractAttributeEditor {
 
   private final JButton but;
   private final JPanel pan;
@@ -33,7 +33,7 @@ public class AddEditor extends AbstractAttributeEditor {
 
   private List<Object> options = new ArrayList<Object>();
 
-  public AddEditor() {
+  public AddElementEditor() {
     super(List.class);
     but = new JButton("Add");
     but.addActionListener(new ActionListener() {
@@ -138,10 +138,6 @@ public class AddEditor extends AbstractAttributeEditor {
       }      
       return this; 
     }
-    
-    
-    
-    
     
   }
 

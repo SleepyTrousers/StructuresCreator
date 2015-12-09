@@ -46,7 +46,7 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
       return;
     }
     Class<? extends Object> clz = obj.getClass();
-    while(clz != null) {
+    while (clz != null) {
       addFieldsFromClass(obj, treeModel, clz);
       clz = clz.getSuperclass();
     }
@@ -65,22 +65,24 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
       IAttributeAccessor aa = null;
       ListElementType lt = field.getAnnotation(ListElementType.class);
       if(lt != null) {
-        aa = new ListAccessor(field, lt.elementType());        
+        aa = new ListAccessor(field, lt.elementType());
       } else if(field.getAnnotation(Expose.class) != null) {
-        aa = new FieldAccessor(field);        
+        aa = new FieldAccessor(field);
       }
       if(aa != null && aa.isValid() && (!skipType || !"type".equals(aa.getAttribuiteName()))) {
         add(new StructuresTreeNode(obj, aa, aa.get(obj), treeModel));
       }
-    }    
+    }
   }
 
   private void addChildren(List<?> obj, DefaultTreeModel treeModel) {
     int index = 0;
     for (Object o : obj) {
-      ListElementAccessor aa = new ListElementAccessor(index, o.getClass(), data.getAttributeAccessor().getAttribuiteName());
-      add(new StructuresTreeNode(obj, aa, o, treeModel));
-      index++;
+      if(o != null) {
+        ListElementAccessor aa = new ListElementAccessor(index, o.getClass(), data.getAttributeAccessor().getAttribuiteName());
+        add(new StructuresTreeNode(obj, aa, o, treeModel));
+        index++;
+      }
     }
   }
 

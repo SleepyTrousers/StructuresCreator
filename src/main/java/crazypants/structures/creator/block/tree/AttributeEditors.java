@@ -11,7 +11,7 @@ import crazypants.structures.api.gen.ISiteValidator;
 import crazypants.structures.api.runtime.IAction;
 import crazypants.structures.api.runtime.IBehaviour;
 import crazypants.structures.api.runtime.ICondition;
-import crazypants.structures.creator.block.tree.editors.AddEditor;
+import crazypants.structures.creator.block.tree.editors.AddElementEditor;
 import crazypants.structures.creator.block.tree.editors.BooleanEditor;
 import crazypants.structures.creator.block.tree.editors.BorderEditor;
 import crazypants.structures.creator.block.tree.editors.ComponentEditor;
@@ -54,7 +54,7 @@ public class AttributeEditors {
     registerEditor(new ComponentEditor());    
     registerEditor(new BorderEditor());
     registerEditor(new RotationEditor());
-    registerEditor(new AddEditor());
+    registerEditor(new AddElementEditor());
     
     //TODO: Make the type checking go up the heirachy and I can just use one generic IType editor
     //for all these (and any other) types

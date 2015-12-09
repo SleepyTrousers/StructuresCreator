@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.GsonIO;
+import crazypants.structures.gen.io.ResourceWrapper;
 import crazypants.structures.gen.io.resource.DirectoryResourcePath;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -64,7 +65,10 @@ public class ExportManager {
 
     String json = null;
     try {
-      json = GsonIO.INSTANCE.getGson().toJson(curTemplate);
+            
+      ResourceWrapper rw = new ResourceWrapper();
+      rw.setStructureTemplate(curTemplate);      
+      json = GsonIO.INSTANCE.getGson().toJson(rw);
     } catch (Exception e) {
       e.printStackTrace();
       if(player != null) {
