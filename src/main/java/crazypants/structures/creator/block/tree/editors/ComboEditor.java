@@ -10,6 +10,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import crazypants.structures.creator.block.tree.NodeData;
 
 public abstract class ComboEditor<T> extends AbstractAttributeEditor {
@@ -45,6 +47,11 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
     } else {
       model = new DefaultComboBoxModel<T>(values);
     }    
+    @SuppressWarnings("unchecked")
+    T val = (T)data.getValue();
+    if(!ArrayUtils.contains(values, val)) {
+      model.insertElementAt(val, 0);
+    }
     ignoreUpdate = true;
     cb.setModel(model);
     cb.setSelectedItem(data.getValue());

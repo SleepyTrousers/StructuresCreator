@@ -6,8 +6,11 @@ import java.util.Collection;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import crazypants.structures.api.ITyped;
 import crazypants.structures.api.gen.IStructureComponent;
+import net.minecraft.block.Block;
 
 public class NodeRenderer extends DefaultTreeCellRenderer {
 
@@ -62,6 +65,10 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
     } else {
       if(val instanceof String) {
         return val.toString();
+      }
+      if(val instanceof Block) {
+        UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor((Block)val);
+        return uid == null ? "Unknown block" : uid.toString();
       }
       if(val instanceof IStructureComponent) {
         return ((IStructureComponent) val).getUid();

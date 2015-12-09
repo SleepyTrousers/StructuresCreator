@@ -195,7 +195,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     newB = new JButton("New");
     openB = new JButton("Open");
     saveAsB = new JButton("Save As");
-    saveB = new JButton("Save");  
+    saveB = new JButton("Save");
     saveB.setEnabled(false);
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
@@ -216,7 +216,7 @@ public class DialogTemplateEditor extends AbstractDialog {
     clearB = new JButton("Clear");
     rotCB = new JComboBox<Rotation>(Rotation.values());
     rotCB.setSelectedIndex(0);
-    
+
     tree = new JTree(new DefaultMutableTreeNode());
     tree.setRootVisible(false);
     tree.setEditable(false);
@@ -258,7 +258,7 @@ public class DialogTemplateEditor extends AbstractDialog {
       @Override
       public void actionPerformed(ActionEvent e) {
         if(!dirtyMonitor.isDirty() || checkClear()) {
-          openRegisteredTemplate();
+          openTemplate();
         }
       }
     });
@@ -282,8 +282,7 @@ public class DialogTemplateEditor extends AbstractDialog {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(!dirtyMonitor.isDirty() || checkClear()) {
-          clearBounds();
+        if(!dirtyMonitor.isDirty() || checkClear()) {          
           tile.setName("NewTemplate");
           sendUpdatePacket();
           curTemplate = null;
@@ -307,9 +306,7 @@ public class DialogTemplateEditor extends AbstractDialog {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(checkClear()) {
-          clearBounds();
-        }
+        clearBounds();
       }
     });
 
@@ -317,11 +314,9 @@ public class DialogTemplateEditor extends AbstractDialog {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(checkClear()) {
-          clearBounds();
-          if(rotCB.getSelectedIndex() >= 0) {
-            generate(rotCB.getItemAt(rotCB.getSelectedIndex()));
-          }
+        clearBounds();
+        if(rotCB.getSelectedIndex() >= 0) {
+          generate(rotCB.getItemAt(rotCB.getSelectedIndex()));
         }
       }
 
@@ -363,7 +358,7 @@ public class DialogTemplateEditor extends AbstractDialog {
 
   }
 
-  private void openRegisteredTemplate() {
+  private void openTemplate() {
     StructureResourceManager resMan = StructureGenRegister.instance.getResourceManager();
     List<File> files = resMan.getFilesWithExt(StructureResourceManager.TEMPLATE_EXT);
 
@@ -371,9 +366,6 @@ public class DialogTemplateEditor extends AbstractDialog {
     for (File file : files) {
 
       final String uid = file.getName().substring(0, file.getName().length() - StructureResourceManager.TEMPLATE_EXT.length());
-      if(uid != null && uid.startsWith("AAAA")) {
-        System.out.println("DialogTemplateEditor.openRegisteredTemplate: ");
-      }
       final IStructureTemplate template = loadFromFile(file);
       if(template != null) {
         JMenuItem mi = new JMenuItem(file.getName());
@@ -432,7 +424,7 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     InputStream stream = null;
     try {
-      stream = new FileInputStream(file);      
+      stream = new FileInputStream(file);
       StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
       IStructureTemplate res = StructureGenRegister.instance.getResourceManager().loadTemplate(name, stream);
       if(res != null) {
@@ -449,7 +441,7 @@ public class DialogTemplateEditor extends AbstractDialog {
   }
 
   private void save() {
-    
+
     if(curTemplate == null) {
       dirtyMonitor.setDirty(false);
       return;
@@ -461,19 +453,18 @@ public class DialogTemplateEditor extends AbstractDialog {
     }
     File dir = new File(tile.getExportDir());
     File file = new File(dir, uid + StructureResourceManager.TEMPLATE_EXT);
-    
+
     if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
-      dirtyMonitor.setDirty(false);      
+      dirtyMonitor.setDirty(false);
       StructureGenRegister.instance.registerTemplate(curTemplate);
       Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText("Saved template to: " + file.getAbsolutePath()));
     }
-    Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());    
-    
+    Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());
+
   }
 
   private void saveAs() {
 
-    
     if(!isTemplateValid()) {
       return;
     }
@@ -536,10 +527,10 @@ public class DialogTemplateEditor extends AbstractDialog {
 
   }
 
-  protected boolean isTemplateValid() {    
+  protected boolean isTemplateValid() {
     if(curTemplate == null) {
       return false;
-    }        
+    }
     if(!curTemplate.isValid()) {
       JOptionPane.showMessageDialog(this, "Current template is not valid", "Boo hoo", JOptionPane.ERROR_MESSAGE, null);
       return false;

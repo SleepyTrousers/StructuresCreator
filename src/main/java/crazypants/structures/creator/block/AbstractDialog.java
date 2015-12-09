@@ -57,7 +57,7 @@ public abstract class AbstractDialog extends JDialog {
   }
   
   protected boolean checkClear() {
-    return JFileChooser.APPROVE_OPTION == JOptionPane.showConfirmDialog(this, "Clear existing data?");
+    return JFileChooser.APPROVE_OPTION == JOptionPane.showConfirmDialog(this, "You have unsaved changes. Trash'm?");
   }
 
 }
