@@ -3,13 +3,22 @@ package crazypants.structures.creator.block.tree;
 import java.awt.Component;
 import java.util.Collection;
 
+import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import crazypants.structures.api.ITyped;
+import crazypants.structures.api.gen.IDecorator;
+import crazypants.structures.api.gen.ISitePreperation;
+import crazypants.structures.api.gen.ISiteValidator;
 import crazypants.structures.api.gen.IStructureComponent;
+import crazypants.structures.api.runtime.IAction;
+import crazypants.structures.api.runtime.IBehaviour;
+import crazypants.structures.api.runtime.ICondition;
+import crazypants.structures.api.util.Point3i;
+import crazypants.structures.api.util.Rotation;
 import net.minecraft.block.Block;
 
 public class NodeRenderer extends DefaultTreeCellRenderer {
@@ -36,7 +45,7 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
         }
         if(nb.getValue() != null) {
           if(text.length() > 0) {
-            text +=  ": ";
+            text += ": ";
           }
           text = text + getValueString(nb.getValue());
         }
@@ -54,9 +63,53 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
       } else if(nb.getValue() != null) {
         text = nb.getValue().getClass().getSimpleName();
       }
-    }
+    }    
     setText(text);
+    Icon icon = getIcon(nb);
+    if(icon != null) {
+      setIcon(icon);
+    } else if(leaf) {
+      setIcon(Icons.DOT);
+    }
     return this;
+  }
+
+  private Icon getIcon(NodeData nd) {
+    if(nd == null || nd.getType() == null) {
+      return null;
+    }
+    Class<?> type = nd.getType();
+    if(IBehaviour.class.isAssignableFrom(type)) {
+      return Icons.BEHAVIOUR;
+    }
+    if(ISitePreperation.class.isAssignableFrom(type)) {
+      return Icons.PREPERATION;
+    }
+    if(ISiteValidator.class.isAssignableFrom(type)) {
+      return Icons.VALIDATOR;
+    }
+    if(IDecorator.class.isAssignableFrom(type)) {
+      return Icons.DECORATOR;
+    }
+    if(IStructureComponent.class.isAssignableFrom(type)) {
+      return Icons.COMPONENT;
+    }
+    if(ICondition.class.isAssignableFrom(type)) {
+      return Icons.CONDITION;
+    }
+    if(IAction.class.isAssignableFrom(type)) {
+      return Icons.ACTION;
+    }
+    if(Rotation.class.isAssignableFrom(type)) {
+      return Icons.ROTATION;
+    }
+    if(Point3i.class.isAssignableFrom(type) || "taggedPosition".equals(nd.getLabel())) {
+      return Icons.LOCATION;
+    }
+//    if(boolean.class.isAssignableFrom(type)) {
+//      return Icons.CHECK_BOX;
+//    }
+    return null;
   }
 
   private String getValueString(Object val) {
@@ -67,7 +120,7 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
         return val.toString();
       }
       if(val instanceof Block) {
-        UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor((Block)val);
+        UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor((Block) val);
         return uid == null ? "Unknown block" : uid.toString();
       }
       if(val instanceof IStructureComponent) {

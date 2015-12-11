@@ -56,6 +56,7 @@ import crazypants.structures.creator.block.template.packet.PacketTemplateEditorG
 import crazypants.structures.creator.block.tree.AttributeEditors;
 import crazypants.structures.creator.block.tree.FieldAccessor;
 import crazypants.structures.creator.block.tree.IAttributeEditor;
+import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListElementAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.creator.block.tree.NodeRenderer;
@@ -112,6 +113,7 @@ public class DialogTemplateEditor extends AbstractDialog {
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    setIconImage(Icons.TEMPLATE.getImage());
     setModal(false);
     setAlwaysOnTop(true);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -192,10 +194,14 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     };
 
-    newB = new JButton("New");
-    openB = new JButton("Open");
-    saveAsB = new JButton("Save As");
-    saveB = new JButton("Save");
+    newB = new JButton(Icons.NEW);
+    newB.setToolTipText("New");
+    openB = new JButton(Icons.OPEN);
+    openB.setToolTipText("Open");
+    saveAsB = new JButton(Icons.SAVE_AS);
+    saveAsB.setToolTipText("Save As");
+    saveB = new JButton(Icons.SAVE);
+    saveB.setToolTipText("Save");
     saveB.setEnabled(false);
 
     KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
@@ -212,8 +218,10 @@ public class DialogTemplateEditor extends AbstractDialog {
       }
     });
 
-    genB = new JButton("Generate");
-    clearB = new JButton("Clear");
+    genB = new JButton(Icons.GENERATE);
+    genB.setToolTipText("Generate Structure");
+    clearB = new JButton(Icons.CLEAR);
+    clearB.setToolTipText("Clear current structure");
     rotCB = new JComboBox<Rotation>(Rotation.values());
     rotCB.setSelectedIndex(0);
 
@@ -226,7 +234,7 @@ public class DialogTemplateEditor extends AbstractDialog {
   }
 
   private void addComponents() {
-    JPanel filePan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+    JPanel filePan = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
     filePan.add(newB);
     filePan.add(openB);
     filePan.add(saveB);
@@ -351,7 +359,8 @@ public class DialogTemplateEditor extends AbstractDialog {
       if(res != null) {
         p.add(res, BorderLayout.CENTER);
       }
-      p.add(removeEditor.getComponent(nd, (ListElementAccessor) nd.getAttributeAccessor()), BorderLayout.SOUTH);
+      Component remEd = removeEditor.getComponent(nd, (ListElementAccessor) nd.getAttributeAccessor());
+      p.add(remEd, BorderLayout.EAST);
       res = p;
     }
     return res;

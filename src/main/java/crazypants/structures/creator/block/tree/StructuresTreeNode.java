@@ -1,6 +1,8 @@
 package crazypants.structures.creator.block.tree;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -45,10 +47,16 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
       addChildren((List<?>) obj, treeModel);
       return;
     }
-    Class<? extends Object> clz = obj.getClass();
+    List<Class<? extends Object>> toScan = new ArrayList<Class<? extends Object>>();
+    Class<? extends Object> clz = obj.getClass();    
     while (clz != null) {
-      addFieldsFromClass(obj, treeModel, clz);
+      toScan.add(clz);
+      //addFieldsFromClass(obj, treeModel, clz);
       clz = clz.getSuperclass();
+    }
+    Collections.reverse(toScan);
+    for(Class<? extends Object> scan : toScan) {
+      addFieldsFromClass(obj, treeModel, scan);
     }
   }
 

@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 import crazypants.structures.api.ITyped;
 import crazypants.structures.creator.block.tree.IAttributeAccessor;
+import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.gen.structure.TypeRegister;
@@ -35,7 +36,8 @@ public class AddElementEditor extends AbstractAttributeEditor {
 
   public AddElementEditor() {
     super(List.class);
-    but = new JButton("Add");
+    but = new JButton(Icons.ADD);
+    but.setToolTipText("Add");
     but.addActionListener(new ActionListener() {
 
       @Override

@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.tree.TreeNode;
 
+import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListElementAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.creator.block.tree.StructuresTreeNode;
@@ -23,7 +24,8 @@ public class RemoveEditor {
   private NodeData nodeData;
   
   public RemoveEditor() {
-    but = new JButton("Delete");
+    but = new JButton(Icons.DELETE);
+    but.setToolTipText("Delete");
     but.addActionListener(new ActionListener() {
       
       @Override
