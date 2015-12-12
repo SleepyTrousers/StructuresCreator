@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.enderio.core.common.TileEntityEnder;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -13,10 +12,11 @@ import com.google.common.collect.Multimap;
 import crazypants.structures.StructureUtils;
 import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.util.Point3i;
+import crazypants.structures.creator.block.AbstractResourceTile;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 
-public class TileComponentTool extends TileEntityEnder {
+public class TileComponentTool extends AbstractResourceTile {
 
   private int width = 9;
   private int height = 9;
@@ -26,9 +26,6 @@ public class TileComponentTool extends TileEntityEnder {
   private int offsetX = 1;
   private int offsetY = 0;
   private int offsetZ = 1;
-
-  private String name = "Component";
-  private String exportDir;
 
   private final HashMultimap<String, Point3i> taggedLocations = HashMultimap.create();
 
@@ -71,12 +68,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   @Override
   public void writeCustomNBT(NBTTagCompound root) {
-    if(name != null && name.length() > 0) {
-      root.setString("name", name);
-    }
-    if(exportDir != null && exportDir.length() > 0) {
-      root.setString("exportDir", exportDir);
-    }
+    super.writeCustomNBT(root);
     root.setInteger("width", width);
     root.setInteger("height", height);
     root.setInteger("length", length);
@@ -93,11 +85,7 @@ public class TileComponentTool extends TileEntityEnder {
 
   @Override
   public void readCustomNBT(NBTTagCompound root) {
-    name = root.getString("name");
-    exportDir = root.getString("exportDir");
-    if(exportDir != null && exportDir.length() == 0) {
-      exportDir = null;
-    }
+    super.readCustomNBT(root);
     width = root.getInteger("width");
     height = root.getInteger("height");
     length = root.getInteger("length");
@@ -144,24 +132,6 @@ public class TileComponentTool extends TileEntityEnder {
 
   public void setSurfaceOffset(int surfaceOffset) {
     this.surfaceOffset = surfaceOffset;
-    markDirty();
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-    markDirty();
-  }
-
-  public String getExportDir() {
-    return exportDir;
-  }
-
-  public void setExportDir(String exportDir) {
-    this.exportDir = exportDir;
     markDirty();
   }
 

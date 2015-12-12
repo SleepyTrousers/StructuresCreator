@@ -15,7 +15,7 @@ import crazypants.structures.creator.block.template.gui.DialogTemplateEditor;
 import crazypants.structures.creator.block.template.gui.GuiTemplateEditor;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
-import crazypants.structures.creator.block.template.packet.PacketTemplateEditorGui;
+import crazypants.structures.creator.block.template.packet.PacketResourceTileGui;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -28,7 +28,7 @@ public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
 
   public static BlockTemplateEditor create() {
 
-    PacketHandler.INSTANCE.registerMessage(PacketTemplateEditorGui.class, PacketTemplateEditorGui.class, PacketHandler.nextID(), Side.SERVER);
+    PacketHandler.INSTANCE.registerMessage(PacketResourceTileGui.class, PacketResourceTileGui.class, PacketHandler.nextID(), Side.SERVER);
     PacketHandler.INSTANCE.registerMessage(PacketBuildStructure.class, PacketBuildStructure.class, PacketHandler.nextID(), Side.SERVER);
     PacketHandler.INSTANCE.registerMessage(PacketClearStructure.class, PacketClearStructure.class, PacketHandler.nextID(), Side.SERVER);
     

@@ -6,20 +6,20 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import crazypants.structures.creator.block.template.TileTemplateEditor;
+import crazypants.structures.creator.block.AbstractResourceTile;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class PacketTemplateEditorGui extends MessageTileEntity<TileTemplateEditor> implements IMessageHandler<PacketTemplateEditorGui, IMessage> {
+public class PacketResourceTileGui extends MessageTileEntity<AbstractResourceTile> implements IMessageHandler<PacketResourceTileGui, IMessage> {
 
   
   private String name;
   private String exportDir;
   
-  public PacketTemplateEditorGui() {        
+  public PacketResourceTileGui() {        
   }
   
-  public PacketTemplateEditorGui(TileTemplateEditor tile) {
+  public PacketResourceTileGui(AbstractResourceTile tile) {
     super(tile);
     name = tile.getName();
     exportDir = tile.getExportDir();
@@ -40,9 +40,9 @@ public class PacketTemplateEditorGui extends MessageTileEntity<TileTemplateEdito
   }
 
   @Override
-  public IMessage onMessage(PacketTemplateEditorGui message, MessageContext ctx) {
+  public IMessage onMessage(PacketResourceTileGui message, MessageContext ctx) {
     EntityPlayer player = ctx.getServerHandler().playerEntity;
-    TileTemplateEditor tile = message.getTileEntity(player.worldObj);
+    AbstractResourceTile tile = message.getTileEntity(player.worldObj);
     if(tile == null) {
       return null;
     }

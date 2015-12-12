@@ -10,12 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -26,23 +23,25 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.apache.commons.io.IOUtils;
-import org.lwjgl.opengl.Display;
 
 import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.CreatorUtil;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.AbstractDialog;
+import crazypants.structures.creator.block.AbstractResourceDialog;
+import crazypants.structures.creator.block.AbstractResourceTile;
+import crazypants.structures.creator.block.FileControls;
 import crazypants.structures.creator.block.component.TileComponentTool;
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
 import crazypants.structures.creator.block.component.packet.PacketComponentToolGui;
+import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.client.Minecraft;
 
-public class DialogComponentTool extends AbstractDialog {
+public class DialogComponentTool extends AbstractResourceDialog {
 
   private static final long serialVersionUID = 1L;
 
@@ -55,7 +54,7 @@ public class DialogComponentTool extends AbstractDialog {
       res = new DialogComponentTool(tile);
       openDialogs.put(key, res);
     }
-    res.open();
+    res.openDialog();
 
   }
 
@@ -68,29 +67,20 @@ public class DialogComponentTool extends AbstractDialog {
   private JTextField lengthTF;
   private JTextField grounLevelTF;
 
-  private JButton openB;
-  private JButton importB;
-
-  private JButton exportB;
-
-  private JButton clearB;
+  private FileControls fileControls;
 
   public DialogComponentTool(TileComponentTool tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
-    
+
     initComponents();
     addComponents();
     addListeners();
 
     updateFieldsFromTE();
-  }
 
-  public void open() {
-    pack();
-    setLocation(Display.getX(), Display.getY());
-    setVisible(true);
-    requestFocus();
+    setTitle("Component Editor");
+    setIconImage(Icons.COMPONENT.getImage());
   }
 
   private void updateFieldsFromTE() {
@@ -118,9 +108,159 @@ public class DialogComponentTool extends AbstractDialog {
     sendUpdatePacket();
   }
 
-  private void sendUpdatePacket() {
+  @Override
+  protected void sendUpdatePacket() {
     PacketComponentToolGui packet = new PacketComponentToolGui(tile);
     PacketHandler.INSTANCE.sendToServer(packet);
+  }
+
+  @Override
+  protected void createNewResource() {
+    if(checkClear()) {
+      nameTF.setText("PaulTheNew");
+      clearBounds();
+    }
+  }
+
+  @Override
+  protected void openResource() {
+
+    if(!checkClear()) {
+      return;
+    }
+
+    StructureResourceManager resMan = StructureGenRegister.instance.getResourceManager();
+    List<File> files = resMan.getFilesWithExt(getResourceExtension());
+
+    JPopupMenu menu = new JPopupMenu();
+    for (File file : files) {
+
+      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+      final StructureComponentNBT component = readFromFile(file);
+      if(component != null) {
+        JMenuItem mi = new JMenuItem(file.getName());
+        mi.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            openComponent(uid, component);
+          }
+        });
+        menu.add(mi);
+      } else {
+        System.out.println("DialogComponentTool.openRegisteredTemplate: Could not load component from file: " + file.getAbsolutePath());
+      }
+
+    }
+
+    JMenuItem mi = new JMenuItem("...");
+    mi.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        openFromFile();
+      }
+    });
+    menu.add(mi);
+
+    menu.show(fileControls.getOpenB(), 0, 0);
+  }
+
+  private void openFromFile() {
+    File file = selectFileToOpen();
+    if(file == null) {
+      return;
+    }
+
+    StructureComponentNBT sc = readFromFile(file);
+    if(sc != null) {
+      StructureGenRegister.instance.registerStructureComponent(sc);
+      openComponent(sc.getUid(), sc);
+    } else {
+      JOptionPane.showMessageDialog(this, "Could not load component.", "Bottoms", JOptionPane.ERROR_MESSAGE);
+    }
+  }
+
+  public StructureComponentNBT readFromFile(File file) {
+    String name = file.getName();
+    if(name.endsWith(StructureResourceManager.COMPONENT_EXT)) {
+      name = name.substring(0, name.length() - StructureResourceManager.COMPONENT_EXT.length());
+    }
+
+    InputStream stream = null;
+    try {
+      stream = new FileInputStream(file);
+      return new StructureComponentNBT(name, stream);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      IOUtils.closeQuietly(stream);
+    }
+    return null;
+  }
+
+  @Override
+  protected void writeToFile(File file, String uid) {
+    String name = nameTF.getText().trim();
+    if(!uid.equals(name)) {
+      nameTF.setText(uid);
+
+    }
+    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
+    comp.setTags(tile.getTaggedLocations());
+    if(ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer)) {
+      StructureGenRegister.instance.registerStructureComponent(comp);
+    }
+    sendUpdatePacket();
+  }
+
+  private void openComponent(String name, IStructureComponent component) {
+    if(name == null || component == null) {
+      return;
+    }
+
+    clearBounds();
+    tile.setComponent(name, component);
+    updateFieldsFromTE();
+
+    PacketBuildComponent packet = new PacketBuildComponent(tile, name);
+    PacketHandler.INSTANCE.sendToServer(packet);
+  }
+
+  private void clearBounds() {
+    tile.getTaggedLocations().clear();
+    tile.markDirty();
+    PacketBuildComponent packet = new PacketBuildComponent(tile, null);
+    PacketHandler.INSTANCE.sendToServer(packet);
+  }
+
+  @Override
+  protected void onDialogClose() {
+    openDialogs.remove(position);
+  }
+
+  @Override
+  protected String getResourceUid() {
+    String res = nameTF.getText();
+    if(res == null) {
+      return null;
+    }
+    return res.trim();
+  }
+
+  @Override
+  protected String getResourceExtension() {
+    return StructureResourceManager.COMPONENT_EXT;
+  }
+
+  @Override
+  protected AbstractResourceTile getTile() {
+    return tile;
+  }
+
+  private JTextField createTF(int cols, DocumentListener updateListener) {
+    JTextField res = new JTextField(cols);
+    res.getDocument().addDocumentListener(updateListener);
+    return res;
   }
 
   private int getInt(JTextField tf, int def) {
@@ -159,16 +299,7 @@ public class DialogComponentTool extends AbstractDialog {
     lengthTF = createTF(5, updateListener);
     grounLevelTF = createTF(3, updateListener);
 
-    clearB = new JButton("New");
-    openB = new JButton("Open");
-    importB = new JButton("Import");
-    exportB = new JButton("Export");
-  }
-
-  private JTextField createTF(int cols, DocumentListener updateListener) {
-    JTextField res = new JTextField(cols);
-    res.getDocument().addDocumentListener(updateListener);
-    return res;
+    fileControls = new FileControls(this);
   }
 
   private void addComponents() {
@@ -178,6 +309,11 @@ public class DialogComponentTool extends AbstractDialog {
     Insets insets = new Insets(4, 0, 4, 0);
     int x = 0;
     int y = 0;
+
+    rootPan.add(fileControls.getPanel(), new GridBagConstraints(x, y, 2, 1, 1, 1, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+    x = 0;
+    y++;
+
     rootPan.add(new JLabel("Name: "), new GridBagConstraints(x, y, 1, 1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE, insets, 0, 0));
     x++;
     rootPan.add(nameTF, new GridBagConstraints(x, y, 1, 1, 1, 1, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
@@ -202,201 +338,13 @@ public class DialogComponentTool extends AbstractDialog {
     x++;
     rootPan.add(grounLevelTF, new GridBagConstraints(x, y, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.NONE, insets, 0, 0));
 
-    x = 0;
-    y++;
-
-    bPan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
-    bPan.add(clearB);
-    bPan.add(openB);
-    bPan.add(importB);
-    bPan.add(exportB);
-    rootPan.add(bPan, new GridBagConstraints(x, y, 2, 1, 1, 1, GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
-
     getContentPane().setLayout(new GridBagLayout());
     getContentPane().add(rootPan,
         new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH, new Insets(10, 10, 10, 10), 0, 0));
 
   }
 
-  private void openRegisteredComponent() {
-    Map<String, IStructureComponent> comps = StructureGenRegister.instance.getStructureComponentMap();
-    JPopupMenu menu = new JPopupMenu();
-    for (Entry<String, IStructureComponent> comp : comps.entrySet()) {
-      final Entry<String, IStructureComponent> c = comp;
-      JMenuItem mi = new JMenuItem(comp.getKey());
-      mi.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          openComponent(c.getKey(), c.getValue());
-        }
-      });
-      menu.add(mi);
-    }
-    menu.show(openB, 0, 0);
-  }
-
-  private void importFromFile() {
-    File startDir = new File(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
-    JFileChooser fc = new JFileChooser(startDir);
-    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fc.setDialogTitle("Select Component File");
-    int res = fc.showOpenDialog(this);    
-    if(res != JFileChooser.APPROVE_OPTION) {
-      return;
-    }
-        
-    StructureComponentNBT sc = loadFromFile(fc.getSelectedFile());
-    if(sc != null) {
-      StructureGenRegister.instance.registerStructureComponent(sc);
-    } else {
-      JOptionPane.showMessageDialog(this, "Could not load component.", "Bottoms", JDialog.ERROR );
-    }
-    String name = sc.getUid();
-    
-    openComponent(name, sc);
-  }
-  
-  public StructureComponentNBT loadFromFile(File file) {
-    String name = file.getName();
-    if(name.endsWith(StructureResourceManager.COMPONENT_EXT)) {
-      name = name.substring(0, name.length() - StructureResourceManager.COMPONENT_EXT.length());
-    }
-    
-    InputStream stream = null;
-    try {
-      stream = new FileInputStream(file);      
-      return new StructureComponentNBT(name, stream);
-    } catch(Exception e) {
-      e.printStackTrace();
-    } finally {
-      IOUtils.closeQuietly(stream);
-    }
-    return null;
-  }
-
-  private void exportToFile() {
-
-    String name = nameTF.getText();
-    if(name == null || name.trim().length() == 0) {
-      JOptionPane.showMessageDialog(this, "No name specified", "Boo hoo", JOptionPane.ERROR_MESSAGE, null);
-      return;
-    }
-
-    File startDir = new File(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
-    JFileChooser fc = new JFileChooser(startDir);
-    fc.setSelectedFile(new File(name + StructureResourceManager.COMPONENT_EXT));
-    fc.setDialogTitle("Select Directory");
-    int res = fc.showSaveDialog(this);
-
-    if(res != JFileChooser.APPROVE_OPTION) {
-      return;
-    }
-    File dir;
-    File file = fc.getSelectedFile();
-    if(file.isDirectory()) {
-      dir = file;
-      file = new File(dir, name + StructureResourceManager.COMPONENT_EXT);
-    } else {
-      dir = file.getParentFile();
-      if(!file.exists() && !file.getName().endsWith(StructureResourceManager.COMPONENT_EXT)) {
-        file = new File(dir, file.getName() + StructureResourceManager.COMPONENT_EXT);
-      }
-    }
-    if(!dir.exists()) {
-      dir.mkdirs();
-    }
-    if(!dir.exists()) {
-      return;
-    }
-
-    tile.setExportDir(dir.getPath());
-    sendUpdatePacket();
-
-    if(file.exists()) {
-      res = JOptionPane.showConfirmDialog(this, "Replace existing file?");
-      if(res != JFileChooser.APPROVE_OPTION) {
-        return;
-      }
-    }
-
-    StructureComponentNBT comp = CreatorUtil.createComponent(name, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
-    comp.setTags(tile.getTaggedLocations());
-    if(comp != null) {
-      StructureGenRegister.instance.registerStructureComponent(comp);
-      ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer);
-    }
-  }
-
-  
-
-  private void openComponent(String name, IStructureComponent component) {
-    if(name == null || component == null) {
-      return;
-    }
-    
-    clearBounds();
-    tile.setComponent(name, component);
-    updateFieldsFromTE();
-
-    PacketBuildComponent packet = new PacketBuildComponent(tile, name);
-    PacketHandler.INSTANCE.sendToServer(packet);
-  }
-
-  private void clearBounds() {
-    tile.getTaggedLocations().clear();
-    tile.markDirty();
-    PacketBuildComponent packet = new PacketBuildComponent(tile, null);
-    PacketHandler.INSTANCE.sendToServer(packet);
-  }
-
-  @Override
-  protected void onClose() {
-    openDialogs.remove(position);    
-  }
-
   private void addListeners() {
-
-    openB.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(checkClear()) {
-          openRegisteredComponent();
-        }
-
-      }
-    });
-
-    importB.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(checkClear()) {
-          importFromFile();
-        }
-      }
-    });
-
-    exportB.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        exportToFile();
-      }
-
-    });
-
-    clearB.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(checkClear()) {
-          nameTF.setText("PaulTheNew");
-          clearBounds();
-        }
-      }
-
-    });
 
   }
 

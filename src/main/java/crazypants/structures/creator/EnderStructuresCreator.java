@@ -18,7 +18,6 @@ import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentTool;
 import crazypants.structures.creator.block.BlockTemplateEditor;
 import crazypants.structures.creator.block.component.ToolRegister;
-import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
 import crazypants.structures.creator.item.ItemDebugTool;
@@ -79,7 +78,7 @@ public class EnderStructuresCreator {
   @EventHandler
   public void postInit(FMLPostInitializationEvent event) {  
     addRecipes();        
-    ExportManager.instance.loadExportFolder();
+    //ExportManager.instance.loadExportFolder();
   }
   
   @EventHandler

@@ -8,11 +8,8 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -23,7 +20,6 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -41,18 +37,18 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.commons.io.IOUtils;
-import org.lwjgl.opengl.Display;
 
 import crazypants.structures.Log;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.AbstractDialog;
+import crazypants.structures.creator.block.AbstractResourceDialog;
+import crazypants.structures.creator.block.AbstractResourceTile;
+import crazypants.structures.creator.block.FileControls;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
-import crazypants.structures.creator.block.template.packet.PacketTemplateEditorGui;
 import crazypants.structures.creator.block.tree.AttributeEditors;
 import crazypants.structures.creator.block.tree.FieldAccessor;
 import crazypants.structures.creator.block.tree.IAttributeEditor;
@@ -67,9 +63,8 @@ import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureTemplate;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 
-public class DialogTemplateEditor extends AbstractDialog {
+public class DialogTemplateEditor extends AbstractResourceDialog {
 
   private static final long serialVersionUID = 1L;
 
@@ -82,29 +77,23 @@ public class DialogTemplateEditor extends AbstractDialog {
       res = new DialogTemplateEditor(tile);
       openDialogs.put(key, res);
     }
-    res.open();
+    res.openDialog();
   }
 
   private final TileTemplateEditor tile;
   private final Point3i position;
+  private IStructureTemplate curTemplate;
 
-  private JButton newB;
-  private JButton openB;
-  private JButton saveB;
-  private JButton saveAsB;
-
+  private FileControls fileControls;
   private JButton genB;
   private JButton clearB;
   private JComboBox<Rotation> rotCB;
 
   private JPanel editorPan;
-
   private JTree tree;
-  private StructuresTreeNode rootNode;
-  private IStructureTemplate curTemplate;
-
   private DefaultTreeModel treeModel;
-
+  private StructuresTreeNode rootNode;
+  
   private RemoveEditor removeEditor = new RemoveEditor();
   private JPanel emptyEditor;
 
@@ -137,11 +126,21 @@ public class DialogTemplateEditor extends AbstractDialog {
     buildTree();
   }
 
-  public void open() {
-    pack();
-    setLocation(Display.getX(), Display.getY());
-    setVisible(true);
-    requestFocus();
+  @Override
+  protected void saveAs() {
+    if(isTemplateValid()) {
+      super.saveAs();
+    }    
+  }
+  
+  @Override
+  protected void createNewResource() {
+    if(!dirtyMonitor.isDirty() || checkClear()) {          
+      tile.setName("NewTemplate");
+      sendUpdatePacket();
+      curTemplate = null;
+      buildTree();
+    }    
   }
 
   private void buildTree() {
@@ -169,13 +168,9 @@ public class DialogTemplateEditor extends AbstractDialog {
     repaint();
   }
 
-  private void sendUpdatePacket() {
-    PacketTemplateEditorGui packet = new PacketTemplateEditorGui(tile);
-    PacketHandler.INSTANCE.sendToServer(packet);
-  }
-
   private void initComponents() {
 
+    fileControls = new FileControls(this);
     emptyEditor = new JPanel();
     emptyEditor.setPreferredSize(new Dimension(20, 50));
 
@@ -194,30 +189,6 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     };
 
-    newB = new JButton(Icons.NEW);
-    newB.setToolTipText("New");
-    openB = new JButton(Icons.OPEN);
-    openB.setToolTipText("Open");
-    saveAsB = new JButton(Icons.SAVE_AS);
-    saveAsB.setToolTipText("Save As");
-    saveB = new JButton(Icons.SAVE);
-    saveB.setToolTipText("Save");
-    saveB.setEnabled(false);
-
-    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
-      @Override
-      public boolean dispatchKeyEvent(KeyEvent e) {
-        boolean keyHandled = false;
-        if(e.getID() == KeyEvent.KEY_PRESSED) {
-          if(e.getKeyCode() == KeyEvent.VK_S && e.isControlDown()) {
-            keyHandled = true;
-            save();
-          }
-        }
-        return keyHandled;
-      }
-    });
-
     genB = new JButton(Icons.GENERATE);
     genB.setToolTipText("Generate Structure");
     clearB = new JButton(Icons.CLEAR);
@@ -234,11 +205,6 @@ public class DialogTemplateEditor extends AbstractDialog {
   }
 
   private void addComponents() {
-    JPanel filePan = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
-    filePan.add(newB);
-    filePan.add(openB);
-    filePan.add(saveB);
-    filePan.add(saveAsB);
 
     JPanel generatePan = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
     generatePan.setBorder(new TitledBorder("Generate"));
@@ -255,50 +221,12 @@ public class DialogTemplateEditor extends AbstractDialog {
 
     Container cp = getContentPane();
     cp.setLayout(new BorderLayout());
-    cp.add(filePan, BorderLayout.NORTH);
+    cp.add(fileControls.getPanel(), BorderLayout.NORTH);
     cp.add(treePan, BorderLayout.CENTER);
     cp.add(generatePan, BorderLayout.SOUTH);
   }
-
+ 
   private void addListeners() {
-
-    openB.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(!dirtyMonitor.isDirty() || checkClear()) {
-          openTemplate();
-        }
-      }
-    });
-
-    saveAsB.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        saveAs();
-      }
-    });
-
-    saveB.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        save();
-      }
-
-    });
-
-    newB.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if(!dirtyMonitor.isDirty() || checkClear()) {          
-          tile.setName("NewTemplate");
-          sendUpdatePacket();
-          curTemplate = null;
-          buildTree();
-        }
-      }
-
-    });
 
     tree.addTreeSelectionListener(new TreeSelectionListener() {
 
@@ -367,14 +295,20 @@ public class DialogTemplateEditor extends AbstractDialog {
 
   }
 
-  private void openTemplate() {
+  @Override
+  protected void openResource() {
+    
+    if(dirtyMonitor.isDirty() && !checkClear()) {
+      return;
+    }
+    
     StructureResourceManager resMan = StructureGenRegister.instance.getResourceManager();
-    List<File> files = resMan.getFilesWithExt(StructureResourceManager.TEMPLATE_EXT);
+    List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
     JPopupMenu menu = new JPopupMenu();
     for (File file : files) {
 
-      final String uid = file.getName().substring(0, file.getName().length() - StructureResourceManager.TEMPLATE_EXT.length());
+      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
       final IStructureTemplate template = loadFromFile(file);
       if(template != null) {
         JMenuItem mi = new JMenuItem(file.getName());
@@ -396,25 +330,20 @@ public class DialogTemplateEditor extends AbstractDialog {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        importFromFile();
+        openFromFile();
       }
     });
     menu.add(mi);
 
-    menu.show(openB, 0, 0);
+    menu.show(fileControls.getOpenB(), 0, 0);
   }
 
-  private void importFromFile() {
-    File startDir = new File(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
-    JFileChooser fc = new JFileChooser(startDir);
-    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    fc.setDialogTitle("Select Template File");
-    int res = fc.showOpenDialog(this);
-    if(res != JFileChooser.APPROVE_OPTION) {
+  private void openFromFile() {
+    File file = selectFileToOpen();
+    if(file == null) {
       return;
     }
-
-    IStructureTemplate sc = loadFromFile(fc.getSelectedFile());
+    IStructureTemplate sc = loadFromFile(file);
     if(sc != null) {
       StructureGenRegister.instance.registerTemplate(sc);
       String name = sc.getUid();
@@ -422,8 +351,9 @@ public class DialogTemplateEditor extends AbstractDialog {
     } else {
       JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
     }
-
   }
+
+  
 
   private IStructureTemplate loadFromFile(File file) {
     String name = file.getName();
@@ -449,81 +379,20 @@ public class DialogTemplateEditor extends AbstractDialog {
     return null;
   }
 
-  private void save() {
-
+  @Override
+  protected void save() {
     if(curTemplate == null) {
       dirtyMonitor.setDirty(false);
       return;
     }
-    String uid = curTemplate.getUid().trim();
-    if(tile.getExportDir() == null) {
-      tile.setExportDir(ExportManager.EXPORT_DIR.getName());
-      sendUpdatePacket();
-    }
-    File dir = new File(tile.getExportDir());
-    File file = new File(dir, uid + StructureResourceManager.TEMPLATE_EXT);
-
-    if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
-      dirtyMonitor.setDirty(false);
-      StructureGenRegister.instance.registerTemplate(curTemplate);
-      Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText("Saved template to: " + file.getAbsolutePath()));
-    }
-    Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());
-
+    super.save();      
   }
-
-  private void saveAs() {
-
-    if(!isTemplateValid()) {
-      return;
-    }
-    String uid = curTemplate.getUid().trim();
-    File startDir = new File(tile.getExportDir() == null ? ExportManager.EXPORT_DIR.getName() : tile.getExportDir());
-    JFileChooser fc = new JFileChooser(startDir);
-    fc.setSelectedFile(new File(uid + StructureResourceManager.TEMPLATE_EXT));
-    fc.setDialogTitle("Select Directory");
-    int res = fc.showSaveDialog(this);
-
-    if(res != JFileChooser.APPROVE_OPTION) {
-      return;
-    }
-    File dir;
-    File file = fc.getSelectedFile();
-    if(file.isDirectory()) {
-      dir = file;
-      file = new File(dir, uid + StructureResourceManager.TEMPLATE_EXT);
-    } else {
-      dir = file.getParentFile();
-      if(!file.exists() && !file.getName().endsWith(StructureResourceManager.TEMPLATE_EXT)) {
-        file = new File(dir, file.getName() + StructureResourceManager.TEMPLATE_EXT);
-      }
-    }
-    if(!dir.exists()) {
-      dir.mkdirs();
-    }
-    if(!dir.exists()) {
-      return;
-    }
-
-    tile.setExportDir(dir.getPath());
-    sendUpdatePacket();
-
-    String fileName = file.getName();
-    if(!fileName.endsWith(StructureResourceManager.TEMPLATE_EXT)) {
-      fileName = fileName + StructureResourceManager.TEMPLATE_EXT;
-      file = new File(file.getParentFile(), fileName);
-    }
-
-    if(file.exists()) {
-      res = JOptionPane.showConfirmDialog(this, "Replace existing file?");
-      if(res != JFileChooser.APPROVE_OPTION) {
-        return;
-      }
-    }
-
+  
+  @Override
+  protected void writeToFile(File file, String newUid) {
     if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
-      String newUid = file.getName().substring(0, file.getName().length() - StructureResourceManager.TEMPLATE_EXT.length());
-      if(!newUid.equals(uid)) {
+      Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());
+      if(!newUid.equals(curTemplate.getUid())) {
         ((StructureTemplate) curTemplate).setUid(newUid);
         tile.setName(newUid);
         sendUpdatePacket();
@@ -533,7 +402,25 @@ public class DialogTemplateEditor extends AbstractDialog {
       dirtyMonitor.setDirty(false);
       StructureGenRegister.instance.registerTemplate(curTemplate);
     }
+    
+  }
 
+  @Override
+  protected String getResourceUid() {
+    if(curTemplate == null || curTemplate.getUid() == null) {
+      return null;
+    }    
+    return curTemplate.getUid().trim();
+  }
+
+  @Override
+  protected String getResourceExtension() {
+    return StructureResourceManager.TEMPLATE_EXT;
+  }
+
+  @Override
+  protected AbstractResourceTile getTile() {
+    return tile;
   }
 
   protected boolean isTemplateValid() {
@@ -581,9 +468,9 @@ public class DialogTemplateEditor extends AbstractDialog {
   }
 
   @Override
-  protected void onClose() {
+  protected void onDialogClose() {
     openDialogs.remove(position);
-    super.onClose();
+    super.onDialogClose();
   }
 
   private void onDirtyChanged(boolean dirty) {
@@ -593,7 +480,7 @@ public class DialogTemplateEditor extends AbstractDialog {
       title += "*";
     }
     setTitle(title);
-    saveB.setEnabled(dirty);
+    fileControls.getSaveB().setEnabled(dirty);
   }
 
   private class DirtMonitor implements TreeModelListener {

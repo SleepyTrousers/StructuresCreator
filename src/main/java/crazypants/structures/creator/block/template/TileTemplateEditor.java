@@ -1,19 +1,16 @@
 package crazypants.structures.creator.block.template;
 
-import com.enderio.core.common.TileEntityEnder;
-
 import crazypants.structures.api.gen.IStructure;
+import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.gen.structure.Structure;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class TileTemplateEditor extends TileEntityEnder {
+public class TileTemplateEditor extends AbstractResourceTile {
 
   private int offsetX = 1;
   private int offsetY = 0;
   private int offsetZ = 1;
 
-  private String name;
-  private String exportDir;
   private IStructure structure;
 
   private boolean doneInit = false;  
@@ -63,12 +60,7 @@ public class TileTemplateEditor extends TileEntityEnder {
 
   @Override
   public void writeCustomNBT(NBTTagCompound root) {
-    if(name != null && name.length() > 0) {
-      root.setString("name", name);
-    }
-    if(exportDir != null && exportDir.length() > 0) {
-      root.setString("exportDir", exportDir);
-    }
+    super.writeCustomNBT(root);
 
     root.setInteger("offsetX", offsetX);
     root.setInteger("offsetY", offsetY);
@@ -84,11 +76,7 @@ public class TileTemplateEditor extends TileEntityEnder {
 
   @Override
   public void readCustomNBT(NBTTagCompound root) {
-    name = root.getString("name");
-    exportDir = root.getString("exportDir");
-    if(exportDir != null && exportDir.length() == 0) {
-      exportDir = null;
-    }
+    super.readCustomNBT(root);
 
     offsetX = root.getInteger("offsetX");
     offsetY = root.getInteger("offsetY");
@@ -99,19 +87,23 @@ public class TileTemplateEditor extends TileEntityEnder {
     }
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
     markDirty();
   }
 
+  @Override
   public String getExportDir() {
     return exportDir;
   }
 
+  @Override
   public void setExportDir(String exportDir) {
     this.exportDir = exportDir;
     markDirty();

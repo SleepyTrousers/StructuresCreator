@@ -1,0 +1,205 @@
+package crazypants.structures.creator.block;
+
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+
+import crazypants.structures.creator.PacketHandler;
+import crazypants.structures.creator.block.template.packet.PacketResourceTileGui;
+import crazypants.structures.creator.item.ExportManager;
+//import crazypants.structures.gen.io.resource.StructureResourceManager;
+import net.minecraft.client.Minecraft;
+
+public abstract class AbstractResourceDialog extends JDialog {
+
+  private static final long serialVersionUID = 1L;
+    
+  private FileNameExtensionFilter filter;
+
+  protected AbstractResourceDialog() {
+    setModal(false);
+    setAlwaysOnTop(true);
+    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+    addWindowListener(new WindowAdapter() {
+
+      @Override
+      public void windowClosed(WindowEvent e) {
+        onDialogClose();
+      }
+    });
+
+    ActionListener al = new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        onDialogClose();
+        setVisible(false);
+      }
+    };
+    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    JRootPane rootPane = getRootPane();
+    rootPane.registerKeyboardAction(al, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+      @Override
+      public boolean dispatchKeyEvent(java.awt.event.KeyEvent e) {
+        boolean keyHandled = false;
+        if(e.getID() == java.awt.event.KeyEvent.KEY_PRESSED) {
+          if(e.getKeyCode() == KeyEvent.VK_S && e.isControlDown()) {
+            keyHandled = true;
+            save();
+          }
+        }
+        return keyHandled;
+      }
+    });
+    
+  }
+  
+  protected FileFilter getFileFilter() {
+    if(filter == null) {
+      String ext = getResourceExtension();
+      ext = ext.substring(1, ext.length());
+      filter = new FileNameExtensionFilter(ext, ext);
+    }
+    return filter;
+  }
+
+  protected void onDialogClose() {
+    Mouse.setCursorPosition(Display.getX() - Display.getWidth() / 2, Display.getY() - Display.getHeight() / 2);
+    if(Minecraft.getMinecraft().thePlayer != null) {
+      Minecraft.getMinecraft().thePlayer.closeScreen();
+    }
+  }
+  
+  protected void openDialog() {
+    pack();
+    setLocation(Display.getX(), Display.getY());
+    setVisible(true);
+    requestFocus();
+  }
+
+  protected boolean checkClear() {
+    return JFileChooser.APPROVE_OPTION == JOptionPane.showConfirmDialog(this, "Discard any unsaved changes?");
+  }
+  
+  protected abstract String getResourceUid();
+  protected abstract String getResourceExtension();
+  protected abstract AbstractResourceTile getTile();
+
+  protected abstract void createNewResource();
+  
+  protected abstract void openResource();
+  
+  protected void save() {
+    String uid = getResourceUid();
+    AbstractResourceTile tile = getTile();
+    if(tile.getExportDir() == null) {
+      tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
+      sendUpdatePacket();
+    }
+    File f = new File(tile.getExportDir(), uid + getResourceExtension());
+    writeToFile(f, uid);  
+  }
+
+  protected void saveAs() {
+
+    String name = getResourceUid();
+    String ext = getResourceExtension();
+    AbstractResourceTile tile = getTile();    
+    if(name == null || name.trim().length() == 0) {
+      JOptionPane.showMessageDialog(this, "No name specified", "Boo hoo", JOptionPane.ERROR_MESSAGE, null);
+      return;
+    }
+
+    File startDir = new File(tile.getExportDir() == null ? ExportManager.instance.getDefaultDirectory().getAbsolutePath() : tile.getExportDir());
+    JFileChooser fc = new JFileChooser(startDir);
+    fc.setSelectedFile(new File(name + ext));
+    fc.setDialogTitle("Save As");                
+    fc.setFileFilter(getFileFilter());
+    
+    int res = fc.showSaveDialog(this);
+
+    if(res != JFileChooser.APPROVE_OPTION) {
+      return;
+    }
+    File dir;
+    File file = fc.getSelectedFile();
+    if(file.isDirectory()) {
+      dir = file;
+      file = new File(dir, name + ext);
+    } else {
+      dir = file.getParentFile();
+      if(!file.exists() && !file.getName().endsWith(ext)) {
+        file = new File(dir, file.getName() + ext);
+      }
+    }
+    if(!dir.exists()) {
+      dir.mkdirs();
+    }
+    if(!dir.exists()) {
+      return;
+    }
+
+    tile.setExportDir(dir.getPath());
+
+    String fileName = file.getName();
+    if(!fileName.endsWith(ext)) {
+      fileName = fileName + ext;
+      file = new File(file.getParentFile(), fileName);
+    }
+
+    if(file.exists()) {
+      res = JOptionPane.showConfirmDialog(this, "Replace existing file?");
+      if(res != JFileChooser.APPROVE_OPTION) {
+        return;
+      }
+    }
+
+    String newName = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+    writeToFile(file, newName);
+  }
+  
+  protected void sendUpdatePacket() {    
+    if(getTile() != null) {
+      PacketResourceTileGui packet = new PacketResourceTileGui(getTile());
+      PacketHandler.INSTANCE.sendToServer(packet);
+    }
+  }
+  
+  protected File selectFileToOpen() {
+    AbstractResourceTile tile = getTile();   
+    File startDir = new File(tile.getExportDir() == null ? ExportManager.instance.getDefaultDirectory().getAbsolutePath() : tile.getExportDir());
+    JFileChooser fc = new JFileChooser(startDir);
+    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    fc.setDialogTitle("Open");
+    fc.setFileFilter(getFileFilter());    
+    int res = fc.showOpenDialog(this);
+    if(res != JFileChooser.APPROVE_OPTION) {
+      return null;
+    }
+    File file = fc.getSelectedFile();
+    return file;
+  }
+
+  protected abstract void writeToFile(File file, String newName);
+
+}
