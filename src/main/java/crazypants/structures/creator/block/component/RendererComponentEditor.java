@@ -31,12 +31,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 
-public class RendererComponentTool extends TileEntitySpecialRenderer {
+public class RendererComponentEditor extends TileEntitySpecialRenderer {
 
   @Override
   public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partialTick) {
 
-    TileComponentTool ct = (TileComponentTool) te;
+    TileComponentEditor ct = (TileComponentEditor) te;
 
     RenderUtil.bindBlockTexture();
 
@@ -64,7 +64,7 @@ public class RendererComponentTool extends TileEntitySpecialRenderer {
 
   }
 
-  private void renderTags(TileComponentTool ct, double wldX, double wldY, double wldZ) {
+  private void renderTags(TileComponentEditor ct, double wldX, double wldY, double wldZ) {
     Tessellator.instance.startDrawingQuads();
     Tessellator.instance.addTranslation((float) wldX, (float) wldY, (float) wldZ);
 
@@ -95,7 +95,7 @@ public class RendererComponentTool extends TileEntitySpecialRenderer {
 
   }
 
-  private TagsAtLoc renderTag(TileComponentTool te, Point3i tagOffset, Collection<String> tags) {
+  private TagsAtLoc renderTag(TileComponentEditor te, Point3i tagOffset, Collection<String> tags) {
 
     //Local pos
     Point3i tagPos = new Point3i(te.getOffsetX() + tagOffset.x, te.getOffsetY() + tagOffset.y, te.getOffsetZ() + tagOffset.z);
@@ -128,7 +128,7 @@ public class RendererComponentTool extends TileEntitySpecialRenderer {
 
   }
 
-  private void renderGroundLevel(TileComponentTool ct, double wldX, double wldY, double wldZ) {
+  private void renderGroundLevel(TileComponentEditor ct, double wldX, double wldY, double wldZ) {
     AxisAlignedBB bb = ct.getStructureBounds();
 
     double x = ct.getOffsetX();

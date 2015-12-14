@@ -16,7 +16,7 @@ import crazypants.structures.creator.block.AbstractResourceTile;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 
-public class TileComponentTool extends AbstractResourceTile {
+public class TileComponentEditor extends AbstractResourceTile {
 
   private int width = 9;
   private int height = 9;
@@ -45,14 +45,14 @@ public class TileComponentTool extends AbstractResourceTile {
   protected void doUpdate() {
     if(!doneInit) {
       doneInit = true;
-      ToolRegister.onLoad(this);
+      EditorRegister.onLoad(this);
     }
   }
 
   @Override
   public void invalidate() {
     super.invalidate();
-    ToolRegister.onUnload(this);
+    EditorRegister.onUnload(this);
     doneInit = false;
   }
 

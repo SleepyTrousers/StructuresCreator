@@ -15,7 +15,7 @@ import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.api.util.VecUtil;
 import crazypants.structures.creator.EnderStructuresCreator;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.StructureBlock;
 import crazypants.structures.gen.structure.StructureComponentNBT;
@@ -24,7 +24,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
-public class PacketBuildComponent extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketBuildComponent, IMessage> {
+public class PacketBuildComponent extends MessageTileEntity<TileComponentEditor> implements IMessageHandler<PacketBuildComponent, IMessage> {
 
   private String structureName;
 
@@ -32,7 +32,7 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentTool> i
     super();
   }
 
-  public PacketBuildComponent(TileComponentTool tile, String structureName) {
+  public PacketBuildComponent(TileComponentEditor tile, String structureName) {
     super(tile);
     this.structureName = structureName;
   }
@@ -59,7 +59,7 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentTool> i
   @Override
   public IMessage onMessage(PacketBuildComponent message, MessageContext ctx) {
     EntityPlayer player = ctx.getServerHandler().playerEntity;
-    TileComponentTool tile = message.getTileEntity(player.worldObj);
+    TileComponentEditor tile = message.getTileEntity(player.worldObj);
     if(tile == null) {
       return null;
     }
@@ -102,7 +102,7 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentTool> i
     return null;
   }
 
-  private void clearBounds(TileComponentTool tile) {
+  private void clearBounds(TileComponentEditor tile) {
     
     tile.getTaggedLocations().clear();
     tile.markDirty();

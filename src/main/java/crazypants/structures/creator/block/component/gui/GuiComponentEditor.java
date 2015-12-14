@@ -7,7 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.tileentity.TileEntity;
 
-public class GuiComponentTool extends GuiContainerBase {
+public class GuiComponentEditor extends GuiContainerBase {
 
   private TextFieldEnder nameTF;
   private String nameLabel = "Name:";
@@ -17,7 +17,7 @@ public class GuiComponentTool extends GuiContainerBase {
   
   private final int MARGIN = 5;
   
-  public GuiComponentTool(EntityPlayer player, InventoryPlayer inventory, TileEntity te) {
+  public GuiComponentEditor(EntityPlayer player, InventoryPlayer inventory, TileEntity te) {
     super(new EmptyContainer());
     
 //    FontRenderer fr = Minecraft.getMinecraft().fontRenderer;

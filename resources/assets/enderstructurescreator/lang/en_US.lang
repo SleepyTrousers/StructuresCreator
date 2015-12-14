@@ -1,5 +1,6 @@
-tile.blockComponentTool.name=Component Editor
+tile.blockComponentEditor.name=Component Editor
 tile.blockTemplateEditor.name=Template Editor
+tile.blockGeneratorEditor.name=Generator Editor
 tile.blockClearMarker.name=Clear Marker
 
 item.itemComponentTool.name=Component Tool

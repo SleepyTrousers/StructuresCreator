@@ -15,9 +15,9 @@ import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
-import crazypants.structures.creator.block.BlockComponentTool;
+import crazypants.structures.creator.block.BlockComponentEditor;
 import crazypants.structures.creator.block.BlockTemplateEditor;
-import crazypants.structures.creator.block.component.ToolRegister;
+import crazypants.structures.creator.block.component.EditorRegister;
 import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
 import crazypants.structures.creator.item.ItemDebugTool;
@@ -39,7 +39,7 @@ public class EnderStructuresCreator {
     
   public static BlockClearMarker blockClearMarker;  
   
-  public static BlockComponentTool blockComponentTool;
+  public static BlockComponentEditor blockComponentTool;
   public static BlockTemplateEditor blockTemplateEditor;
   
   public static ItemComponentTool itemComponentTool;
@@ -56,7 +56,7 @@ public class EnderStructuresCreator {
 
     //Config.load(event);   
     
-    blockComponentTool = BlockComponentTool.create();    
+    blockComponentTool = BlockComponentEditor.create();    
     blockTemplateEditor = BlockTemplateEditor.create();   
     blockClearMarker = BlockClearMarker.create();
     
@@ -83,12 +83,12 @@ public class EnderStructuresCreator {
   
   @EventHandler
   public void serverStarted(FMLServerStartedEvent event) {
-    ToolRegister.reset();
+    EditorRegister.reset();
   }
 
   @EventHandler
   public void serverStopped(FMLServerStoppedEvent event) {
-    ToolRegister.reset();
+    EditorRegister.reset();
   }
   
   private void addRecipes() {  

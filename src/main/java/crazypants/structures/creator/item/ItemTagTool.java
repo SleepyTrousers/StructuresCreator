@@ -14,8 +14,8 @@ import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.component.TileComponentTool;
-import crazypants.structures.creator.block.component.ToolRegister;
+import crazypants.structures.creator.block.component.TileComponentEditor;
+import crazypants.structures.creator.block.component.EditorRegister;
 import crazypants.structures.creator.block.component.gui.EmptyContainer;
 import crazypants.structures.creator.block.component.gui.GuiTagEditor;
 import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
@@ -34,7 +34,7 @@ public class ItemTagTool extends Item implements IGuiHandler {
   private static final String NAME = "itemTagTool";
 
   //dont like this, but need to pass info from onItemFirstUsed to getClientGui
-  private TileComponentTool currentTile;
+  private TileComponentEditor currentTile;
 
   public static ItemTagTool create() {
     ItemTagTool res = new ItemTagTool();
@@ -95,7 +95,7 @@ public class ItemTagTool extends Item implements IGuiHandler {
 
     List<Hit> coordsInSight = getBlocksInPath(world, startVec, endVec, true, true);
     for (Hit hit : coordsInSight) {
-      currentTile = ToolRegister.getTooleRegister(world).getClosestTileInBounds(world, hit.blockCoord.x, hit.blockCoord.y, hit.blockCoord.z);
+      currentTile = EditorRegister.getTooleRegister(world).getClosestTileInBounds(world, hit.blockCoord.x, hit.blockCoord.y, hit.blockCoord.z);
       if(currentTile != null) {
         if(hit.isSolid) {
           return stack;
@@ -118,7 +118,7 @@ public class ItemTagTool extends Item implements IGuiHandler {
   @Override
   public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
 
-    currentTile = ToolRegister.getTooleRegister(world).getClosestTileInBounds(world, x, y, z);
+    currentTile = EditorRegister.getTooleRegister(world).getClosestTileInBounds(world, x, y, z);
     if(currentTile == null) {
       return true;
     }

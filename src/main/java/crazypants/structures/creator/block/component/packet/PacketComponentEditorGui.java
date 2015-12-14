@@ -6,21 +6,21 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class PacketComponentToolGui extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketComponentToolGui, IMessage> {
+public class PacketComponentEditorGui extends MessageTileEntity<TileComponentEditor> implements IMessageHandler<PacketComponentEditorGui, IMessage> {
 
   
   private NBTTagCompound data;
   
-  public PacketComponentToolGui() {    
+  public PacketComponentEditorGui() {    
     
   }
   
-  public PacketComponentToolGui(TileComponentTool tile) {
+  public PacketComponentEditorGui(TileComponentEditor tile) {
     super(tile);
     data = new NBTTagCompound();
     tile.writeCustomNBT(data);
@@ -39,9 +39,9 @@ public class PacketComponentToolGui extends MessageTileEntity<TileComponentTool>
   }
 
   @Override
-  public IMessage onMessage(PacketComponentToolGui message, MessageContext ctx) {
+  public IMessage onMessage(PacketComponentEditorGui message, MessageContext ctx) {
     EntityPlayer player = ctx.getServerHandler().playerEntity;
-    TileComponentTool tile = message.getTileEntity(player.worldObj);
+    TileComponentEditor tile = message.getTileEntity(player.worldObj);
     if(tile == null) {
       return null;
     }

@@ -7,10 +7,10 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.api.util.Point3i;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import io.netty.buffer.ByteBuf;
 
-public class PacketAddRemoveTaggedLocation extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketAddRemoveTaggedLocation, IMessage> {
+public class PacketAddRemoveTaggedLocation extends MessageTileEntity<TileComponentEditor> implements IMessageHandler<PacketAddRemoveTaggedLocation, IMessage> {
 
   private String tag;
   private Point3i loc;
@@ -20,7 +20,7 @@ public class PacketAddRemoveTaggedLocation extends MessageTileEntity<TileCompone
     super();
   }
 
-  public PacketAddRemoveTaggedLocation(TileComponentTool tile, String tag, Point3i loc, boolean isAdd) {
+  public PacketAddRemoveTaggedLocation(TileComponentEditor tile, String tag, Point3i loc, boolean isAdd) {
     super(tile);
     this.tag= tag;
     this.loc = loc;
@@ -53,7 +53,7 @@ public class PacketAddRemoveTaggedLocation extends MessageTileEntity<TileCompone
 
   @Override
   public IMessage onMessage(PacketAddRemoveTaggedLocation message, MessageContext ctx) {
-    TileComponentTool te = message.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
+    TileComponentEditor te = message.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
     if(te == null) {
       return null;
     }

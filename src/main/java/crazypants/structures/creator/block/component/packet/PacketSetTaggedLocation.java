@@ -11,10 +11,10 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.api.util.Point3i;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import io.netty.buffer.ByteBuf;
 
-public class PacketSetTaggedLocation extends MessageTileEntity<TileComponentTool> implements IMessageHandler<PacketSetTaggedLocation, IMessage> {
+public class PacketSetTaggedLocation extends MessageTileEntity<TileComponentEditor> implements IMessageHandler<PacketSetTaggedLocation, IMessage> {
 
   private List<String> tags;
   private Point3i loc;
@@ -23,7 +23,7 @@ public class PacketSetTaggedLocation extends MessageTileEntity<TileComponentTool
     super();
   }
 
-  public PacketSetTaggedLocation(TileComponentTool tile, Point3i loc, Collection<String> tags) {
+  public PacketSetTaggedLocation(TileComponentEditor tile, Point3i loc, Collection<String> tags) {
     super(tile);
     if(tags != null & !tags.isEmpty()) {
       this.tags = new ArrayList<String>(tags);
@@ -64,7 +64,7 @@ public class PacketSetTaggedLocation extends MessageTileEntity<TileComponentTool
 
   @Override
   public IMessage onMessage(PacketSetTaggedLocation message, MessageContext ctx) {
-    TileComponentTool te = message.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
+    TileComponentEditor te = message.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
     if(te == null) {
       return null;
     }

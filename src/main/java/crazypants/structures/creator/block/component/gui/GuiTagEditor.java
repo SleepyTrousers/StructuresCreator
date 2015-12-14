@@ -10,7 +10,7 @@ import com.enderio.core.client.render.EnderWidget;
 
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,14 +18,14 @@ import net.minecraft.entity.player.InventoryPlayer;
 
 public class GuiTagEditor  extends GuiContainerBase {
 
-  private TileComponentTool te;
+  private TileComponentEditor te;
   private Point3i loc;
   
   private List<String> tags = new ArrayList<String>();
   
   private List<IconButton> buts = new ArrayList<IconButton>();
   
-  public GuiTagEditor(EntityPlayer player, InventoryPlayer inventory, TileComponentTool te, Point3i loc) {
+  public GuiTagEditor(EntityPlayer player, InventoryPlayer inventory, TileComponentEditor te, Point3i loc) {
     super(new EmptyContainer());
     this.te = te;
     this.loc = loc;  

@@ -1,14 +1,14 @@
 package crazypants.structures.creator;
 
 import cpw.mods.fml.client.registry.ClientRegistry;
-import crazypants.structures.creator.block.component.RendererComponentTool;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.RendererComponentEditor;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 
 public class ClientProxy extends CommonProxy {
 
   @Override
   public void load() {
-    ClientRegistry.bindTileEntitySpecialRenderer(TileComponentTool.class, new RendererComponentTool());
+    ClientRegistry.bindTileEntitySpecialRenderer(TileComponentEditor.class, new RendererComponentEditor());
   }
 
 }

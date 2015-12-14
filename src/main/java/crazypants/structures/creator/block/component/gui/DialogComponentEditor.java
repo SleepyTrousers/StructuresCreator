@@ -31,9 +31,9 @@ import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.AbstractResourceDialog;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.FileControls;
-import crazypants.structures.creator.block.component.TileComponentTool;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
-import crazypants.structures.creator.block.component.packet.PacketComponentToolGui;
+import crazypants.structures.creator.block.component.packet.PacketComponentEditorGui;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
@@ -41,24 +41,24 @@ import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.client.Minecraft;
 
-public class DialogComponentTool extends AbstractResourceDialog {
+public class DialogComponentEditor extends AbstractResourceDialog {
 
   private static final long serialVersionUID = 1L;
 
-  private static Map<Point3i, DialogComponentTool> openDialogs = new HashMap<Point3i, DialogComponentTool>();
+  private static Map<Point3i, DialogComponentEditor> openDialogs = new HashMap<Point3i, DialogComponentEditor>();
 
-  public static void openDialog(TileComponentTool tile) {
+  public static void openDialog(TileComponentEditor tile) {
     Point3i key = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
-    DialogComponentTool res = openDialogs.get(key);
+    DialogComponentEditor res = openDialogs.get(key);
     if(res == null) {
-      res = new DialogComponentTool(tile);
+      res = new DialogComponentEditor(tile);
       openDialogs.put(key, res);
     }
     res.openDialog();
 
   }
 
-  private final TileComponentTool tile;
+  private final TileComponentEditor tile;
   private final Point3i position;
 
   private JTextField nameTF;
@@ -69,7 +69,7 @@ public class DialogComponentTool extends AbstractResourceDialog {
 
   private FileControls fileControls;
 
-  public DialogComponentTool(TileComponentTool tile) {
+  public DialogComponentEditor(TileComponentEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
 
@@ -110,7 +110,7 @@ public class DialogComponentTool extends AbstractResourceDialog {
 
   @Override
   protected void sendUpdatePacket() {
-    PacketComponentToolGui packet = new PacketComponentToolGui(tile);
+    PacketComponentEditorGui packet = new PacketComponentEditorGui(tile);
     PacketHandler.INSTANCE.sendToServer(packet);
   }
 
