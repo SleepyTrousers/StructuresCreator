@@ -20,6 +20,7 @@ public class Icons {
   
   public static final ImageIcon COMPONENT = createIcon("component");
   public static final ImageIcon TEMPLATE = createIcon(TEXTURE_PATH + "blocks/", "blockTemplateEditor");
+  public static final ImageIcon GENERATOR = createIcon(TEXTURE_PATH + "blocks/", "blockGeneratorEditor");
   
   public static final ImageIcon PREPERATION = createIcon("preperation");
   public static final ImageIcon VALIDATOR = createIcon("validator");

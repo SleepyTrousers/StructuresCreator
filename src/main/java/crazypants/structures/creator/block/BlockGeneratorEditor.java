@@ -8,36 +8,29 @@ import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
-import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.template.DialogTemplateEditor;
-import crazypants.structures.creator.block.template.GuiTemplateEditor;
+import crazypants.structures.creator.block.generator.DialogGeneratorEditor;
+import crazypants.structures.creator.block.generator.GuiGeneratorEditor;
+import crazypants.structures.creator.block.generator.TileGeneratorEditor;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
-import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
-import crazypants.structures.creator.block.template.packet.PacketClearStructure;
-import crazypants.structures.creator.block.template.packet.PacketResourceTileGui;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 
-public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
+public class BlockGeneratorEditor extends BlockEnder implements IGuiHandler {
 
-  public static final String NAME = "blockTemplateEditor";
+  public static final String NAME = "blockGeneratorEditor";
 
-  public static BlockTemplateEditor create() {
+  public static BlockGeneratorEditor create() {
 
-    PacketHandler.INSTANCE.registerMessage(PacketResourceTileGui.class, PacketResourceTileGui.class, PacketHandler.nextID(), Side.SERVER);
-    PacketHandler.INSTANCE.registerMessage(PacketBuildStructure.class, PacketBuildStructure.class, PacketHandler.nextID(), Side.SERVER);
-    PacketHandler.INSTANCE.registerMessage(PacketClearStructure.class, PacketClearStructure.class, PacketHandler.nextID(), Side.SERVER);
-    
-    BlockTemplateEditor res = new BlockTemplateEditor();
+    BlockGeneratorEditor res = new BlockGeneratorEditor();
     res.init();
     return res;
   }
 
-  protected BlockTemplateEditor() {
-    super(NAME, TileTemplateEditor.class);
+  protected BlockGeneratorEditor() {
+    super(NAME, TileGeneratorEditor.class);
     setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
     setLightOpacity(0);
     setResistance(2000);
@@ -62,12 +55,12 @@ public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
   @Override
   protected boolean openGui(World world, int x, int y, int z, EntityPlayer entityPlayer, int side) {
     if(!world.isRemote) {
-      entityPlayer.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_TEMPLATE_EDITOR, world, x, y, z);
+      entityPlayer.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_GENERATOR_EDITOR, world, x, y, z);
     }
     if(world.isRemote) {
       TileEntity te = world.getTileEntity(x, y, z);
-      if(te instanceof TileTemplateEditor) {
-        DialogTemplateEditor.openDialog((TileTemplateEditor) te);
+      if(te instanceof TileGeneratorEditor) {
+        DialogGeneratorEditor.openDialog((TileGeneratorEditor) te);
       }
     }
     return true;
@@ -76,13 +69,13 @@ public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
   @Override
   protected void init() {
     super.init();
-    EnderStructuresCreator.guiHandler.registerGuiHandler(GuiHandler.GUI_ID_TEMPLATE_EDITOR, this);
+    EnderStructuresCreator.guiHandler.registerGuiHandler(GuiHandler.GUI_ID_GENERATOR_EDITOR, this);
   }
 
   @Override
   public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {    
     TileEntity te = world.getTileEntity(x, y, z);
-    if(te instanceof TileTemplateEditor) {
+    if(te instanceof TileGeneratorEditor) {
       return new EmptyContainer();
     }
     return null;
@@ -92,7 +85,7 @@ public class BlockTemplateEditor extends BlockEnder implements IGuiHandler {
   public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
     TileEntity te = world.getTileEntity(x, y, z);
     if(te instanceof TileTemplateEditor) {
-      return new GuiTemplateEditor();      
+      return new GuiGeneratorEditor();      
     }
     return null;
   }

@@ -7,12 +7,12 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import crazypants.structures.api.gen.IStructureGenerator;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.config.Config;
 import crazypants.structures.gen.io.GsonIO;
 import crazypants.structures.gen.io.ResourceWrapper;
 import crazypants.structures.gen.structure.StructureComponentNBT;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
@@ -22,7 +22,7 @@ public class ExportManager {
 
   public static final ExportManager instance = new ExportManager();
 
-  public ExportManager() {            
+  public ExportManager() {
   }
 
   public File getDefaultDirectory() {
@@ -30,12 +30,12 @@ public class ExportManager {
       return exportDir;
     }
     if(Config.configDirectory != null) {
-      exportDir = new File(Config.configDirectory.getAbsolutePath()); 
+      exportDir = new File(Config.configDirectory.getAbsolutePath());
       return exportDir;
     }
     return new File("StructureCreator");
   }
-  
+
   public static boolean writeToFile(File file, StructureComponentNBT st, EntityPlayer player) {
     boolean saved = false;
     FileOutputStream fos = null;
@@ -59,12 +59,21 @@ public class ExportManager {
     return saved;
   }
 
-  public static boolean writeToFile(File file, IStructureTemplate curTemplate, EntityClientPlayerMP player) {
+  public static boolean writeToFile(File file, IStructureTemplate curTemplate, EntityPlayer player) {
+    ResourceWrapper rw = new ResourceWrapper();
+    rw.setStructureTemplate(curTemplate);
+    return writeToFile(file, rw, player);
+  }
 
+  public static boolean writeToFile(File file, IStructureGenerator curGenerator, EntityPlayer player) {
+    ResourceWrapper rw = new ResourceWrapper();
+    rw.setStructureGenerator(curGenerator);
+    return writeToFile(file, rw, player);
+  }
+
+  public static boolean writeToFile(File file, ResourceWrapper rw, EntityPlayer player) {
     String json = null;
-    try {            
-      ResourceWrapper rw = new ResourceWrapper();
-      rw.setStructureTemplate(curTemplate);      
+    try {
       json = GsonIO.INSTANCE.getGson().toJson(rw);
     } catch (Exception e) {
       e.printStackTrace();

@@ -16,6 +16,7 @@ import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentEditor;
+import crazypants.structures.creator.block.BlockGeneratorEditor;
 import crazypants.structures.creator.block.BlockTemplateEditor;
 import crazypants.structures.creator.block.component.EditorRegister;
 import crazypants.structures.creator.item.ItemClearTool;
@@ -41,6 +42,7 @@ public class EnderStructuresCreator {
   
   public static BlockComponentEditor blockComponentTool;
   public static BlockTemplateEditor blockTemplateEditor;
+  public static BlockGeneratorEditor blockGeneratorEditor;
   
   public static ItemComponentTool itemComponentTool;
   public static ItemTemplateTool itemTemplateTool;
@@ -58,6 +60,7 @@ public class EnderStructuresCreator {
     
     blockComponentTool = BlockComponentEditor.create();    
     blockTemplateEditor = BlockTemplateEditor.create();   
+    blockGeneratorEditor = BlockGeneratorEditor.create();
     blockClearMarker = BlockClearMarker.create();
     
     itemTagTool = ItemTagTool.create();
@@ -78,7 +81,6 @@ public class EnderStructuresCreator {
   @EventHandler
   public void postInit(FMLPostInitializationEvent event) {  
     addRecipes();        
-    //ExportManager.instance.loadExportFolder();
   }
   
   @EventHandler

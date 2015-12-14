@@ -11,7 +11,6 @@ import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.gui.DialogComponentEditor;
-import crazypants.structures.creator.block.component.gui.EmptyContainer;
 import crazypants.structures.creator.block.component.gui.GuiComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;

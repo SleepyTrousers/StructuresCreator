@@ -10,6 +10,7 @@ import com.enderio.core.client.render.EnderWidget;
 
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.PacketHandler;
+import crazypants.structures.creator.block.EmptyContainer;
 import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
 import net.minecraft.client.gui.GuiButton;

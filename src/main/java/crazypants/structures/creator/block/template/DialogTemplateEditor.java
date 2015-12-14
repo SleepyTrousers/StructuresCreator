@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.template.gui;
+package crazypants.structures.creator.block.template;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -46,7 +46,6 @@ import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.AbstractResourceDialog;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.FileControls;
-import crazypants.structures.creator.block.template.TileTemplateEditor;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
 import crazypants.structures.creator.block.tree.AttributeEditors;
