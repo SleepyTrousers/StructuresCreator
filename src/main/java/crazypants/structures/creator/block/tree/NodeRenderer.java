@@ -10,7 +10,10 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import crazypants.structures.api.ITyped;
+import crazypants.structures.api.gen.IChunkValidator;
 import crazypants.structures.api.gen.IDecorator;
+import crazypants.structures.api.gen.ILocationSampler;
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.api.gen.ISitePreperation;
 import crazypants.structures.api.gen.ISiteValidator;
 import crazypants.structures.api.gen.IStructureComponent;
@@ -85,9 +88,12 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
     if(ISitePreperation.class.isAssignableFrom(type)) {
       return Icons.PREPERATION;
     }
-    if(ISiteValidator.class.isAssignableFrom(type)) {
+    if(ILocationSampler.class.isAssignableFrom(type)) {
+      return Icons.LOCATION_SAMPLER;
+    }    
+    if(ISiteValidator.class.isAssignableFrom(type) || IChunkValidator.class.isAssignableFrom(type)) {
       return Icons.VALIDATOR;
-    }
+    }    
     if(IDecorator.class.isAssignableFrom(type)) {
       return Icons.DECORATOR;
     }
@@ -128,6 +134,9 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
       }
       if(val instanceof ITyped) {
         return ((ITyped) val).getType();
+      }
+      if(val instanceof IResource) {
+        return ((IResource)val).getUid();
       }
       return val.toString();
     }

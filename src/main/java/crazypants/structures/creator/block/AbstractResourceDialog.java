@@ -24,6 +24,7 @@ import org.lwjgl.opengl.Display;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.template.packet.PacketResourceTileGui;
 import crazypants.structures.creator.item.ExportManager;
+import crazypants.structures.gen.io.resource.StructureResourceManager;
 import net.minecraft.client.Minecraft;
 
 public abstract class AbstractResourceDialog extends JDialog {
@@ -100,13 +101,22 @@ public abstract class AbstractResourceDialog extends JDialog {
     return JFileChooser.APPROVE_OPTION == JOptionPane.showConfirmDialog(this, "Discard any unsaved changes?");
   }
   
-  protected abstract String getResourceUid();
-  protected abstract String getResourceExtension();
-  protected abstract AbstractResourceTile getTile();
+  public abstract String getResourceUid();
+  public abstract String getResourceExtension();
+  public abstract AbstractResourceTile getTile();  
 
   protected abstract void createNewResource();
   
   protected abstract void openResource();
+  
+  public void onDirtyChanged(boolean dirty) {
+    String title = getResourceUid();
+    title = title + StructureResourceManager.GENERATOR_EXT;
+    if(dirty) {
+      title += "*";
+    }
+    setTitle(title);
+  }
   
   protected void save() {
     String uid = getResourceUid();

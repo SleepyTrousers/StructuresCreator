@@ -2,13 +2,19 @@ package crazypants.structures.creator.block.generator;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 
 import org.apache.commons.io.IOUtils;
 
@@ -18,6 +24,7 @@ import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.block.AbstractResourceDialog;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.FileControls;
+import crazypants.structures.creator.block.tree.EditorTreeControl;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
@@ -47,6 +54,7 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
   private IStructureGenerator curGenerator;
   
   private FileControls fileControls;
+  private EditorTreeControl treeControl;
 
   public DialogGeneratorEditor(TileGeneratorEditor tile) {
     this.tile = tile;
@@ -65,30 +73,79 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
       try {
         curGenerator = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.GENERATOR_EXT));
       } catch (Exception e) {
-        tile.setName("NewTemplate");
+        tile.setName("NewGenerator");
         e.printStackTrace();
       }
 
     } else {
-      tile.setName("NewTemplate");
+      tile.setName("NewGenerator");
     }
-//    buildTree();
+    buildTree();
+  }
+
+  private void buildTree() {
+    String name = tile.getName();
+    if(curGenerator == null) {
+      curGenerator = new StructureGenerator(name);
+    }
+    treeControl.buildTree(curGenerator);    
+    
   }
 
   @Override
   protected void createNewResource() {
-    // TODO Auto-generated method stub
-    
+    if(!treeControl.isDirty() || checkClear()) {
+      tile.setName("NewGenerator");
+      sendUpdatePacket();
+      curGenerator = null;
+      buildTree();
+    }    
   }
 
   @Override
   protected void openResource() {
-    // TODO Auto-generated method stub
-    
+    if(treeControl.isDirty() && !checkClear()) {
+      return;
+    }
+
+    StructureResourceManager resMan = StructureGenRegister.instance.getResourceManager();
+    List<File> files = resMan.getFilesWithExt(getResourceExtension());
+
+    JPopupMenu menu = new JPopupMenu();
+    for (File file : files) {
+
+      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+      final IStructureGenerator gen = loadFromFile(file);
+      if(gen != null) {
+        JMenuItem mi = new JMenuItem(file.getName());
+        mi.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            openGenerator(uid, gen);
+          }
+        });
+        menu.add(mi);
+      } else {
+        System.out.println("DialogTemplateEditor.openRegisteredTemplate: Could not load template from file: " + file.getAbsolutePath());
+      }
+
+    }
+
+    JMenuItem mi = new JMenuItem("...");
+    mi.addActionListener(new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        openFromFile();
+      }
+    });
+    menu.add(mi);
+
+    menu.show(fileControls.getOpenB(), 0, 0);
   }
 
   @Override
-  protected String getResourceUid() {
+  public String getResourceUid() {
     if(curGenerator == null || curGenerator.getUid() == null) {
       return null;
     }    
@@ -96,12 +153,12 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
   }
   
   @Override
-  protected String getResourceExtension() {
+  public String getResourceExtension() {
     return StructureResourceManager.GENERATOR_EXT;
   }
 
   @Override
-  protected AbstractResourceTile getTile() {
+  public AbstractResourceTile getTile() {
     return tile;
   }
   
@@ -109,6 +166,12 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
   protected void onDialogClose() {
     openDialogs.remove(position);
     super.onDialogClose();
+  }
+
+  @Override
+  public void onDirtyChanged(boolean dirty) {
+    super.onDirtyChanged(dirty);
+    fileControls.getSaveB().setEnabled(dirty);
   }
   
   @Override
@@ -119,12 +182,38 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
         ((StructureGenerator) curGenerator).setUid(newUid);
         tile.setName(newUid);
         sendUpdatePacket();
-//        buildTree();
-//        dirtyMonitor.setDirty(true);
+        buildTree();
+        treeControl.setDirty(true);
       }
-//      dirtyMonitor.setDirty(false);
+      treeControl.setDirty(false);
       StructureGenRegister.instance.registerGenerator(curGenerator);
     }    
+  }
+  
+  private void openGenerator(String name, IStructureGenerator gen) {
+    if(name == null || gen == null) {
+      return;
+    }   
+    tile.setName(name);
+    sendUpdatePacket();
+    curGenerator = gen;
+    onDirtyChanged(false);
+    buildTree();
+  }
+  
+  private void openFromFile() {
+    File file = selectFileToOpen();
+    if(file == null) {
+      return;
+    }
+    IStructureGenerator sc = loadFromFile(file);
+    if(sc != null) {
+      StructureGenRegister.instance.registerGenerator(sc);
+      String name = sc.getUid();
+      openGenerator(name, sc);
+    } else {
+      JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
+    }
   }
   
   private IStructureGenerator loadFromFile(File file) {
@@ -153,12 +242,14 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
 
   private void initComponents() {
     fileControls = new FileControls(this);
+    treeControl = new EditorTreeControl(this);
   }
 
   private void addComponents() {
     Container cp = getContentPane();
     cp.setLayout(new BorderLayout());
     cp.add(fileControls.getPanel(), BorderLayout.NORTH);
+    cp.add(treeControl.getRoot(), BorderLayout.CENTER);
   }
 
   private void addListeners() {

@@ -20,6 +20,7 @@ import crazypants.structures.creator.block.tree.editors.IntegerEditor;
 import crazypants.structures.creator.block.tree.editors.Point3iEditor;
 import crazypants.structures.creator.block.tree.editors.RotationEditor;
 import crazypants.structures.creator.block.tree.editors.StringEditor;
+import crazypants.structures.creator.block.tree.editors.TemplateEditor;
 import crazypants.structures.creator.block.tree.editors.TypedEditor;
 
 public class AttributeEditors {
@@ -51,18 +52,21 @@ public class AttributeEditors {
   }
 
   private AttributeEditors() {
+    //Basic types
     registerEditor(new BooleanEditor());
     registerEditor(new IntegerEditor());
     registerEditor(new StringEditor());
     registerEditor(new Point3iEditor());
-    registerEditor(new ComponentEditor());
     registerEditor(new BorderEditor());
     registerEditor(new RotationEditor());
     registerEditor(new AddElementEditor());
     registerEditor(new BlockEditor());
+    
+    //Resources
+    registerEditor(new ComponentEditor());
+    registerEditor(new TemplateEditor());
 
-    //TODO: Make the type checking go up the heirachy and I can just use one generic IType editor
-    //for all these (and any other) types
+    //Types
     registerEditor(new TypedEditor<ISitePreperation>(ISitePreperation.class));
     registerEditor(new TypedEditor<ISiteValidator>(ISiteValidator.class));
     registerEditor(new TypedEditor<IDecorator>(IDecorator.class));

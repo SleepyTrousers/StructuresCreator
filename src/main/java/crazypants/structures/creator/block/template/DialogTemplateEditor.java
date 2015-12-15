@@ -1,13 +1,8 @@
 package crazypants.structures.creator.block.template;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,16 +20,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.commons.io.IOUtils;
 
@@ -48,15 +34,8 @@ import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.FileControls;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
-import crazypants.structures.creator.block.tree.AttributeEditors;
-import crazypants.structures.creator.block.tree.FieldAccessor;
-import crazypants.structures.creator.block.tree.IAttributeEditor;
+import crazypants.structures.creator.block.tree.EditorTreeControl;
 import crazypants.structures.creator.block.tree.Icons;
-import crazypants.structures.creator.block.tree.ListElementAccessor;
-import crazypants.structures.creator.block.tree.NodeData;
-import crazypants.structures.creator.block.tree.NodeRenderer;
-import crazypants.structures.creator.block.tree.StructuresTreeNode;
-import crazypants.structures.creator.block.tree.editors.RemoveEditor;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
@@ -83,20 +62,12 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   private final Point3i position;
   private IStructureTemplate curTemplate;
 
-  private FileControls fileControls;
+  private FileControls fileControls;  
+  private EditorTreeControl treeControl;
+  
   private JButton genB;
   private JButton clearB;
   private JComboBox<Rotation> rotCB;
-
-  private JPanel editorPan;
-  private JTree tree;
-  private DefaultTreeModel treeModel;
-  private StructuresTreeNode rootNode;
-  
-  private RemoveEditor removeEditor = new RemoveEditor();
-  private JPanel emptyEditor;
-
-  private final DirtMonitor dirtyMonitor = new DirtMonitor();
 
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
@@ -129,78 +100,40 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   protected void saveAs() {
     if(isTemplateValid()) {
       super.saveAs();
-    }    
+    }
   }
-  
+
   @Override
   protected void createNewResource() {
-    if(!dirtyMonitor.isDirty() || checkClear()) {          
+    if(!treeControl.isDirty() || checkClear()) {
       tile.setName("NewTemplate");
       sendUpdatePacket();
       curTemplate = null;
       buildTree();
-    }    
+    }
   }
 
   private void buildTree() {
-
     String name = tile.getName();
     if(curTemplate == null) {
       curTemplate = new StructureTemplate(name);
     }
-    if(treeModel != null) {
-      treeModel.removeTreeModelListener(dirtyMonitor);
-    }
-
-    treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
-    rootNode = new StructuresTreeNode(curTemplate, null, curTemplate, treeModel);
-    StructuresTreeNode uidNode = new StructuresTreeNode(curTemplate, new FieldAccessor(StructureTemplate.class, String.class, "uid"), curTemplate.getUid(),
-        treeModel);
-    rootNode.insert(uidNode, 0);
-    treeModel.setRoot(rootNode);
-    treeModel.addTreeModelListener(dirtyMonitor);
-    dirtyMonitor.setDirty(false);
-
-    tree.setModel(treeModel);
-
-    revalidate();
-    repaint();
+    treeControl.buildTree(curTemplate);    
   }
 
   private void initComponents() {
 
+    treeControl = new EditorTreeControl(this);
+    
     fileControls = new FileControls(this);
-    emptyEditor = new JPanel();
-    emptyEditor.setPreferredSize(new Dimension(20, 50));
-
-    editorPan = new JPanel(new GridBagLayout()) {
-
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public Dimension getPreferredSize() {
-        Dimension res = super.getPreferredSize();
-        if(res.getHeight() < emptyEditor.getPreferredSize().getHeight()) {
-          res.setSize(res.getWidth(), emptyEditor.getPreferredSize().getHeight());
-        }
-        return res;
-      }
-
-    };
-
+    
     genB = new JButton(Icons.GENERATE);
     genB.setToolTipText("Generate Structure");
     clearB = new JButton(Icons.CLEAR);
     clearB.setToolTipText("Clear current structure");
     rotCB = new JComboBox<Rotation>(Rotation.values());
     rotCB.setSelectedIndex(0);
-
-    tree = new JTree(new DefaultMutableTreeNode());
-    tree.setRootVisible(false);
-    tree.setEditable(false);
-    tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-    tree.setShowsRootHandles(true);
-    tree.setCellRenderer(new NodeRenderer());
+    
   }
 
   private void addComponents() {
@@ -212,30 +145,14 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     generatePan.add(rotCB);
     generatePan.add(genB);
 
-    JPanel treePan = new JPanel(new BorderLayout());
-    treePan.add(editorPan, BorderLayout.SOUTH);
-    JScrollPane sp = new JScrollPane(tree);
-    sp.setPreferredSize(new Dimension(360, Math.min(Minecraft.getMinecraft().displayHeight - 20, 500)));
-    treePan.add(sp, BorderLayout.CENTER);
-
     Container cp = getContentPane();
     cp.setLayout(new BorderLayout());
     cp.add(fileControls.getPanel(), BorderLayout.NORTH);
-    cp.add(treePan, BorderLayout.CENTER);
+    cp.add(treeControl.getRoot(), BorderLayout.CENTER);
     cp.add(generatePan, BorderLayout.SOUTH);
   }
- 
+
   private void addListeners() {
-
-    tree.addTreeSelectionListener(new TreeSelectionListener() {
-
-      @Override
-      public void valueChanged(TreeSelectionEvent e) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        selectionChanged(node);
-      }
-
-    });
 
     clearB.addActionListener(new ActionListener() {
 
@@ -259,48 +176,13 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
 
   }
 
-  private void selectionChanged(DefaultMutableTreeNode node) {
-    editorPan.removeAll();
-    Component editor = getEditorForSelection(node);
-    if(editor != null) {
-      editorPan.add(editor, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(2, 6, 2, 6), 0, 0));
-    }
-    revalidate();
-    repaint();
-  }
-
-  private Component getEditorForSelection(DefaultMutableTreeNode node) {
-    Object userObj = node == null ? null : node.getUserObject();
-    Component res = null;
-    if(!(userObj instanceof NodeData)) {
-      return res;
-    }
-
-    NodeData nd = (NodeData) userObj;
-    IAttributeEditor ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
-    if(ed != null) {
-      res = ed.getComponent(nd);
-    }
-    if(nd.getAttributeAccessor() instanceof ListElementAccessor) {
-      JPanel p = new JPanel(new BorderLayout());
-      if(res != null) {
-        p.add(res, BorderLayout.CENTER);
-      }
-      Component remEd = removeEditor.getComponent(nd, (ListElementAccessor) nd.getAttributeAccessor());
-      p.add(remEd, BorderLayout.EAST);
-      res = p;
-    }
-    return res;
-
-  }
-
   @Override
   protected void openResource() {
-    
-    if(dirtyMonitor.isDirty() && !checkClear()) {
+
+    if(treeControl.isDirty() && !checkClear()) {
       return;
     }
-    
+
     StructureResourceManager resMan = StructureGenRegister.instance.getResourceManager();
     List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
@@ -352,8 +234,6 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     }
   }
 
-  
-
   private IStructureTemplate loadFromFile(File file) {
     String name = file.getName();
     if(name.endsWith(StructureResourceManager.TEMPLATE_EXT)) {
@@ -381,12 +261,12 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   @Override
   protected void save() {
     if(curTemplate == null) {
-      dirtyMonitor.setDirty(false);
+      treeControl.setDirty(false);
       return;
     }
-    super.save();      
+    super.save();
   }
-  
+
   @Override
   protected void writeToFile(File file, String newUid) {
     if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
@@ -396,29 +276,29 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
         tile.setName(newUid);
         sendUpdatePacket();
         buildTree();
-        dirtyMonitor.setDirty(true);
+        treeControl.setDirty(true);
       }
-      dirtyMonitor.setDirty(false);
+      treeControl.setDirty(false);
       StructureGenRegister.instance.registerTemplate(curTemplate);
     }
-    
+
   }
 
   @Override
-  protected String getResourceUid() {
+  public String getResourceUid() {
     if(curTemplate == null || curTemplate.getUid() == null) {
       return null;
-    }    
+    }
     return curTemplate.getUid().trim();
   }
 
   @Override
-  protected String getResourceExtension() {
+  public String getResourceExtension() {
     return StructureResourceManager.TEMPLATE_EXT;
   }
 
   @Override
-  protected AbstractResourceTile getTile() {
+  public AbstractResourceTile getTile() {
     return tile;
   }
 
@@ -472,52 +352,10 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     super.onDialogClose();
   }
 
-  private void onDirtyChanged(boolean dirty) {
-    String title = curTemplate == null ? "" : curTemplate.getUid();
-    title = title + StructureResourceManager.GENERATOR_EXT;
-    if(dirty) {
-      title += "*";
-    }
-    setTitle(title);
+  @Override
+  public void onDirtyChanged(boolean dirty) {
+    super.onDirtyChanged(dirty);
     fileControls.getSaveB().setEnabled(dirty);
-  }
-
-  private class DirtMonitor implements TreeModelListener {
-
-    private boolean dirty = false;
-
-    public void setDirty(boolean dirty) {
-      if(dirty == this.dirty) {
-        return;
-      }
-      this.dirty = dirty;
-      onDirtyChanged(dirty);
-    }
-
-    public boolean isDirty() {
-      return dirty;
-    }
-
-    @Override
-    public void treeNodesChanged(TreeModelEvent e) {
-      setDirty(true);
-    }
-
-    @Override
-    public void treeNodesInserted(TreeModelEvent e) {
-      setDirty(true);
-    }
-
-    @Override
-    public void treeNodesRemoved(TreeModelEvent e) {
-      setDirty(true);
-    }
-
-    @Override
-    public void treeStructureChanged(TreeModelEvent e) {
-      setDirty(true);
-    }
-
   }
 
 }

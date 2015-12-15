@@ -11,7 +11,6 @@ import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.block.generator.DialogGeneratorEditor;
 import crazypants.structures.creator.block.generator.GuiGeneratorEditor;
 import crazypants.structures.creator.block.generator.TileGeneratorEditor;
-import crazypants.structures.creator.block.template.TileTemplateEditor;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -84,7 +83,7 @@ public class BlockGeneratorEditor extends BlockEnder implements IGuiHandler {
   @Override
   public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
     TileEntity te = world.getTileEntity(x, y, z);
-    if(te instanceof TileTemplateEditor) {
+    if(te instanceof TileGeneratorEditor) {
       return new GuiGeneratorEditor();      
     }
     return null;

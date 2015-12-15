@@ -21,30 +21,6 @@ public class TypedEditor<T extends ITyped> extends ComboEditor<T> {
     getComboBox().setRenderer(new Renderer());
   }
 
-   
-  
-  @Override
-  public Component getComponent(NodeData data) {
-   
-//    setNodeData(data);    
-//    
-//    DefaultComboBoxModel<T> model;    
-//    T[] values = getValues();
-//    if(values == null) {
-//      model = new DefaultComboBoxModel<T>();
-//    } else {
-//      model = new DefaultComboBoxModel<T>(values);
-//    }    
-//    JComboBox<T> cb = getComboBox();
-//    cb.setModel(model);
-//    cb.setSelectedItem(data.getValue());
-//    
-//    getLabel().setText(data.getLabel());
-//    
-//    return getRootComponent();
-    return super.getComponent(data);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   protected T[] getValues() {

@@ -239,7 +239,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
   }
 
   @Override
-  protected String getResourceUid() {
+  public String getResourceUid() {
     String res = nameTF.getText();
     if(res == null) {
       return null;
@@ -248,12 +248,12 @@ public class DialogComponentEditor extends AbstractResourceDialog {
   }
 
   @Override
-  protected String getResourceExtension() {
+  public String getResourceExtension() {
     return StructureResourceManager.COMPONENT_EXT;
   }
 
   @Override
-  protected AbstractResourceTile getTile() {
+  public AbstractResourceTile getTile() {
     return tile;
   }
 

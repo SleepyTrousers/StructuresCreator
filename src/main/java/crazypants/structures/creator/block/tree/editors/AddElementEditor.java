@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
@@ -16,10 +17,12 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 
 import crazypants.structures.api.ITyped;
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.creator.block.tree.IAttributeAccessor;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
+import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.TypeRegister;
 
 public class AddElementEditor extends AbstractAttributeEditor {
@@ -97,10 +100,15 @@ public class AddElementEditor extends AbstractAttributeEditor {
       if(vals != null) {
         options.addAll(vals);
       }
-    } else if(type.isEnum()) {   //Enum
-      if(type.getEnumConstants() != null) {
-        options.addAll(Arrays.asList(type.getEnumConstants()));
-      }
+    } else if(type.isEnum() && type.getEnumConstants() != null) {   //Enum      
+      
+      options.addAll(Arrays.asList(type.getEnumConstants()));      
+      
+    } else if(IResource.class.isAssignableFrom(type)) {    //IResource  
+      Collection<? extends IResource> vals = StructureGenRegister.instance.getResources(type);
+      if(vals != null) {
+        options.addAll(vals);
+      }      
     } else {   //Primitives / Basic types
       try { 
         options.add(type.newInstance());
@@ -137,7 +145,9 @@ public class AddElementEditor extends AbstractAttributeEditor {
       super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);      
       if(value instanceof ITyped) {
         setText(((ITyped)value).getType());
-      }      
+      } else if(value instanceof IResource) {
+        setText(((IResource)value).getUid());
+      }
       return this; 
     }
     
