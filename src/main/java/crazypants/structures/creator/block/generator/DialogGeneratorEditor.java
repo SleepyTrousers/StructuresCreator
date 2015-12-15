@@ -86,7 +86,9 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
   private void buildTree() {
     String name = tile.getName();
     if(curGenerator == null) {
-      curGenerator = new StructureGenerator(name);
+      StructureGenerator gen = new StructureGenerator();
+      gen.setUid(name);
+      curGenerator = gen;       
     }
     treeControl.buildTree(curGenerator);    
     
