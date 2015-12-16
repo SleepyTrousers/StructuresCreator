@@ -1,4 +1,4 @@
-package crazypants.structures.creator.block.generator;
+package crazypants.structures.creator.block.villager;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -18,7 +18,7 @@ import javax.swing.JPopupMenu;
 import org.apache.commons.io.IOUtils;
 
 import crazypants.structures.Log;
-import crazypants.structures.api.gen.IStructureGenerator;
+import crazypants.structures.api.gen.IVillagerGenerator;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.block.AbstractResourceDialog;
 import crazypants.structures.creator.block.AbstractResourceTile;
@@ -27,35 +27,36 @@ import crazypants.structures.creator.block.tree.EditorTreeControl;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
+import crazypants.structures.gen.io.VillagerParser;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
-import crazypants.structures.gen.structure.StructureGenerator;
+import crazypants.structures.gen.villager.VillagerTemplate;
 import net.minecraft.client.Minecraft;
 
-public class DialogGeneratorEditor extends AbstractResourceDialog {
+public class DialogVillagerEditor extends AbstractResourceDialog {
 
   
   private static final long serialVersionUID = 1L;
 
-  private static Map<Point3i, DialogGeneratorEditor> openDialogs = new HashMap<Point3i, DialogGeneratorEditor>();
+  private static Map<Point3i, DialogVillagerEditor> openDialogs = new HashMap<Point3i, DialogVillagerEditor>();
 
-  public static void openDialog(TileGeneratorEditor tile) {
+  public static void openDialog(TileVillagerEditor tile) {
     Point3i key = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
-    DialogGeneratorEditor res = openDialogs.get(key);
+    DialogVillagerEditor res = openDialogs.get(key);
     if(res == null) {
-      res = new DialogGeneratorEditor(tile);
+      res = new DialogVillagerEditor(tile);
       openDialogs.put(key, res);
     }
     res.openDialog();
   }
 
-  private final TileGeneratorEditor tile;
+  private final TileVillagerEditor tile;
   private final Point3i position;  
-  private IStructureGenerator curGenerator;
+  private VillagerTemplate curTemplate;
   
   private FileControls fileControls;
   private EditorTreeControl treeControl;
 
-  public DialogGeneratorEditor(TileGeneratorEditor tile) {
+  public DialogVillagerEditor(TileVillagerEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
     setIconImage(Icons.GENERATOR.getImage());    
@@ -67,7 +68,7 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
 
     if(tile.getName() != null && tile.getName().trim().length() > 0 && tile.getExportDir() != null) {
       try {
-        curGenerator = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.GENERATOR_EXT));
+        curTemplate = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.VILLAGER_EXT));
       } catch (Exception e) {
         tile.setName("NewGenerator");
         e.printStackTrace();
@@ -81,21 +82,21 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
 
   private void buildTree() {
     String name = tile.getName();
-    if(curGenerator == null) {
-      StructureGenerator gen = new StructureGenerator();
-      gen.setUid(name);
-      curGenerator = gen;       
+    if(curTemplate == null) {
+      VillagerTemplate tmpl = new VillagerTemplate();
+      tmpl.setUid(name);
+      curTemplate = tmpl;       
     }
-    treeControl.buildTree(curGenerator);    
+    treeControl.buildTree(curTemplate);    
     
   }
 
   @Override
   protected void createNewResource() {
     if(!treeControl.isDirty() || checkClear()) {
-      tile.setName("NewGenerator");
+      tile.setName("NewVillagerGen");
       sendUpdatePacket();
-      curGenerator = null;
+      curTemplate = null;
       buildTree();
     }    
   }
@@ -113,7 +114,7 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
     for (File file : files) {
 
       final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
-      final IStructureGenerator gen = loadFromFile(file);
+      final VillagerTemplate gen = loadFromFile(file);
       if(gen != null) {
         JMenuItem mi = new JMenuItem(file.getName());
         mi.addActionListener(new ActionListener() {
@@ -124,7 +125,7 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
         });
         menu.add(mi);
       } else {
-        System.out.println("DialogGeneratorEditor.openResource: Could not load template from file: " + file.getAbsolutePath());
+        System.out.println("DialogVillagerEditor.openResource: Could not load template from file: " + file.getAbsolutePath());
       }
 
     }
@@ -144,15 +145,15 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
 
   @Override
   public String getResourceUid() {
-    if(curGenerator == null || curGenerator.getUid() == null) {
+    if(curTemplate == null || curTemplate.getUid() == null) {
       return null;
     }    
-    return curGenerator.getUid().trim();
+    return curTemplate.getUid().trim();
   }
   
   @Override
   public String getResourceExtension() {
-    return StructureResourceManager.GENERATOR_EXT;
+    return StructureResourceManager.VILLAGER_EXT;
   }
 
   @Override
@@ -174,27 +175,27 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
   
   @Override
   protected void writeToFile(File file, String newUid) {
-    if(ExportManager.writeToFile(file, curGenerator, Minecraft.getMinecraft().thePlayer)) {
+    if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
       Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());
-      if(!newUid.equals(curGenerator.getUid())) {
-        ((StructureGenerator) curGenerator).setUid(newUid);
+      if(!newUid.equals(curTemplate.getUid())) {
+        curTemplate.setUid(newUid);
         tile.setName(newUid);
         sendUpdatePacket();
         buildTree();
         treeControl.setDirty(true);
       }
-      treeControl.setDirty(false);
-      StructureGenRegister.instance.registerGenerator(curGenerator);
+      treeControl.setDirty(false);   
+      registerCurrentTemplate();
     }    
   }
   
-  private void openGenerator(String name, IStructureGenerator gen) {
+  private void openGenerator(String name, VillagerTemplate gen) {
     if(name == null || gen == null) {
       return;
     }   
     tile.setName(name);
     sendUpdatePacket();
-    curGenerator = gen;
+    curTemplate = gen;
     onDirtyChanged(false);
     buildTree();
   }
@@ -204,27 +205,36 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
     if(file == null) {
       return;
     }
-    IStructureGenerator sc = loadFromFile(file);
-    if(sc != null) {
-      StructureGenRegister.instance.registerGenerator(sc);
-      String name = sc.getUid();
-      openGenerator(name, sc);
+    VillagerTemplate vilTmpl = loadFromFile(file);
+    if(vilTmpl != null) {      
+      String name = vilTmpl.getUid();
+      openGenerator(name, vilTmpl);
+      registerCurrentTemplate();
     } else {
       JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
     }
   }
+
+  private void registerCurrentTemplate() {
+    if(curTemplate != null && curTemplate.isValid()) {
+      IVillagerGenerator gen = curTemplate.createGenerator();
+      StructureGenRegister.instance.registerVillagerGenerator(gen);
+      gen.onReload();
+    }
+  }
   
-  private IStructureGenerator loadFromFile(File file) {
+  private VillagerTemplate loadFromFile(File file) {
     String name = file.getName();
-    if(name.endsWith(StructureResourceManager.GENERATOR_EXT)) {
-      name = name.substring(0, name.length() - StructureResourceManager.GENERATOR_EXT.length());
+    if(name.endsWith(StructureResourceManager.VILLAGER_EXT)) {
+      name = name.substring(0, name.length() - StructureResourceManager.VILLAGER_EXT.length());
     }
 
     InputStream stream = null;
     try {
       stream = new FileInputStream(file);
-      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
-      IStructureGenerator res = StructureGenRegister.instance.getResourceManager().loadGenerator(name, stream);
+      String json = StructureGenRegister.instance.getResourceManager().loadText(name, stream);
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());      
+      VillagerTemplate res = new VillagerParser().parseVillagerTemplate(name, json);      
       if(res != null) {
         tile.setExportDir(file.getParentFile().getAbsolutePath());
         sendUpdatePacket();

@@ -13,6 +13,7 @@ import crazypants.structures.config.Config;
 import crazypants.structures.gen.io.GsonIO;
 import crazypants.structures.gen.io.ResourceWrapper;
 import crazypants.structures.gen.structure.StructureComponentNBT;
+import crazypants.structures.gen.villager.VillagerTemplate;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 
@@ -68,6 +69,12 @@ public class ExportManager {
   public static boolean writeToFile(File file, IStructureGenerator curGenerator, EntityPlayer player) {
     ResourceWrapper rw = new ResourceWrapper();
     rw.setStructureGenerator(curGenerator);
+    return writeToFile(file, rw, player);
+  }
+  
+  public static boolean writeToFile(File file, VillagerTemplate curTemplate, EntityPlayer player) {
+    ResourceWrapper rw = new ResourceWrapper();
+    rw.setVillagerTemplate(curTemplate);
     return writeToFile(file, rw, player);
   }
 

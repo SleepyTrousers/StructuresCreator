@@ -14,7 +14,6 @@ import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -72,10 +71,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
-    setIconImage(Icons.TEMPLATE.getImage());
-    setModal(false);
-    setAlwaysOnTop(true);
-    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    setIconImage(Icons.TEMPLATE.getImage());   
     setTitle("Template Editor");
 
     initComponents();

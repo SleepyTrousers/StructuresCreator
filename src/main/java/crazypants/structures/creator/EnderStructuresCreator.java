@@ -18,6 +18,7 @@ import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentEditor;
 import crazypants.structures.creator.block.BlockGeneratorEditor;
 import crazypants.structures.creator.block.BlockTemplateEditor;
+import crazypants.structures.creator.block.BlockVillagerEditor;
 import crazypants.structures.creator.block.component.EditorRegister;
 import crazypants.structures.creator.item.ItemClearTool;
 import crazypants.structures.creator.item.ItemComponentTool;
@@ -43,6 +44,7 @@ public class EnderStructuresCreator {
   public static BlockComponentEditor blockComponentTool;
   public static BlockTemplateEditor blockTemplateEditor;
   public static BlockGeneratorEditor blockGeneratorEditor;
+  public static BlockVillagerEditor blockVillagerEditor;
   
   public static ItemComponentTool itemComponentTool;
   public static ItemTemplateTool itemTemplateTool;
@@ -61,6 +63,7 @@ public class EnderStructuresCreator {
     blockComponentTool = BlockComponentEditor.create();    
     blockTemplateEditor = BlockTemplateEditor.create();   
     blockGeneratorEditor = BlockGeneratorEditor.create();
+    blockVillagerEditor = BlockVillagerEditor.create(); 
     blockClearMarker = BlockClearMarker.create();
     
     itemTagTool = ItemTagTool.create();

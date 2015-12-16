@@ -35,7 +35,7 @@ public abstract class AbstractResourceDialog extends JDialog {
 
   protected AbstractResourceDialog() {
     setModal(false);
-    setAlwaysOnTop(true);
+    //setAlwaysOnTop(true);
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
     addWindowListener(new WindowAdapter() {

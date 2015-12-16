@@ -17,6 +17,7 @@ import crazypants.structures.creator.block.tree.editors.BooleanEditor;
 import crazypants.structures.creator.block.tree.editors.BorderEditor;
 import crazypants.structures.creator.block.tree.editors.ComponentEditor;
 import crazypants.structures.creator.block.tree.editors.IntegerEditor;
+import crazypants.structures.creator.block.tree.editors.ItemStackEditor;
 import crazypants.structures.creator.block.tree.editors.Point3iEditor;
 import crazypants.structures.creator.block.tree.editors.RotationEditor;
 import crazypants.structures.creator.block.tree.editors.StringEditor;
@@ -61,6 +62,7 @@ public class AttributeEditors {
     registerEditor(new RotationEditor());
     registerEditor(new AddElementEditor());
     registerEditor(new BlockEditor());
+    registerEditor(new ItemStackEditor());
     
     //Resources
     registerEditor(new ComponentEditor());

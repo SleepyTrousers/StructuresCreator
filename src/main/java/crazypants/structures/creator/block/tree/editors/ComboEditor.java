@@ -31,15 +31,25 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
       public void actionPerformed(ActionEvent e) {
         onValueChanged();
       }
-    });
+    });    
     pan.add(label);
     pan.add(cb);
   }
 
   @Override
   public Component getComponent(NodeData data) {
-    this.data = data;
+    this.data = data;    
+    updateComboModel(data);    
     
+    ignoreUpdate = true;    
+    //cb.setSelectedItem(data.getValue());
+    ignoreUpdate = false;
+    
+    label.setText(data.getLabel());    
+    return pan;
+  }
+
+  protected void updateComboModel(NodeData data) {
     DefaultComboBoxModel<T> model;    
     T[] values = getValues();
     if(values == null) {
@@ -56,10 +66,6 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
     cb.setModel(model);
     cb.setSelectedItem(data.getValue());
     ignoreUpdate = false;
-    
-    label.setText(data.getLabel());
-    
-    return pan;
   }
 
   protected abstract T[] getValues();

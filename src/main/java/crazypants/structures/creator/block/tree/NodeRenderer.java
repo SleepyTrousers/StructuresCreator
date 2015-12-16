@@ -17,12 +17,14 @@ import crazypants.structures.api.gen.IResource;
 import crazypants.structures.api.gen.ISitePreperation;
 import crazypants.structures.api.gen.ISiteValidator;
 import crazypants.structures.api.gen.IStructureComponent;
+import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.runtime.IAction;
 import crazypants.structures.api.runtime.IBehaviour;
 import crazypants.structures.api.runtime.ICondition;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
 
 public class NodeRenderer extends DefaultTreeCellRenderer {
 
@@ -100,6 +102,9 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
     if(IStructureComponent.class.isAssignableFrom(type)) {
       return Icons.COMPONENT;
     }
+    if(IStructureTemplate.class.isAssignableFrom(type)) {
+      return Icons.TEMPLATE;
+    }
     if(ICondition.class.isAssignableFrom(type)) {
       return Icons.CONDITION;
     }
@@ -137,6 +142,10 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
       }
       if(val instanceof IResource) {
         return ((IResource)val).getUid();
+      }
+      if(val instanceof ItemStack) {
+        ItemStack is = (ItemStack)val;
+        return is.stackSize + " " + is.getDisplayName();
       }
       return val.toString();
     }
