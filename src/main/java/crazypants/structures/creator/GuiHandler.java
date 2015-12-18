@@ -14,6 +14,7 @@ public class GuiHandler implements IGuiHandler {
   public static final int GUI_ID_TEMPLATE_EDITOR = 3;
   public static final int GUI_ID_GENERATOR_EDITOR = 4;
   public static final int GUI_ID_VILLAGER_EDITOR = 5;
+  public static final int GUI_ID_LOOT_EDITOR = 6;
   
 
   protected final Map<Integer, IGuiHandler> guiHandlers = new HashMap<Integer, IGuiHandler>();

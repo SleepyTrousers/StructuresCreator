@@ -17,6 +17,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentEditor;
 import crazypants.structures.creator.block.BlockGeneratorEditor;
+import crazypants.structures.creator.block.BlockLootCategoryEditor;
 import crazypants.structures.creator.block.BlockTemplateEditor;
 import crazypants.structures.creator.block.BlockVillagerEditor;
 import crazypants.structures.creator.block.component.EditorRegister;
@@ -45,6 +46,7 @@ public class EnderStructuresCreator {
   public static BlockTemplateEditor blockTemplateEditor;
   public static BlockGeneratorEditor blockGeneratorEditor;
   public static BlockVillagerEditor blockVillagerEditor;
+  public static BlockLootCategoryEditor blockLootCategoryEditor;
   
   public static ItemComponentTool itemComponentTool;
   public static ItemTemplateTool itemTemplateTool;
@@ -65,6 +67,7 @@ public class EnderStructuresCreator {
     blockGeneratorEditor = BlockGeneratorEditor.create();
     blockVillagerEditor = BlockVillagerEditor.create(); 
     blockClearMarker = BlockClearMarker.create();
+    blockLootCategoryEditor = BlockLootCategoryEditor.create();
     
     itemTagTool = ItemTagTool.create();
     itemComponentTool = ItemComponentTool.create();

@@ -21,6 +21,7 @@ public class Icons {
   public static final ImageIcon COMPONENT = createIcon("component");
   public static final ImageIcon TEMPLATE = createIcon(TEXTURE_PATH + "blocks/", "blockTemplateEditor");
   public static final ImageIcon GENERATOR = createIcon(TEXTURE_PATH + "blocks/", "blockGeneratorEditor");
+  public static final ImageIcon LOOT_EDITOR = createIcon(TEXTURE_PATH + "blocks/", "blockLootCategoryEditor");
   
   public static final ImageIcon LOCATION_SAMPLER = createIcon("locationSampler");
   public static final ImageIcon PREPERATION = createIcon("preperation");
@@ -35,6 +36,8 @@ public class Icons {
   public static final ImageIcon CHECK_BOX = createIcon("checkBox");
   
   public static final ImageIcon DOT = createIcon("dot");
+
+  
   
   public static ImageIcon createIcon(String name) {
     return createIcon (TEXTURE_PATH + "icons/" , name);      

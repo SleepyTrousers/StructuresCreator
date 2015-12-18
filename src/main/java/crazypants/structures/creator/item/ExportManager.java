@@ -10,7 +10,9 @@ import org.apache.commons.io.IOUtils;
 import crazypants.structures.api.gen.IStructureGenerator;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.config.Config;
+import crazypants.structures.gen.DefaultStructures;
 import crazypants.structures.gen.io.GsonIO;
+import crazypants.structures.gen.io.LootCategories;
 import crazypants.structures.gen.io.ResourceWrapper;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import crazypants.structures.gen.villager.VillagerTemplate;
@@ -31,7 +33,7 @@ public class ExportManager {
       return exportDir;
     }
     if(Config.configDirectory != null) {
-      exportDir = new File(Config.configDirectory.getAbsolutePath());
+      exportDir = DefaultStructures.ROOT_DIR;
       return exportDir;
     }
     return new File("StructureCreator");
@@ -75,6 +77,12 @@ public class ExportManager {
   public static boolean writeToFile(File file, VillagerTemplate curTemplate, EntityPlayer player) {
     ResourceWrapper rw = new ResourceWrapper();
     rw.setVillagerTemplate(curTemplate);
+    return writeToFile(file, rw, player);
+  }
+  
+  public static boolean writeToFile(File file, LootCategories curCategories, EntityPlayer player) {
+    ResourceWrapper rw = new ResourceWrapper();
+    rw.setLootCategories(curCategories);
     return writeToFile(file, rw, player);
   }
 

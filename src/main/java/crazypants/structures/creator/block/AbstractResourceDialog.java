@@ -24,7 +24,6 @@ import org.lwjgl.opengl.Display;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.template.packet.PacketResourceTileGui;
 import crazypants.structures.creator.item.ExportManager;
-import crazypants.structures.gen.io.resource.StructureResourceManager;
 import net.minecraft.client.Minecraft;
 
 public abstract class AbstractResourceDialog extends JDialog {
@@ -111,7 +110,7 @@ public abstract class AbstractResourceDialog extends JDialog {
   
   public void onDirtyChanged(boolean dirty) {
     String title = getResourceUid();
-    title = title + StructureResourceManager.GENERATOR_EXT;
+    title = title + getResourceExtension();
     if(dirty) {
       title += "*";
     }
