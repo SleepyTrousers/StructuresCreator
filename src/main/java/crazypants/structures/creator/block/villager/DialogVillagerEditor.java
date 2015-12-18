@@ -234,7 +234,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
       stream = new FileInputStream(file);
       String json = StructureGenRegister.instance.getResourceManager().loadText(name, stream);
       StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());      
-      VillagerTemplate res = new VillagerParser().parseVillagerTemplate(name, json);      
+      VillagerTemplate res = VillagerParser.parseVillagerTemplate(name, json);      
       if(res != null) {
         tile.setExportDir(file.getParentFile().getAbsolutePath());
         sendUpdatePacket();

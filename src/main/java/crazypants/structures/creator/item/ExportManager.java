@@ -7,14 +7,14 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import crazypants.structures.api.gen.IStructureGenerator;
-import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.config.Config;
 import crazypants.structures.gen.DefaultStructures;
 import crazypants.structures.gen.io.GsonIO;
 import crazypants.structures.gen.io.LootCategories;
 import crazypants.structures.gen.io.ResourceWrapper;
 import crazypants.structures.gen.structure.StructureComponentNBT;
+import crazypants.structures.gen.structure.StructureGenerator;
+import crazypants.structures.gen.structure.StructureTemplate;
 import crazypants.structures.gen.villager.VillagerTemplate;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
@@ -62,13 +62,13 @@ public class ExportManager {
     return saved;
   }
 
-  public static boolean writeToFile(File file, IStructureTemplate curTemplate, EntityPlayer player) {
+  public static boolean writeToFile(File file, StructureTemplate curTemplate, EntityPlayer player) {
     ResourceWrapper rw = new ResourceWrapper();
     rw.setStructureTemplate(curTemplate);
     return writeToFile(file, rw, player);
   }
 
-  public static boolean writeToFile(File file, IStructureGenerator curGenerator, EntityPlayer player) {
+  public static boolean writeToFile(File file, StructureGenerator curGenerator, EntityPlayer player) {
     ResourceWrapper rw = new ResourceWrapper();
     rw.setStructureGenerator(curGenerator);
     return writeToFile(file, rw, player);

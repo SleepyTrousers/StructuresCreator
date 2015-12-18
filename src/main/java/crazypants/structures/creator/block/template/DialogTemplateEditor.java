@@ -265,7 +265,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
 
   @Override
   protected void writeToFile(File file, String newUid) {
-    if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
+    if(ExportManager.writeToFile(file, (StructureTemplate)curTemplate, Minecraft.getMinecraft().thePlayer)) {
       Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());
       if(!newUid.equals(curTemplate.getUid())) {
         ((StructureTemplate) curTemplate).setUid(newUid);
