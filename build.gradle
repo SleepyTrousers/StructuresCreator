@@ -39,6 +39,7 @@ configurations {
 repositories {
     mavenCentral()
     maven { url = "http://maven.tterrag.com" }
+    maven { url = "http://chickenbones.net/maven/" }
 }
 
 dependencies {
