@@ -98,6 +98,11 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
       super.saveAs();
     }
   }
+  
+  @Override
+  protected boolean checkClear() {
+    return !treeControl.isDirty() || super.checkClear();     
+  }
 
   @Override
   protected void createNewResource() {

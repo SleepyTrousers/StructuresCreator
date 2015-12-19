@@ -86,8 +86,12 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
       gen.setUid(name);
       curGenerator = gen;       
     }
-    treeControl.buildTree(curGenerator);    
-    
+    treeControl.buildTree(curGenerator);        
+  }
+  
+  @Override
+  protected boolean checkClear() {
+    return !treeControl.isDirty() || super.checkClear();     
   }
 
   @Override

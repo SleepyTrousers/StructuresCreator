@@ -97,7 +97,13 @@ public class EditorTreeControl {
     }
 
     NodeData nd = (NodeData) userObj;
-    IAttributeEditor ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
+    IAttributeEditor ed;
+    if(nd.aa != null) {
+      ed = AttributeEditors.INSTANCE.getEditor(nd.aa);
+    } else {
+      ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
+    }
+    
     if(ed != null) {
       res = ed.getComponent(nd);
     }

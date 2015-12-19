@@ -4,17 +4,17 @@ import java.lang.reflect.Field;
 
 public class FieldAccessor implements IAttributeAccessor {
 
-  protected final String attribuiteName;
+  protected final String attribuiteName;  
+  protected final Class<?> attributeType;
   protected final Field field;
-  protected final Class<?> typeClass;
 
-  public FieldAccessor(Class<?> objClass, Class<?> typeClass, String attribuiteName) {
+  public FieldAccessor(Class<?> ownersClass, Class<?> attributeClass, String attribuiteName) {
     this.attribuiteName = attribuiteName;
-    this.typeClass = typeClass;
+    this.attributeType = attributeClass;
     Field f = null;
     try {
-      f = objClass.getDeclaredField(attribuiteName);
-      if(!f.getType().isAssignableFrom(typeClass)) {
+      f = ownersClass.getDeclaredField(attribuiteName);
+      if(!f.getType().isAssignableFrom(attributeClass)) {
         f = null;
         System.out.println("AttributeAccessor.AttributeAccessor: wrong attribute type");
       } else {
@@ -31,10 +31,10 @@ public class FieldAccessor implements IAttributeAccessor {
     if(field != null) {
       field.setAccessible(true);
       attribuiteName = field.getName();
-      typeClass = field.getType();
+      attributeType = field.getType();
     } else {
       attribuiteName = null;
-      typeClass = null;
+      attributeType = null;
     }
   }
 
@@ -45,7 +45,7 @@ public class FieldAccessor implements IAttributeAccessor {
 
   @Override
   public Class<?> getType() {
-    return typeClass;
+    return attributeType;
   }
   
   @Override
@@ -72,5 +72,44 @@ public class FieldAccessor implements IAttributeAccessor {
     }
     return null;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((attribuiteName == null) ? 0 : attribuiteName.hashCode());
+    result = prime * result + ((field == null) ? 0 : field.hashCode());
+    result = prime * result + ((attributeType == null) ? 0 : attributeType.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null)
+      return false;
+    if(getClass() != obj.getClass())
+      return false;
+    FieldAccessor other = (FieldAccessor) obj;
+    if(attribuiteName == null) {
+      if(other.attribuiteName != null)
+        return false;
+    } else if(!attribuiteName.equals(other.attribuiteName))
+      return false;
+    if(field == null) {
+      if(other.field != null)
+        return false;
+    } else if(!field.equals(other.field))
+      return false;
+    if(attributeType == null) {
+      if(other.attributeType != null)
+        return false;
+    } else if(!attributeType.equals(other.attributeType))
+      return false;
+    return true;
+  }
+  
+  
 
 }

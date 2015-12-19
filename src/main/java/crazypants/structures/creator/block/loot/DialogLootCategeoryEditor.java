@@ -88,8 +88,12 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
       curCategories = new LootCategories();
       curCategories.setUid(name);
     }
-    treeControl.buildTree(curCategories);    
-    
+    treeControl.buildTree(curCategories);        
+  }
+  
+  @Override
+  protected boolean checkClear() {
+    return !treeControl.isDirty() || super.checkClear();     
   }
 
   @Override

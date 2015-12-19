@@ -34,7 +34,6 @@ import net.minecraft.client.Minecraft;
 
 public class DialogVillagerEditor extends AbstractResourceDialog {
 
-  
   private static final long serialVersionUID = 1L;
 
   private static Map<Point3i, DialogVillagerEditor> openDialogs = new HashMap<Point3i, DialogVillagerEditor>();
@@ -50,16 +49,16 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
   }
 
   private final TileVillagerEditor tile;
-  private final Point3i position;  
+  private final Point3i position;
   private VillagerTemplate curTemplate;
-  
+
   private FileControls fileControls;
   private EditorTreeControl treeControl;
 
   public DialogVillagerEditor(TileVillagerEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
-    setIconImage(Icons.GENERATOR.getImage());    
+    setIconImage(Icons.GENERATOR.getImage());
     setTitle("Generator Editor");
 
     initComponents();
@@ -85,10 +84,10 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     if(curTemplate == null) {
       VillagerTemplate tmpl = new VillagerTemplate();
       tmpl.setUid(name);
-      curTemplate = tmpl;       
+      curTemplate = tmpl;
     }
-    treeControl.buildTree(curTemplate);    
-    
+    treeControl.buildTree(curTemplate);
+
   }
 
   @Override
@@ -98,7 +97,12 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
       sendUpdatePacket();
       curTemplate = null;
       buildTree();
-    }    
+    }
+  }
+
+  @Override
+  protected boolean checkClear() {
+    return !treeControl.isDirty() || super.checkClear();
   }
 
   @Override
@@ -147,10 +151,10 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
   public String getResourceUid() {
     if(curTemplate == null || curTemplate.getUid() == null) {
       return null;
-    }    
+    }
     return curTemplate.getUid().trim();
   }
-  
+
   @Override
   public String getResourceExtension() {
     return StructureResourceManager.VILLAGER_EXT;
@@ -160,7 +164,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
   public AbstractResourceTile getTile() {
     return tile;
   }
-  
+
   @Override
   protected void onDialogClose() {
     openDialogs.remove(position);
@@ -172,7 +176,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     super.onDirtyChanged(dirty);
     fileControls.getSaveB().setEnabled(dirty);
   }
-  
+
   @Override
   protected void writeToFile(File file, String newUid) {
     if(ExportManager.writeToFile(file, curTemplate, Minecraft.getMinecraft().thePlayer)) {
@@ -184,29 +188,29 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
         buildTree();
         treeControl.setDirty(true);
       }
-      treeControl.setDirty(false);   
+      treeControl.setDirty(false);
       registerCurrentTemplate();
-    }    
+    }
   }
-  
+
   private void openGenerator(String name, VillagerTemplate gen) {
     if(name == null || gen == null) {
       return;
-    }   
+    }
     tile.setName(name);
     sendUpdatePacket();
     curTemplate = gen;
     onDirtyChanged(false);
     buildTree();
   }
-  
+
   private void openFromFile() {
     File file = selectFileToOpen();
     if(file == null) {
       return;
     }
     VillagerTemplate vilTmpl = loadFromFile(file);
-    if(vilTmpl != null) {      
+    if(vilTmpl != null) {
       String name = vilTmpl.getUid();
       openGenerator(name, vilTmpl);
       registerCurrentTemplate();
@@ -222,7 +226,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
       gen.onReload();
     }
   }
-  
+
   private VillagerTemplate loadFromFile(File file) {
     String name = file.getName();
     if(name.endsWith(StructureResourceManager.VILLAGER_EXT)) {
@@ -233,8 +237,8 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     try {
       stream = new FileInputStream(file);
       String json = StructureGenRegister.instance.getResourceManager().loadText(name, stream);
-      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());      
-      VillagerTemplate res = VillagerParser.parseVillagerTemplate(name, json);      
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
+      VillagerTemplate res = VillagerParser.parseVillagerTemplate(name, json);
       if(res != null) {
         tile.setExportDir(file.getParentFile().getAbsolutePath());
         sendUpdatePacket();
@@ -261,7 +265,6 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
   }
 
   private void addListeners() {
-    
+
   }
 }
-
