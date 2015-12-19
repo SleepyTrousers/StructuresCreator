@@ -38,9 +38,16 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url = "http://maven.tterrag.com" }
 }
 
 dependencies {
+
+    if (!project.hasProperty('useLocalEnderCore')) {
+        compile "com.enderio.core:EnderCore:${endercore_version}:dev"
+    }
+    compile "com.enderio.structures:Structures:${enderstructures_version}:dev"
+
 }
 
 sourceSets {
