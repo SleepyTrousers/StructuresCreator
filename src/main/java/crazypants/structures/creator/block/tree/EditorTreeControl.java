@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Enumeration;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -16,6 +17,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import crazypants.structures.creator.block.AbstractResourceDialog;
@@ -72,7 +74,7 @@ public class EditorTreeControl {
   public void setDirty(boolean dirty) {
     dirtyMonitor.setDirty(dirty);
   }
-  
+
   public Component getRoot() {
     return rootPan;
   }
@@ -185,7 +187,7 @@ public class EditorTreeControl {
 
     @Override
     public void treeNodesInserted(TreeModelEvent e) {
-      setDirty(true);
+      setDirty(true);      
     }
 
     @Override
@@ -196,6 +198,22 @@ public class EditorTreeControl {
     @Override
     public void treeStructureChanged(TreeModelEvent e) {
       setDirty(true);
+
+      if(e.getTreePath().getLastPathComponent() instanceof StructuresTreeNode) {
+        StructuresTreeNode node = (StructuresTreeNode) e.getTreePath().getLastPathComponent();
+        Enumeration<?> kids = node.children();
+        if(kids != null && kids.hasMoreElements()) {
+          Object lastEl = null;
+          while(kids.hasMoreElements()) {
+            lastEl = kids.nextElement();
+          }          
+          if(lastEl != null) {
+            TreePath selPath = e.getTreePath().pathByAddingChild(lastEl);
+            tree.expandPath(selPath);
+            tree.setSelectionPath(selPath);
+          }
+        }
+      }      
     }
 
   }

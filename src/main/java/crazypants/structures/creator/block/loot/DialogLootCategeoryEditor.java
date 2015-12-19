@@ -27,8 +27,8 @@ import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.LootCategeoriesParser;
-import crazypants.structures.gen.io.LootCategories;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
+import crazypants.structures.gen.structure.loot.LootCategories;
 import net.minecraft.client.Minecraft;
 
 public class DialogLootCategeoryEditor extends AbstractResourceDialog {
@@ -52,6 +52,8 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
   private final Point3i position;  
   
   private LootCategories curCategories;
+  
+  private LootCategories oldCategories;
   
   private FileControls fileControls;
   private EditorTreeControl treeControl;
@@ -94,7 +96,7 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
   protected void createNewResource() {
     if(!treeControl.isDirty() || checkClear()) {
       tile.setName("NewLootz");
-      sendUpdatePacket();
+      sendUpdatePacket();      
       curCategories = null;
       buildTree();
     }    
@@ -186,8 +188,11 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
         buildTree();
         treeControl.setDirty(true);
       }
-      treeControl.setDirty(false);            
-      curCategories.register();;      
+      treeControl.setDirty(false);  
+      if(oldCategories != null) {
+        oldCategories.deregister();
+      }
+      curCategories.register();    
     }    
   }
   
@@ -198,6 +203,7 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
     tile.setName(name);
     sendUpdatePacket();
     curCategories = cats;
+    oldCategories = new LootCategories(cats);
     onDirtyChanged(false);
     buildTree();
   }
@@ -209,6 +215,7 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
     }
     LootCategories lc = loadFromFile(file);
     if(lc != null) {
+      lc.deregister();//in case it has already been loaded, dont want to add things twice
       lc.register();
       String name = lc.getUid();
       openCategories(name, lc);

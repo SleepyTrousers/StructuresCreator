@@ -22,6 +22,7 @@ import crazypants.structures.creator.block.tree.IAttributeAccessor;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
+import crazypants.structures.creator.block.tree.StructuresTreeNode;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.TypeRegister;
 
@@ -51,9 +52,10 @@ public class AddElementEditor extends AbstractAttributeEditor {
         }        
         listAcc.add(nodeData.getOwner(), newItem);
 
-        nodeData.getNode().removeAllChildren();
-        nodeData.getNode().addChildren(nodeData.getValue());
-        nodeData.getNode().dataChanged(true);
+        StructuresTreeNode node = nodeData.getNode();
+        node.removeAllChildren();
+        node.addChildren(nodeData.getValue());
+        node.dataChanged(true);        
       }
 
     });

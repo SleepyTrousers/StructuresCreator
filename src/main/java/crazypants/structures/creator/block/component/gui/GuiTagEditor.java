@@ -39,6 +39,9 @@ public class GuiTagEditor  extends GuiContainerBase {
   public void initGui() {    
     super.initGui();
     addTextFields();
+    if(!textFields.isEmpty()) {
+      textFields.get(0).setFocused(true);
+    }
   }
 
   @Override

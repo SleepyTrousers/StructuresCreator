@@ -18,6 +18,7 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
@@ -35,22 +36,22 @@ public abstract class AbstractResourceDialog extends JDialog {
   protected AbstractResourceDialog() {
     setModal(false);
     //setAlwaysOnTop(true);
-    setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
     addWindowListener(new WindowAdapter() {
 
       @Override
-      public void windowClosed(WindowEvent e) {
+      public void windowClosing(WindowEvent e) {
         onDialogClose();
       }
+
     });
 
     ActionListener al = new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        onDialogClose();
-        setVisible(false);
+        onDialogClose();        
       }
     };
     KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
@@ -82,11 +83,16 @@ public abstract class AbstractResourceDialog extends JDialog {
     return filter;
   }
 
-  protected void onDialogClose() {
+  protected void onDialogClose() {    
+    if(!checkClear()) {
+      return;
+    }
     Mouse.setCursorPosition(Display.getX() - Display.getWidth() / 2, Display.getY() - Display.getHeight() / 2);
     if(Minecraft.getMinecraft().thePlayer != null) {
       Minecraft.getMinecraft().thePlayer.closeScreen();
     }
+    setVisible(false);
+    dispose();
   }
   
   protected void openDialog() {
@@ -94,6 +100,17 @@ public abstract class AbstractResourceDialog extends JDialog {
     setLocation(Display.getX(), Display.getY());
     setVisible(true);
     requestFocus();
+    
+    
+    java.awt.EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+          toFront();
+          requestFocus();
+          repaint();
+      }
+  });
+    
   }
 
   protected boolean checkClear() {
@@ -122,6 +139,10 @@ public abstract class AbstractResourceDialog extends JDialog {
     AbstractResourceTile tile = getTile();
     if(tile.getExportDir() == null) {
       tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
+      sendUpdatePacket();
+    }
+    if(!StringUtils.equals(uid, tile.getName())) {
+      tile.setName(uid);
       sendUpdatePacket();
     }
     File f = new File(tile.getExportDir(), uid + getResourceExtension());
@@ -168,6 +189,7 @@ public abstract class AbstractResourceDialog extends JDialog {
     }
 
     tile.setExportDir(dir.getPath());
+    sendUpdatePacket();
 
     String fileName = file.getName();
     if(!fileName.endsWith(ext)) {
