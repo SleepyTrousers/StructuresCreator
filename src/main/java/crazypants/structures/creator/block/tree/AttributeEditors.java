@@ -17,11 +17,11 @@ import crazypants.structures.creator.block.tree.editors.BooleanEditor;
 import crazypants.structures.creator.block.tree.editors.BorderEditor;
 import crazypants.structures.creator.block.tree.editors.ComponentEditor;
 import crazypants.structures.creator.block.tree.editors.EntityEditor;
+import crazypants.structures.creator.block.tree.editors.EnumEditor;
 import crazypants.structures.creator.block.tree.editors.IntegerEditor;
 import crazypants.structures.creator.block.tree.editors.ItemStackEditor;
 import crazypants.structures.creator.block.tree.editors.LootCategoryEditor;
 import crazypants.structures.creator.block.tree.editors.Point3iEditor;
-import crazypants.structures.creator.block.tree.editors.RotationEditor;
 import crazypants.structures.creator.block.tree.editors.StringEditor;
 import crazypants.structures.creator.block.tree.editors.TemplateEditor;
 import crazypants.structures.creator.block.tree.editors.TextureResourceEditor;
@@ -83,10 +83,12 @@ public class AttributeEditors {
     registerEditor(new StringEditor());
     registerEditor(new Point3iEditor());
     registerEditor(new BorderEditor());
-    registerEditor(new RotationEditor());
+    registerEditor(new EnumEditor());
+//    registerEditor(new RotationEditor());
     registerEditor(new AddElementEditor());
     registerEditor(new BlockEditor());
-    registerEditor(new ItemStackEditor());
+    registerEditor(new ItemStackEditor());    
+//    registerEditor(new BiomeTypeEditor());
     
     //Resources
     registerEditor(new ComponentEditor());
