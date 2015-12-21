@@ -69,12 +69,14 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
       try {
         curTemplate = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.VILLAGER_EXT));
       } catch (Exception e) {
-        tile.setName("NewGenerator");
-        e.printStackTrace();
+        treeControl.setDirty(false);
+        createNewResource();
       }
 
     } else {
-      tile.setName("NewGenerator");
+      treeControl.setDirty(false);
+      createNewResource();
+      
     }
     buildTree();
   }
@@ -94,6 +96,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
   protected void createNewResource() {
     if(!treeControl.isDirty() || checkClear()) {
       tile.setName("NewVillagerGen");
+      tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
       sendUpdatePacket();
       curTemplate = null;
       buildTree();

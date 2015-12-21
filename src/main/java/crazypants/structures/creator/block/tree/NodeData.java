@@ -2,13 +2,13 @@ package crazypants.structures.creator.block.tree;
 
 public class NodeData {
 
-  private final StructuresTreeNode treeNode;
+  private final EditorTreeNode treeNode;
 
   private final Object owner;
   final IAttributeAccessor aa;
   Object currentValue;    
 
-  public NodeData(Object owner, IAttributeAccessor aa, Object attributeVal, StructuresTreeNode treeNode) {
+  public NodeData(Object owner, IAttributeAccessor aa, Object attributeVal, EditorTreeNode treeNode) {
     this.treeNode = treeNode;
     this.owner = owner;
     this.aa = aa;
@@ -55,7 +55,7 @@ public class NodeData {
 
   
   
-  public StructuresTreeNode getNode() {
+  public EditorTreeNode getNode() {
     return treeNode;
   }
   

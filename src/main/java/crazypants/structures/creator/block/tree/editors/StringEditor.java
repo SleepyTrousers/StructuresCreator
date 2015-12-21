@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 
 public class StringEditor extends AbstractAttributeEditor {
@@ -58,7 +59,7 @@ public class StringEditor extends AbstractAttributeEditor {
   }
   
   @Override
-  public Component getComponent(NodeData data) {
+  public Component getComponent(AbstractResourceTile tile, NodeData data) {
     nd = data;
     if(data == null) {
       return null;

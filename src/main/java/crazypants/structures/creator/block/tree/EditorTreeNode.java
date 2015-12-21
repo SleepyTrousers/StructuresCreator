@@ -14,17 +14,17 @@ import crazypants.structures.api.ITyped;
 import crazypants.structures.api.ListElementType;
 import crazypants.structures.api.gen.IResource;
 
-public class StructuresTreeNode extends DefaultMutableTreeNode {
+public class EditorTreeNode extends DefaultMutableTreeNode {
 
   private static final long serialVersionUID = 1L;
   private final NodeData data;
   private final DefaultTreeModel treeModel;
 
-  public StructuresTreeNode(Object owner, IAttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel) {
+  public EditorTreeNode(Object owner, IAttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel) {
     this(owner,aa, currentValue, treeModel, true);
   }
   
-  public StructuresTreeNode(Object owner, IAttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel, boolean addChildrenOfResources) {
+  public EditorTreeNode(Object owner, IAttributeAccessor aa, Object currentValue, DefaultTreeModel treeModel, boolean addChildrenOfResources) {
     this.treeModel = treeModel;
     data = new NodeData(owner, aa, currentValue, this);
     setUserObject(data);    
@@ -82,7 +82,7 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
         aa = new FieldAccessor(field);
       }
       if(aa != null && aa.isValid() && (!skipType || !"type".equals(aa.getAttribuiteName()))) {
-        add(new StructuresTreeNode(obj, aa, aa.get(obj), treeModel, false));
+        add(new EditorTreeNode(obj, aa, aa.get(obj), treeModel, false));
       }
     }
   }
@@ -92,7 +92,7 @@ public class StructuresTreeNode extends DefaultMutableTreeNode {
     for (Object o : obj) {
       if(o != null) {
         ListElementAccessor aa = new ListElementAccessor(index, o.getClass(), data.getAttributeAccessor().getAttribuiteName());
-        add(new StructuresTreeNode(obj, aa, o, treeModel, false));
+        add(new EditorTreeNode(obj, aa, o, treeModel, false));
         index++;
       }
     }

@@ -22,7 +22,8 @@ import crazypants.structures.creator.block.tree.IAttributeAccessor;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
-import crazypants.structures.creator.block.tree.StructuresTreeNode;
+import crazypants.structures.creator.block.AbstractResourceTile;
+import crazypants.structures.creator.block.tree.EditorTreeNode;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.TypeRegister;
 
@@ -52,7 +53,7 @@ public class AddElementEditor extends AbstractAttributeEditor {
         }        
         listAcc.add(nodeData.getOwner(), newItem);
 
-        StructuresTreeNode node = nodeData.getNode();
+        EditorTreeNode node = nodeData.getNode();
         node.removeAllChildren();
         node.addChildren(nodeData.getValue());
         node.dataChanged(true);        
@@ -69,7 +70,7 @@ public class AddElementEditor extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(NodeData nodeData) {
+  public Component getComponent(AbstractResourceTile tile, NodeData nodeData) {
     this.nodeData = nodeData;
     IAttributeAccessor aa = nodeData.getAttributeAccessor();
     if(!(aa instanceof ListAccessor)) {

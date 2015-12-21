@@ -31,7 +31,7 @@ public class EditorTreeControl {
   private JPanel editorPan;
   private JTree tree;
   private DefaultTreeModel treeModel;
-  private StructuresTreeNode rootNode;
+  private EditorTreeNode rootNode;
 
   private RemoveEditor removeEditor = new RemoveEditor();
   private JPanel emptyEditor;
@@ -53,8 +53,8 @@ public class EditorTreeControl {
 
     treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
     if(resourceObj != null) {
-      rootNode = new StructuresTreeNode(resourceObj, null, resourceObj, treeModel);
-      StructuresTreeNode uidNode = new StructuresTreeNode(resourceObj, new FieldAccessor(resourceObj.getClass(), String.class, "uid"), dialog.getResourceUid(),
+      rootNode = new EditorTreeNode(resourceObj, null, resourceObj, treeModel);
+      EditorTreeNode uidNode = new EditorTreeNode(resourceObj, new FieldAccessor(resourceObj.getClass(), String.class, "uid"), dialog.getResourceUid(),
           treeModel);
       rootNode.insert(uidNode, 0);
       treeModel.setRoot(rootNode);
@@ -105,7 +105,7 @@ public class EditorTreeControl {
     }
     
     if(ed != null) {
-      res = ed.getComponent(nd);
+      res = ed.getComponent(dialog.getTile(), nd);
     }
     if(nd.getAttributeAccessor() instanceof ListElementAccessor) {
       JPanel p = new JPanel(new BorderLayout());
@@ -205,8 +205,8 @@ public class EditorTreeControl {
     public void treeStructureChanged(TreeModelEvent e) {
       setDirty(true);
 
-      if(e.getTreePath().getLastPathComponent() instanceof StructuresTreeNode) {
-        StructuresTreeNode node = (StructuresTreeNode) e.getTreePath().getLastPathComponent();
+      if(e.getTreePath().getLastPathComponent() instanceof EditorTreeNode) {
+        EditorTreeNode node = (EditorTreeNode) e.getTreePath().getLastPathComponent();
         Enumeration<?> kids = node.children();
         if(kids != null && kids.hasMoreElements()) {
           Object lastEl = null;

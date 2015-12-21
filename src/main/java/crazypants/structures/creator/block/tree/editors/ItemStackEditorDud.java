@@ -21,6 +21,7 @@ import javax.swing.event.DocumentListener;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -75,7 +76,7 @@ public class ItemStackEditorDud extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(NodeData data) {
+  public Component getComponent(AbstractResourceTile tile, NodeData data) {
     this.data = data;
 
     DefaultComboBoxModel<Item> model;

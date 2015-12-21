@@ -39,6 +39,11 @@ import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureTemplate;
+import crazypants.structures.gen.structure.preperation.ClearPreperation;
+import crazypants.structures.gen.structure.preperation.CompositePreperation;
+import crazypants.structures.gen.structure.preperation.FillPreperation;
+import crazypants.structures.gen.structure.validator.CompositeSiteValidator;
+import crazypants.structures.gen.structure.validator.LevelGroundValidator;
 import net.minecraft.client.Minecraft;
 
 public class DialogTemplateEditor extends AbstractResourceDialog {
@@ -82,12 +87,13 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
       try {
         curTemplate = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.TEMPLATE_EXT));
       } catch (Exception e) {
-        tile.setName("NewTemplate");
-        e.printStackTrace();
+        treeControl.setDirty(false);
+        createNewResource();
       }
 
     } else {
-      tile.setName("NewTemplate");
+      treeControl.setDirty(false);
+      createNewResource();
     }
     buildTree();
   }
@@ -108,8 +114,19 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   protected void createNewResource() {
     if(!treeControl.isDirty() || checkClear()) {
       tile.setName("NewTemplate");
+      tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
       sendUpdatePacket();
-      curTemplate = null;
+      curTemplate = new StructureTemplate(tile.getName());
+      
+      CompositePreperation cp = new CompositePreperation();
+      cp.add(new ClearPreperation());
+      cp.add(new FillPreperation());
+      curTemplate.setSitePreperation(cp);
+      
+      CompositeSiteValidator val = new CompositeSiteValidator();
+      val.add(new LevelGroundValidator());
+      curTemplate.setSiteValidator(val);
+      
       buildTree();
     }
   }

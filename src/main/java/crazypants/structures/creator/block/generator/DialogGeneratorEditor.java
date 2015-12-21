@@ -29,6 +29,9 @@ import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureGenerator;
+import crazypants.structures.gen.structure.sampler.SurfaceLocationSampler;
+import crazypants.structures.gen.structure.validator.RandomValidator;
+import crazypants.structures.gen.structure.validator.SpacingValidator;
 import net.minecraft.client.Minecraft;
 
 public class DialogGeneratorEditor extends AbstractResourceDialog {
@@ -69,12 +72,13 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
       try {
         curGenerator = loadFromFile(new File(tile.getExportDir(), tile.getName() + StructureResourceManager.GENERATOR_EXT));
       } catch (Exception e) {
-        tile.setName("NewGenerator");
-        e.printStackTrace();
+        treeControl.setDirty(false);
+        createNewResource();
       }
 
     } else {
-      tile.setName("NewGenerator");
+      treeControl.setDirty(false);
+      createNewResource();
     }
     buildTree();
   }
@@ -98,8 +102,19 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
   protected void createNewResource() {
     if(!treeControl.isDirty() || checkClear()) {
       tile.setName("NewGenerator");
+      tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
       sendUpdatePacket();
       curGenerator = null;
+      StructureGenerator gen = new StructureGenerator();
+      gen.setUid(tile.getName());
+      
+      gen.setLocationSampler(new SurfaceLocationSampler());
+      gen.addChunkValidator(new RandomValidator(0.1f));
+      gen.addChunkValidator(new SpacingValidator(100));
+      gen.addChunkValidator(new SpacingValidator(500, tile.getName()));      
+      
+      curGenerator = gen;       
+            
       buildTree();
     }    
   }

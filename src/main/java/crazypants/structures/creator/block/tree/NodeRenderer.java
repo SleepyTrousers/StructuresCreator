@@ -35,11 +35,11 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
 
     super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
-    if(!(value instanceof StructuresTreeNode)) {
+    if(!(value instanceof EditorTreeNode)) {
       return this;
     }
 
-    StructuresTreeNode node = (StructuresTreeNode) value;
+    EditorTreeNode node = (EditorTreeNode) value;
     NodeData nb = node.getData();
 
     String text = "";

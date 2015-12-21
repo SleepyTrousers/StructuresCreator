@@ -12,7 +12,7 @@ import javax.swing.tree.TreeNode;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListElementAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
-import crazypants.structures.creator.block.tree.StructuresTreeNode;
+import crazypants.structures.creator.block.tree.EditorTreeNode;
 
 public class RemoveEditor {
 
@@ -36,8 +36,8 @@ public class RemoveEditor {
         lea.remove(nodeData.getOwner());
         //nodeData.getNode().dataChanged(true);
         TreeNode par = nodeData.getNode().getParent();
-        if(par instanceof StructuresTreeNode) {
-          StructuresTreeNode parNode = (StructuresTreeNode)par;
+        if(par instanceof EditorTreeNode) {
+          EditorTreeNode parNode = (EditorTreeNode)par;
           parNode.removeAllChildren();          
           parNode.addChildren(nodeData.getOwner());          
           parNode.dataChanged(true);

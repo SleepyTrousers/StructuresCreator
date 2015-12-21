@@ -3,6 +3,7 @@ package crazypants.structures.creator.block.tree.editors;
 import java.awt.Color;
 import java.awt.Component;
 
+import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 
 public class IntegerEditor extends StringEditor {
@@ -16,8 +17,8 @@ public class IntegerEditor extends StringEditor {
   }
 
   @Override
-  public Component getComponent(NodeData data) {
-    Component res = super.getComponent(data);
+  public Component getComponent(AbstractResourceTile tile, NodeData data) {
+    Component res = super.getComponent(tile, data);
     getTf().setBackground(defCol);
     return res;
   }
