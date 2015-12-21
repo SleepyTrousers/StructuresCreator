@@ -56,6 +56,8 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer {
     Tessellator.instance.draw();
 
     renderGroundLevel(ct, x, y, z);
+    
+    renderNorthMarker(ct, x, y, z);
 
     renderTags(ct, x, y, z);
 
@@ -154,6 +156,35 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer {
     tessellator.addTranslation((float) -wldX, (float) -wldY, (float) -wldZ);
 
     GL11.glEnable(GL11.GL_TEXTURE_2D);
+  }
+  
+  private void renderNorthMarker(TileComponentEditor ct, double wldX, double wldY, double wldZ) {
+    AxisAlignedBB bb = ct.getStructureBounds();
+
+    double x = ct.getOffsetX();
+    double y = ct.getOffsetY();
+    double z = ct.getOffsetZ();
+    double width = Math.abs(bb.maxX - bb.minX);
+    double height = Math.abs(bb.maxY - bb.minY);
+    int colorRGB = ColorUtil.getRGB(Color.RED);
+    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    GL11.glDisable(GL11.GL_TEXTURE_2D);
+    Tessellator tessellator = Tessellator.instance;
+
+    tessellator.addTranslation((float) wldX, (float) wldY, (float) wldZ);
+
+    double i = 0.25;
+    tessellator.startDrawingQuads();
+    tessellator.setColorOpaque_I(colorRGB);
+    tessellator.addVertex(x + i, y + i, z);
+    tessellator.addVertex(x + width - i, y + i, z);
+    tessellator.addVertex(x + width - i, y+ height - i, z);
+    tessellator.addVertex(x + i, y+ height - i, z);
+    tessellator.draw();
+
+    tessellator.addTranslation((float) -wldX, (float) -wldY, (float) -wldZ);
+
+    GL11.glEnable(GL11.GL_TEXTURE_2D);    
   }
   
 

@@ -69,9 +69,9 @@ public class DialogComponentEditor extends AbstractResourceDialog {
 
   private FileControls fileControls;
 
-  public DialogComponentEditor(TileComponentEditor tile) {
+  public DialogComponentEditor(TileComponentEditor tile) {    
     this.tile = tile;
-    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);    
 
     initComponents();
     addComponents();
@@ -235,6 +235,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
 
   @Override
   protected void onDialogClose() {
+    super.onDialogClose();
     openDialogs.remove(position);
   }
 
