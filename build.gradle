@@ -101,25 +101,6 @@ task deobfJar(type: Jar) {
 
 build.dependsOn sourceJar, deobfJar, javadocJar
 
-publishing {
-    tasks.publish.dependsOn 'build'
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourceJar
-            artifact javadocJar
-            artifact deobfJar
-        }
-    }
-
-    repositories {
-        if (project.hasProperty('mavendir')) {
-            maven { url mavendir }
-        }
-    }
-}
-
 String getChangelogText() {
     def changelogFile = new File('ReleaseNotes.txt')
     String str = ''
