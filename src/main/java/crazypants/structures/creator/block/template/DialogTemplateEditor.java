@@ -126,7 +126,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
       CompositeSiteValidator val = new CompositeSiteValidator();
       val.add(new LevelGroundValidator());
       curTemplate.setSiteValidator(val);
-      
+     
       buildTree();
     }
   }

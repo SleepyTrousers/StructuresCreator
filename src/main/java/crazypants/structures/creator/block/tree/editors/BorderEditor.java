@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.gen.structure.Border;
@@ -81,7 +82,7 @@ public class BorderEditor extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(AbstractResourceTile tile, NodeData data) {
+  public Component getComponent(AbstractResourceTile tile, IResource resource, NodeData data) {
     this.data = data;
     
     ignoreUpdates = true;

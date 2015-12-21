@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 
@@ -20,8 +21,10 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
   private final JPanel pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
   private final JLabel label = new JLabel();
   private final JComboBox<T> cb = new JComboBox<T>();
-  private NodeData data;
-  private AbstractResourceTile tile;
+  
+  protected NodeData data;
+  protected AbstractResourceTile tile;
+  protected IResource resource;
   
   private boolean ignoreUpdate = false;
 
@@ -39,8 +42,9 @@ public abstract class ComboEditor<T> extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(AbstractResourceTile tile, NodeData data) {
+  public Component getComponent(AbstractResourceTile tile, IResource resource, NodeData data) {
     this.tile = tile;
+    this.resource = resource;
     this.data = data;    
     updateComboModel(data);        
     label.setText(data.getLabel());    

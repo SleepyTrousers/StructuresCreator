@@ -7,8 +7,10 @@ public class FieldAccessor implements IAttributeAccessor {
   protected final String attribuiteName;  
   protected final Class<?> attributeType;
   protected final Field field;
+  protected final Class<?> declaringClass;
 
   public FieldAccessor(Class<?> ownersClass, Class<?> attributeClass, String attribuiteName) {
+    this.declaringClass = ownersClass;
     this.attribuiteName = attribuiteName;
     this.attributeType = attributeClass;
     Field f = null;
@@ -27,14 +29,16 @@ public class FieldAccessor implements IAttributeAccessor {
   }
 
   public FieldAccessor(Field field) {
-    this.field = field;
+    this.field = field;    
     if(field != null) {
       field.setAccessible(true);
       attribuiteName = field.getName();
       attributeType = field.getType();
+      declaringClass = field.getDeclaringClass();
     } else {
       attribuiteName = null;
       attributeType = null;
+      declaringClass = null;
     }
   }
 
@@ -48,6 +52,13 @@ public class FieldAccessor implements IAttributeAccessor {
     return attributeType;
   }
   
+  
+  
+  @Override
+  public Class<?> getDeclaringClass() {  
+    return declaringClass;
+  }
+
   @Override
   public boolean isValid() {
     return field != null;

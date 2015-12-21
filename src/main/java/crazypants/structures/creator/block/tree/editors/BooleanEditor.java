@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 
@@ -33,7 +34,7 @@ public class BooleanEditor extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(AbstractResourceTile tile, NodeData data) {
+  public Component getComponent(AbstractResourceTile tile, IResource resource, NodeData data) {
     nd = data;
     if(data == null) {
       return null;

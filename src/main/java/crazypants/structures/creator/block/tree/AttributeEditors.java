@@ -3,6 +3,8 @@ package crazypants.structures.creator.block.tree;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import crazypants.structures.api.gen.IChunkValidator;
 import crazypants.structures.api.gen.IDecorator;
 import crazypants.structures.api.gen.ILocationSampler;
@@ -23,12 +25,14 @@ import crazypants.structures.creator.block.tree.editors.ItemStackEditor;
 import crazypants.structures.creator.block.tree.editors.LootCategoryEditor;
 import crazypants.structures.creator.block.tree.editors.Point3iEditor;
 import crazypants.structures.creator.block.tree.editors.StringEditor;
+import crazypants.structures.creator.block.tree.editors.TaggedLocationEditor;
 import crazypants.structures.creator.block.tree.editors.TemplateEditor;
 import crazypants.structures.creator.block.tree.editors.TextureResourceEditor;
 import crazypants.structures.creator.block.tree.editors.TypedEditor;
 import crazypants.structures.gen.structure.decorator.LootTableDecorator;
 import crazypants.structures.gen.structure.loot.LootCategory;
 import crazypants.structures.gen.villager.VillagerTemplate;
+import crazypants.structures.runtime.PositionedType;
 import crazypants.structures.runtime.behaviour.ResidentSpawner;
 import crazypants.structures.runtime.behaviour.vspawner.VirtualSpawnerBehaviour;
 
@@ -46,7 +50,7 @@ public class AttributeEditors {
     editors.put(ed.getType(), ed);
   }
   
-  public void registerEditor(IAttributeAccessor attribue, IAttributeEditor ed) {
+  public void registerEditor(IAttributeAccessor attribue, IAttributeEditor ed) {    
     if(attribue == null) {
       return;
     }
@@ -54,19 +58,46 @@ public class AttributeEditors {
   }
 
   public IAttributeEditor getEditor(IAttributeAccessor attribue) {
+    if(attribue == null) {
+      return null;
+    }    
     IAttributeEditor res = atrAditors.get(attribue);
     if(res == null) {
-      res = getEditor(attribue.getType());
+      for (IAttributeAccessor registeredAcc : atrAditors.keySet()) {
+        if(isParent(registeredAcc, attribue)) {
+          res = atrAditors.get(registeredAcc);          
+          break;
+        }
+      }
+      if(res == null) {      
+        res = getEditor(attribue.getType());
+      }      
+      atrAditors.put(attribue, res);            
     }
     return res;
   }
   
+  private boolean isParent(IAttributeAccessor parent, IAttributeAccessor child) {
+    if(parent == null || child == null) {
+      return false;
+    }
+    if(parent.getType() != child.getType()) {
+      return false;
+    }
+    if(!StringUtils.equals(parent.getAttribuiteName(), child.getAttribuiteName())) {
+      return false;
+    }
+    if(parent.getDeclaringClass() != child.getDeclaringClass() && !parent.getDeclaringClass().isAssignableFrom(child.getDeclaringClass())) {
+      return false;
+    }       
+    return true;
+  }
+
   public IAttributeEditor getEditor(Class<?> type) {
     IAttributeEditor res = editors.get(type);
     if(res == null) {
       for (Class<?> cl : editors.keySet()) {
         if(cl.isAssignableFrom(type)) {
-          //if(type.isInstance(cl)) {
           res = editors.get(cl);
           break;
         }
@@ -84,11 +115,9 @@ public class AttributeEditors {
     registerEditor(new Point3iEditor());
     registerEditor(new BorderEditor());
     registerEditor(new EnumEditor());
-//    registerEditor(new RotationEditor());
     registerEditor(new AddElementEditor());
     registerEditor(new BlockEditor());
     registerEditor(new ItemStackEditor());    
-//    registerEditor(new BiomeTypeEditor());
     
     //Resources
     registerEditor(new ComponentEditor());
@@ -129,6 +158,17 @@ public class AttributeEditors {
     if(aa.isValid()) {
       registerEditor(aa, ed);
     } 
+        
+    ed = new TaggedLocationEditor();
+    aa = new FieldAccessor(PositionedType.class, String.class, "taggedPosition");
+    if(aa.isValid()) {
+      registerEditor(aa, ed);
+    }   
+    ListElementAccessor lea = new ListElementAccessor(LootTableDecorator.class, "targets", 0, String.class);
+    if(lea.isValid()) {
+      registerEditor(lea, ed);
+    }
+    
   }
 
 }

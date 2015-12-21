@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.creator.block.AbstractResourceDialog;
 import crazypants.structures.creator.block.tree.editors.RemoveEditor;
 import net.minecraft.client.Minecraft;
@@ -32,6 +33,7 @@ public class EditorTreeControl {
   private JTree tree;
   private DefaultTreeModel treeModel;
   private EditorTreeNode rootNode;
+  private IResource resource;
 
   private RemoveEditor removeEditor = new RemoveEditor();
   private JPanel emptyEditor;
@@ -45,8 +47,8 @@ public class EditorTreeControl {
     addListeners();
   }
 
-  public void buildTree(Object resourceObj) {
-
+  public void buildTree(IResource resourceObj) {
+    resource = resourceObj;
     if(treeModel != null) {
       treeModel.removeTreeModelListener(dirtyMonitor);
     }
@@ -105,7 +107,7 @@ public class EditorTreeControl {
     }
     
     if(ed != null) {
-      res = ed.getComponent(dialog.getTile(), nd);
+      res = ed.getComponent(dialog.getTile(), resource, nd);
     }
     if(nd.getAttributeAccessor() instanceof ListElementAccessor) {
       JPanel p = new JPanel(new BorderLayout());

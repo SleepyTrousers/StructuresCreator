@@ -7,8 +7,10 @@ public class ListElementAccessor implements IAttributeAccessor {
   private final int index;
   private final Class<?> type;
   private final String attributeName;
+  private final Class<?> declaringClass;
 
-  public ListElementAccessor(int index, Class<?> type, String attributeName) {
+  public ListElementAccessor(Class<?> declaringClass, String attributeName, int index, Class<?> type) {
+    this.declaringClass = declaringClass;
     this.index = index;
     this.type = type;
     this.attributeName = attributeName;
@@ -53,12 +55,17 @@ public class ListElementAccessor implements IAttributeAccessor {
 
   @Override
   public boolean isValid() {    
-    return index > 0;
+    return index >= 0;
   }
 
   @Override
   public Class<?> getType() {
     return type;
+  }
+
+  @Override
+  public Class<?> getDeclaringClass() {  
+    return declaringClass;
   }
 
   @Override

@@ -13,6 +13,7 @@ import com.google.gson.annotations.Expose;
 import crazypants.structures.api.ITyped;
 import crazypants.structures.api.ListElementType;
 import crazypants.structures.api.gen.IResource;
+import crazypants.structures.gen.structure.loot.LootCategories;
 
 public class EditorTreeNode extends DefaultMutableTreeNode {
 
@@ -28,7 +29,7 @@ public class EditorTreeNode extends DefaultMutableTreeNode {
     this.treeModel = treeModel;
     data = new NodeData(owner, aa, currentValue, this);
     setUserObject(data);    
-    if( addChildrenOfResources || !(currentValue instanceof IResource)) {
+    if( addChildrenOfResources || !(currentValue instanceof IResource) || (currentValue instanceof LootCategories)) {
       addChildren(currentValue);
     }
   }
@@ -91,7 +92,8 @@ public class EditorTreeNode extends DefaultMutableTreeNode {
     int index = 0;
     for (Object o : obj) {
       if(o != null) {
-        ListElementAccessor aa = new ListElementAccessor(index, o.getClass(), data.getAttributeAccessor().getAttribuiteName());
+        IAttributeAccessor listAt = data.getAttributeAccessor();
+        ListElementAccessor aa = new ListElementAccessor(listAt.getDeclaringClass(), listAt.getAttribuiteName(), index, o.getClass());
         add(new EditorTreeNode(obj, aa, o, treeModel, false));
         index++;
       }

@@ -70,7 +70,7 @@ public class AddElementEditor extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(AbstractResourceTile tile, NodeData nodeData) {
+  public Component getComponent(AbstractResourceTile tile, IResource resource, NodeData nodeData) {
     this.nodeData = nodeData;
     IAttributeAccessor aa = nodeData.getAttributeAccessor();
     if(!(aa instanceof ListAccessor)) {

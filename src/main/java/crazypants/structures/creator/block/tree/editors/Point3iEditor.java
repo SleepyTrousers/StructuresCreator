@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import crazypants.structures.api.gen.IResource;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
@@ -67,7 +68,7 @@ public class Point3iEditor extends AbstractAttributeEditor {
   }
 
   @Override
-  public Component getComponent(AbstractResourceTile tile, NodeData data) {      
+  public Component getComponent(AbstractResourceTile tile, IResource resource, NodeData data) {      
     this.data = data;
     
     ignoreUpdates = true;

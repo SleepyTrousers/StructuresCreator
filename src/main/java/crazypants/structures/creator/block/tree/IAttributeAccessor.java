@@ -9,6 +9,8 @@ public interface IAttributeAccessor {
   boolean isValid();
 
   Class<?> getType();
+  
+  Class<?> getDeclaringClass();
 
   String getAttribuiteName();
 
