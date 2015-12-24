@@ -14,6 +14,7 @@ import crazypants.structures.api.runtime.IAction;
 import crazypants.structures.api.runtime.IBehaviour;
 import crazypants.structures.api.runtime.ICondition;
 import crazypants.structures.creator.block.tree.editors.AddElementEditor;
+import crazypants.structures.creator.block.tree.editors.BiomeNameEditor;
 import crazypants.structures.creator.block.tree.editors.BlockEditor;
 import crazypants.structures.creator.block.tree.editors.BooleanEditor;
 import crazypants.structures.creator.block.tree.editors.BorderEditor;
@@ -27,10 +28,13 @@ import crazypants.structures.creator.block.tree.editors.Point3iEditor;
 import crazypants.structures.creator.block.tree.editors.StringEditor;
 import crazypants.structures.creator.block.tree.editors.TaggedLocationEditor;
 import crazypants.structures.creator.block.tree.editors.TemplateEditor;
+import crazypants.structures.creator.block.tree.editors.TemplateNameEditor;
 import crazypants.structures.creator.block.tree.editors.TextureResourceEditor;
 import crazypants.structures.creator.block.tree.editors.TypedEditor;
 import crazypants.structures.gen.structure.decorator.LootTableDecorator;
 import crazypants.structures.gen.structure.loot.LootCategory;
+import crazypants.structures.gen.structure.validator.SpacingValidator;
+import crazypants.structures.gen.structure.validator.biome.AbstractBiomeFilter;
 import crazypants.structures.gen.villager.VillagerTemplate;
 import crazypants.structures.runtime.PositionedType;
 import crazypants.structures.runtime.behaviour.ResidentSpawner;
@@ -133,7 +137,7 @@ public class AttributeEditors {
     registerEditor(new TypedEditor<IChunkValidator>(IChunkValidator.class));
     registerEditor(new TypedEditor<ILocationSampler>(ILocationSampler.class));
     
-    //Specials
+    //TODO: Specials, could use annotatins to ID then instead maybe?
     IAttributeEditor ed = new LootCategoryEditor();
     FieldAccessor aa = new FieldAccessor(LootTableDecorator.class, String.class, "category");
     if(aa.isValid()) {      
@@ -168,6 +172,23 @@ public class AttributeEditors {
     if(lea.isValid()) {
       registerEditor(lea, ed);
     }
+    
+    ed = new TemplateNameEditor();    
+    lea = new ListElementAccessor(SpacingValidator.class, "templateFilter", 0, String.class);
+    if(lea.isValid()) {
+      registerEditor(lea, ed);
+    }
+    
+    ed = new BiomeNameEditor();
+    lea = new ListElementAccessor(AbstractBiomeFilter.class, "names", 0, String.class);
+    if(lea.isValid()) {
+      registerEditor(lea, ed);
+    }
+    lea = new ListElementAccessor(AbstractBiomeFilter.class, "nameExcludes", 0, String.class);
+    if(lea.isValid()) {
+      registerEditor(lea, ed);
+    }
+    
     
   }
 
