@@ -144,6 +144,10 @@ public abstract class AbstractResourceDialog extends JDialog {
       tile.setName(uid);
       sendUpdatePacket();
     }
+    if(uid == null || uid.trim().length() == 0) {
+      JOptionPane.showMessageDialog(this, "No name specified", "Boo hoo", JOptionPane.ERROR_MESSAGE, null);
+      return;
+    }
     File f = new File(tile.getExportDir(), uid + getResourceExtension());
     writeToFile(f, uid);  
   }

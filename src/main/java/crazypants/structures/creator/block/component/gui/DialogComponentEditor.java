@@ -115,8 +115,14 @@ public class DialogComponentEditor extends AbstractResourceDialog {
   }
 
   @Override
+  protected boolean checkClear() {
+    //called on exit, no need for a nag in this case
+    return true;
+  }
+  
+  @Override
   protected void createNewResource() {
-    if(checkClear()) {
+    if(super.checkClear()) { //do need a nag as we will clear the terrain
       nameTF.setText("PaulTheNew");
       clearBounds();
     }
@@ -125,7 +131,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
   @Override
   protected void openResource() {
 
-    if(!checkClear()) {
+    if(!super.checkClear()) { //do need a nag as we will clear the terrain
       return;
     }
 
