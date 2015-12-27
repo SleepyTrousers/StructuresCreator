@@ -139,7 +139,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
     List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
     JPopupMenu menu = new JPopupMenu();
-    for (File file : files) {
+    for (final File file : files) {
 
       final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
       final StructureComponentNBT component = readFromFile(file);
@@ -148,6 +148,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
         mi.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
+            tile.setExportDir(file.getParent());
             openComponent(uid, component);
           }
         });
@@ -179,7 +180,9 @@ public class DialogComponentEditor extends AbstractResourceDialog {
 
     StructureComponentNBT sc = readFromFile(file);
     if(sc != null) {
+      tile.setExportDir(file.getParent());
       StructureGenRegister.instance.registerStructureComponent(sc);
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
       openComponent(sc.getUid(), sc);
     } else {
       JOptionPane.showMessageDialog(this, "Could not load component.", "Bottoms", JOptionPane.ERROR_MESSAGE);
@@ -211,7 +214,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
       nameTF.setText(uid);
 
     }
-    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
+    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());    
     comp.setTags(tile.getTaggedLocations());
     if(ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer)) {
       StructureGenRegister.instance.registerStructureComponent(comp);
