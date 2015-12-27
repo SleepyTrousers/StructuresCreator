@@ -53,7 +53,7 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
   
   private LootCategories curCategories;
   
-  private LootCategories oldCategories;
+  private LootCategories lastSaveCategeories;
   
   private FileControls fileControls;
   private EditorTreeControl treeControl;
@@ -116,15 +116,14 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
     List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
     JPopupMenu menu = new JPopupMenu();
-    for (File file : files) {
-      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
-      final LootCategories gen = loadFromFile(file);
-      if(gen != null) {
+    for (final File file : files) {      
+      final LootCategories cat = loadFromFile(file);
+      if(cat != null) {
         JMenuItem mi = new JMenuItem(file.getName());
         mi.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            openCategories(uid, gen);
+            openFromFile(file, cat);            
           }
         });
         menu.add(mi);
@@ -193,57 +192,67 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
         treeControl.setDirty(true);
       }
       treeControl.setDirty(false);  
-      if(oldCategories != null) {
-        oldCategories.deregister();
+      
+      if(lastSaveCategeories != null) {
+        lastSaveCategeories.deregister();
       }
-      curCategories.register();    
+      curCategories.register();  
+      lastSaveCategeories = new LootCategories(curCategories);
     }    
   }
   
-  private void openCategories(String name, LootCategories cats) {
-    if(name == null || cats == null) {
+  private void openCategories(LootCategories cats) {
+    if(cats == null) {
       return;
-    }   
-    tile.setName(name);
+    } 
+    
+    tile.setName(cats.getUid());
     sendUpdatePacket();
+    
     curCategories = cats;
-    oldCategories = new LootCategories(cats);
+    lastSaveCategeories = new LootCategories(curCategories);
+    
+    curCategories.deregister(); //make sure we dont add everything again
+    curCategories.register();
+    
     onDirtyChanged(false);
     buildTree();
   }
+  
   
   private void openFromFile() {
     File file = selectFileToOpen();
     if(file == null) {
       return;
-    }
-    LootCategories lc = loadFromFile(file);
-    if(lc != null) {
-      lc.deregister();//in case it has already been loaded, dont want to add things twice
-      lc.register();
-      String name = lc.getUid();
-      openCategories(name, lc);
-    } else {
+    }    
+    LootCategories lc = openFromFile(file);
+    if(lc == null) {
       JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
-    }
+    }        
   }
 
-  private LootCategories loadFromFile(File file) {
-    String name = file.getName();
-    if(name.endsWith(getResourceExtension())) {
-      name = name.substring(0, name.length() - getResourceExtension().length());
-    }
-
+  private LootCategories openFromFile(File file, LootCategories sc) {
+    if(sc == null) {
+      return null;
+    }    
+    tile.setExportDir(file.getParent());
+    sendUpdatePacket();
+    
+    openCategories(sc);
+    return sc;
+  }
+  
+  private LootCategories openFromFile(File file) {
+    return openFromFile(file, loadFromFile(file));    
+  }
+  
+  private LootCategories loadFromFile(File file) {   
     InputStream stream = null;
     try {
       stream = new FileInputStream(file);
-      String json = StructureGenRegister.instance.getResourceManager().loadText(name, stream);
-      LootCategories cats = LootCategeoriesParser.parseLootCategories(name, json);           
-      if(cats != null) {
-        tile.setExportDir(file.getParentFile().getAbsolutePath());
-        sendUpdatePacket();
-      }      
-      return cats;
+      String uid = getUidFromFileName(file);
+      String json = StructureGenRegister.instance.getResourceManager().loadText(uid, stream);      
+      return LootCategeoriesParser.parseLootCategories(uid, json);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

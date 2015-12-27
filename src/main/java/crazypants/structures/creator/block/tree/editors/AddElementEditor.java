@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -18,12 +20,12 @@ import javax.swing.JPanel;
 
 import crazypants.structures.api.ITyped;
 import crazypants.structures.api.gen.IResource;
+import crazypants.structures.creator.block.AbstractResourceTile;
+import crazypants.structures.creator.block.tree.EditorTreeNode;
 import crazypants.structures.creator.block.tree.IAttributeAccessor;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
-import crazypants.structures.creator.block.AbstractResourceTile;
-import crazypants.structures.creator.block.tree.EditorTreeNode;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.TypeRegister;
 
@@ -33,7 +35,7 @@ public class AddElementEditor extends AbstractAttributeEditor {
   private final JPanel pan;
   private final JComboBox<Object> cb;
   private final Renderer renderer;
-  
+
   private NodeData nodeData;
   private ListAccessor listAcc;
 
@@ -50,13 +52,13 @@ public class AddElementEditor extends AbstractAttributeEditor {
         Object newItem = createNewInstance();
         if(nodeData == null || listAcc == null || newItem == null) {
           return;
-        }        
+        }
         listAcc.add(nodeData.getOwner(), newItem);
 
         EditorTreeNode node = nodeData.getNode();
         node.removeAllChildren();
         node.addChildren(nodeData.getValue());
-        node.dataChanged(true);        
+        node.dataChanged(true);
       }
 
     });
@@ -97,23 +99,35 @@ public class AddElementEditor extends AbstractAttributeEditor {
     if(type == null) {
       return;
     }
-    if(ITyped.class.isAssignableFrom(type)) {    //IType   
+    if(ITyped.class.isAssignableFrom(type)) { //IType   
       @SuppressWarnings("unchecked")
-      List<ITyped> vals = TypeRegister.INSTANCE.getTypesOfType((Class<ITyped>) type);
+      List<ITyped> vals = TypeRegister.INSTANCE.getTypesOfType((Class<ITyped>) type);      
       if(vals != null) {
-        options.addAll(vals);
+        System.out.println("AddElementEditor.updateOptions: " + vals.size());
+        Set<ITyped> copies = new HashSet<ITyped>(vals.size());
+        for (ITyped val : vals) {
+          if(val != null) {
+            try {
+              copies.add(val.getClass().newInstance());
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        }
+        options.addAll(copies);
       }
-    } else if(type.isEnum() && type.getEnumConstants() != null) {   //Enum      
-      
-      options.addAll(Arrays.asList(type.getEnumConstants()));      
-      
-    } else if(IResource.class.isAssignableFrom(type)) {    //IResource  
+
+    } else if(type.isEnum() && type.getEnumConstants() != null) { //Enum      
+
+      options.addAll(Arrays.asList(type.getEnumConstants()));
+
+    } else if(IResource.class.isAssignableFrom(type)) { //IResource  
       Collection<? extends IResource> vals = StructureGenRegister.instance.getResources(type);
       if(vals != null) {
         options.addAll(vals);
-      }      
-    } else {   //Primitives / Basic types
-      try { 
+      }
+    } else { //Primitives / Basic types
+      try {
         options.add(type.newInstance());
       } catch (Exception e) {
         e.printStackTrace();
@@ -138,22 +152,22 @@ public class AddElementEditor extends AbstractAttributeEditor {
     updateOptions();
     return template;
   }
-  
+
   private static class Renderer extends DefaultListCellRenderer {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {      
-      super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);      
+    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
       if(value instanceof ITyped) {
-        setText(((ITyped)value).getType());
+        setText(((ITyped) value).getType());
       } else if(value instanceof IResource) {
-        setText(((IResource)value).getUid());
+        setText(((IResource) value).getUid());
       }
-      return this; 
+      return this;
     }
-    
+
   }
 
 }
