@@ -100,6 +100,7 @@ public class ExportManager {
 
     try {
       FileUtils.write(file, json);
+      player.addChatComponentMessage(new ChatComponentText("Saved to " + file.getAbsolutePath()));
       return true;
     } catch (IOException e) {
       e.printStackTrace();

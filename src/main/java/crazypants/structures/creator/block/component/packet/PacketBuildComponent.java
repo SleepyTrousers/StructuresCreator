@@ -73,7 +73,7 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentEditor>
     if(component == null) {
       return null;
     }    
-    tile.setComponent(message.structureName , component);
+    tile.setComponent(component);
     
     AxisAlignedBB bb = tile.getStructureBounds();
     World wld = tile.getWorldObj();

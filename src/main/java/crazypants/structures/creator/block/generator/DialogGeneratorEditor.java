@@ -129,16 +129,14 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
     List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
     JPopupMenu menu = new JPopupMenu();
-    for (File file : files) {
-
-      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+    for (final File file : files) {
       final IStructureGenerator gen = loadFromFile(file);
       if(gen != null) {
         JMenuItem mi = new JMenuItem(file.getName());
         mi.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            openGenerator(uid, gen);
+            openGeneratorFromFile(file, gen);
           }
         });
         menu.add(mi);
@@ -207,48 +205,52 @@ public class DialogGeneratorEditor extends AbstractResourceDialog {
     }    
   }
   
-  private void openGenerator(String name, IStructureGenerator gen) {
-    if(name == null || gen == null) {
+  private void openGenerator(IStructureGenerator gen) {
+    if(gen == null) {
       return;
     }   
-    tile.setName(name);
+    tile.setName(gen.getUid());
     sendUpdatePacket();
     curGenerator = gen;
     onDirtyChanged(false);
     buildTree();
   }
   
-  private void openFromFile() {
+  private void openFromFile() {    
     File file = selectFileToOpen();
     if(file == null) {
       return;
-    }
-    IStructureGenerator sc = loadFromFile(file);
-    if(sc != null) {
-      StructureGenRegister.instance.registerGenerator(sc);
-      String name = sc.getUid();
-      openGenerator(name, sc);
-    } else {
-      JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
-    }
+    }    
+    IStructureGenerator res = openGeneratorFromFile(file);
+    if(res == null) {
+      JOptionPane.showMessageDialog(this, "Could not load generator.", "Bottoms", JOptionPane.ERROR_MESSAGE);
+    }        
   }
   
-  private IStructureGenerator loadFromFile(File file) {
-    String name = file.getName();
-    if(name.endsWith(StructureResourceManager.GENERATOR_EXT)) {
-      name = name.substring(0, name.length() - StructureResourceManager.GENERATOR_EXT.length());
+  private IStructureGenerator openGeneratorFromFile(File file) {
+    return openGeneratorFromFile(file, loadFromFile(file));
+  }
+  
+  private IStructureGenerator openGeneratorFromFile(File file, IStructureGenerator gen) {    
+    if(gen == null) {
+      return null;
     }
-
+    StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
+    StructureGenRegister.instance.registerGenerator(gen);
+    
+    tile.setExportDir(file.getParentFile().getAbsolutePath());
+    sendUpdatePacket();
+    
+    openGenerator(gen);
+    return gen;        
+  }
+  
+  private IStructureGenerator loadFromFile(File file) {   
     InputStream stream = null;
     try {
       stream = new FileInputStream(file);
-      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
-      IStructureGenerator res = StructureGenRegister.instance.getResourceManager().loadGenerator(name, stream);
-      if(res != null) {
-        tile.setExportDir(file.getParentFile().getAbsolutePath());
-        sendUpdatePacket();
-      }
-      return res;
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());      
+      return StructureGenRegister.instance.getResourceManager().loadGenerator(getUidFromFileName(file), stream);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

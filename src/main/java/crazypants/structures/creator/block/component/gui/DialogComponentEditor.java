@@ -69,9 +69,9 @@ public class DialogComponentEditor extends AbstractResourceDialog {
 
   private FileControls fileControls;
 
-  public DialogComponentEditor(TileComponentEditor tile) {    
+  public DialogComponentEditor(TileComponentEditor tile) {
     this.tile = tile;
-    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);    
+    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
 
     initComponents();
     addComponents();
@@ -119,11 +119,11 @@ public class DialogComponentEditor extends AbstractResourceDialog {
     //called on exit, no need for a nag in this case
     return true;
   }
-  
+
   @Override
   protected void createNewResource() {
     if(super.checkClear()) { //do need a nag as we will clear the terrain
-      nameTF.setText("PaulTheNew");
+      nameTF.setText("NewComponent");
       clearBounds();
     }
   }
@@ -140,16 +140,14 @@ public class DialogComponentEditor extends AbstractResourceDialog {
 
     JPopupMenu menu = new JPopupMenu();
     for (final File file : files) {
-
-      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+      
       final StructureComponentNBT component = readFromFile(file);
       if(component != null) {
         JMenuItem mi = new JMenuItem(file.getName());
         mi.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            tile.setExportDir(file.getParent());
-            openComponent(uid, component);
+            openFromFile(file);
           }
         });
         menu.add(mi);
@@ -178,27 +176,38 @@ public class DialogComponentEditor extends AbstractResourceDialog {
       return;
     }
 
-    StructureComponentNBT sc = readFromFile(file);
-    if(sc != null) {
-      tile.setExportDir(file.getParent());
-      StructureGenRegister.instance.registerStructureComponent(sc);
-      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
-      openComponent(sc.getUid(), sc);
-    } else {
+  }
+
+  public StructureComponentNBT openFromFile(File file) {
+    StructureComponentNBT res = openFromFile(file, readFromFile(file));
+    if(res == null) {
       JOptionPane.showMessageDialog(this, "Could not load component.", "Bottoms", JOptionPane.ERROR_MESSAGE);
     }
+    return res;
+  }
+
+  private StructureComponentNBT openFromFile(File file, StructureComponentNBT sc) {
+    if(sc == null) {
+      return null;
+    }
+
+    tile.setExportDir(file.getParent());
+    sendUpdatePacket();
+
+    StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
+    StructureGenRegister.instance.registerStructureComponent(sc);
+    
+    openComponent(sc);
+
+    return sc;
+
   }
 
   public StructureComponentNBT readFromFile(File file) {
-    String name = file.getName();
-    if(name.endsWith(StructureResourceManager.COMPONENT_EXT)) {
-      name = name.substring(0, name.length() - StructureResourceManager.COMPONENT_EXT.length());
-    }
-
     InputStream stream = null;
     try {
       stream = new FileInputStream(file);
-      return new StructureComponentNBT(name, stream);
+      return new StructureComponentNBT(getUidFromFileName(file), stream);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -214,7 +223,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
       nameTF.setText(uid);
 
     }
-    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());    
+    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
     comp.setTags(tile.getTaggedLocations());
     if(ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer)) {
       StructureGenRegister.instance.registerStructureComponent(comp);
@@ -222,16 +231,17 @@ public class DialogComponentEditor extends AbstractResourceDialog {
     sendUpdatePacket();
   }
 
-  private void openComponent(String name, IStructureComponent component) {
-    if(name == null || component == null) {
+  private void openComponent(IStructureComponent component) {
+    if(component == null) {
       return;
     }
 
     clearBounds();
-    tile.setComponent(name, component);
+    tile.setComponent(component);
+    sendUpdatePacket();
     updateFieldsFromTE();
 
-    PacketBuildComponent packet = new PacketBuildComponent(tile, name);
+    PacketBuildComponent packet = new PacketBuildComponent(tile, component.getUid());
     PacketHandler.INSTANCE.sendToServer(packet);
   }
 

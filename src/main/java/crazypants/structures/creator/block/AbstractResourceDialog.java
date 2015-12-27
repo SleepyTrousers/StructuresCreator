@@ -133,6 +133,14 @@ public abstract class AbstractResourceDialog extends JDialog {
     setTitle(title);
   }
   
+  protected String getUidFromFileName(File file) {
+    String uid = file.getName();
+    if(uid.endsWith(getResourceExtension())) {
+      uid = uid.substring(0, uid.length() - getResourceExtension().length());
+    }
+    return uid;
+  }
+  
   protected void save() {
     String uid = getResourceUid();
     AbstractResourceTile tile = getTile();

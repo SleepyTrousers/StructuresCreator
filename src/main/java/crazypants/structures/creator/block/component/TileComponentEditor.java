@@ -193,8 +193,8 @@ public class TileComponentEditor extends AbstractResourceTile {
     return taggedLocations;
   }
 
-  public void setComponent(String name, IStructureComponent component) {
-    setName(name);
+  public void setComponent(IStructureComponent component) {
+    setName(component.getUid());
     setSurfaceOffset(component.getSurfaceOffset());
 
     Point3i size = component.getSize();

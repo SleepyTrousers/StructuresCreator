@@ -66,9 +66,9 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   private final Point3i position;
   private IStructureTemplate curTemplate;
 
-  private FileControls fileControls;  
+  private FileControls fileControls;
   private EditorTreeControl treeControl;
-  
+
   private JButton genB;
   private JButton clearB;
   private JComboBox<Rotation> rotCB;
@@ -76,7 +76,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
     position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
-    setIconImage(Icons.TEMPLATE.getImage());   
+    setIconImage(Icons.TEMPLATE.getImage());
     setTitle("Template Editor");
 
     initComponents();
@@ -104,10 +104,10 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
       super.saveAs();
     }
   }
-  
+
   @Override
   protected boolean checkClear() {
-    return !treeControl.isDirty() || super.checkClear();     
+    return !treeControl.isDirty() || super.checkClear();
   }
 
   @Override
@@ -117,16 +117,16 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
       tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
       sendUpdatePacket();
       curTemplate = new StructureTemplate(tile.getName());
-      
+
       CompositePreperation cp = new CompositePreperation();
       cp.add(new ClearPreperation());
       cp.add(new FillPreperation());
       curTemplate.setSitePreperation(cp);
-      
+
       CompositeSiteValidator val = new CompositeSiteValidator();
       val.add(new LevelGroundValidator());
       curTemplate.setSiteValidator(val);
-     
+
       buildTree();
     }
   }
@@ -136,22 +136,22 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     if(curTemplate == null) {
       curTemplate = new StructureTemplate(name);
     }
-    treeControl.buildTree(curTemplate);    
+    treeControl.buildTree(curTemplate);
   }
 
   private void initComponents() {
 
     treeControl = new EditorTreeControl(this);
-    
+
     fileControls = new FileControls(this);
-    
+
     genB = new JButton(Icons.GENERATE);
     genB.setToolTipText("Generate Structure");
     clearB = new JButton(Icons.CLEAR);
     clearB.setToolTipText("Clear current structure");
     rotCB = new JComboBox<Rotation>(Rotation.values());
     rotCB.setSelectedIndex(0);
-    
+
   }
 
   private void addComponents() {
@@ -205,23 +205,20 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
     JPopupMenu menu = new JPopupMenu();
-    for (File file : files) {
-
-      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+    for (final File file : files) {      
       final IStructureTemplate template = loadFromFile(file);
       if(template != null) {
         JMenuItem mi = new JMenuItem(file.getName());
         mi.addActionListener(new ActionListener() {
           @Override
-          public void actionPerformed(ActionEvent e) {
-            openTemplate(uid, template);
+          public void actionPerformed(ActionEvent e) {            
+            openTemplateFromFile(file, template);
           }
         });
         menu.add(mi);
       } else {
-        System.out.println("DialogTemplateEditor.openRegisteredTemplate: Could not load template from file: " + file.getAbsolutePath());
+        Log.warn("DialogTemplateEditor: Could not open " + file);
       }
-
     }
 
     JMenuItem mi = new JMenuItem("...");
@@ -241,33 +238,37 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     File file = selectFileToOpen();
     if(file == null) {
       return;
-    }
-    IStructureTemplate sc = loadFromFile(file);
-    if(sc != null) {
-      StructureGenRegister.instance.registerTemplate(sc);
-      String name = sc.getUid();
-      openTemplate(name, sc);
-    } else {
+    }    
+    IStructureTemplate sc = openTemplateFromFile(file);
+    if(sc == null) {
       JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
-    }
+    }        
   }
 
-  private IStructureTemplate loadFromFile(File file) {
-    String name = file.getName();
-    if(name.endsWith(StructureResourceManager.TEMPLATE_EXT)) {
-      name = name.substring(0, name.length() - StructureResourceManager.TEMPLATE_EXT.length());
+  private IStructureTemplate openTemplateFromFile(File file, IStructureTemplate sc) {
+    if(sc == null) {
+      return null;
     }
+    StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
+    StructureGenRegister.instance.registerTemplate(sc);
+    
+    tile.setExportDir(file.getParent());
+    sendUpdatePacket();
+    
+    openTemplate(sc);
+    return sc;
+  }
+  
+  private IStructureTemplate openTemplateFromFile(File file) {
+    return openTemplateFromFile(file, loadFromFile(file));    
+  }
 
+  private IStructureTemplate loadFromFile(File file) {    
     InputStream stream = null;
     try {
       stream = new FileInputStream(file);
-      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
-      IStructureTemplate res = StructureGenRegister.instance.getResourceManager().loadTemplate(name, stream);
-      if(res != null) {
-        tile.setExportDir(file.getParentFile().getAbsolutePath());
-        sendUpdatePacket();
-      }
-      return res;
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());      
+      return StructureGenRegister.instance.getResourceManager().loadTemplate(getUidFromFileName(file), stream);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -275,6 +276,8 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     }
     return null;
   }
+
+  
 
   @Override
   protected void save() {
@@ -287,7 +290,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
 
   @Override
   protected void writeToFile(File file, String newUid) {
-    if(ExportManager.writeToFile(file, (StructureTemplate)curTemplate, Minecraft.getMinecraft().thePlayer)) {
+    if(ExportManager.writeToFile(file, (StructureTemplate) curTemplate, Minecraft.getMinecraft().thePlayer)) {
       Log.info("DialogTemplateEditor.save: Saved template to " + file.getAbsolutePath());
       if(!newUid.equals(curTemplate.getUid())) {
         ((StructureTemplate) curTemplate).setUid(newUid);
@@ -337,18 +340,17 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
     return true;
   }
 
-  private void openTemplate(String name, IStructureTemplate template) {
-    if(name == null || template == null) {
+  private void openTemplate(IStructureTemplate template) {
+    if(template == null) {
       return;
     }
-
-    clearBounds();
-    tile.setName(name);
+    tile.setName(template.getUid());
     sendUpdatePacket();
+    
+    clearBounds();    
     curTemplate = template;
     onDirtyChanged(false);
     buildTree();
-
   }
 
   private void generate(Rotation rot) {

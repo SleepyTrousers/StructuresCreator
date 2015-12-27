@@ -118,17 +118,16 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     List<File> files = resMan.getFilesWithExt(getResourceExtension());
 
     JPopupMenu menu = new JPopupMenu();
-    for (File file : files) {
-
-      final String uid = file.getName().substring(0, file.getName().length() - getResourceExtension().length());
+    for (final File file : files) {
+      
       final VillagerTemplate gen = loadFromFile(file);
       if(gen != null) {
         JMenuItem mi = new JMenuItem(file.getName());
         mi.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            openGenerator(uid, gen);
-          }
+            openGeneratorFromFile(file, gen);
+          }          
         });
         menu.add(mi);
       } else {
@@ -196,11 +195,11 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     }
   }
 
-  private void openGenerator(String name, VillagerTemplate gen) {
-    if(name == null || gen == null) {
+  private void openGenerator(VillagerTemplate gen) {
+    if(gen == null) {
       return;
-    }
-    tile.setName(name);
+    }    
+    tile.setName(gen.getUid());
     sendUpdatePacket();
     curTemplate = gen;
     onDirtyChanged(false);
@@ -212,14 +211,25 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     if(file == null) {
       return;
     }
-    VillagerTemplate vilTmpl = loadFromFile(file);
-    if(vilTmpl != null) {
-      String name = vilTmpl.getUid();
-      openGenerator(name, vilTmpl);
-      registerCurrentTemplate();
-    } else {
+    VillagerTemplate vilTmp = openGeneratorFromFile(file);
+    if(vilTmp == null) {
       JOptionPane.showMessageDialog(this, "Could not load template.", "Bottoms", JOptionPane.ERROR_MESSAGE);
-    }
+    }        
+  }
+
+  private VillagerTemplate openGeneratorFromFile(File file) {    
+    return openGeneratorFromFile(file, loadFromFile(file));    
+  }
+  
+  private VillagerTemplate openGeneratorFromFile(File file, VillagerTemplate gen) {
+    
+    tile.setExportDir(file.getParentFile().getAbsolutePath());
+    sendUpdatePacket();
+            
+    openGenerator(gen);
+    registerCurrentTemplate();
+     
+    return gen;    
   }
 
   private void registerCurrentTemplate() {
@@ -230,23 +240,14 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
     }
   }
 
-  private VillagerTemplate loadFromFile(File file) {
-    String name = file.getName();
-    if(name.endsWith(StructureResourceManager.VILLAGER_EXT)) {
-      name = name.substring(0, name.length() - StructureResourceManager.VILLAGER_EXT.length());
-    }
-
+  private VillagerTemplate loadFromFile(File file) {   
     InputStream stream = null;
     try {
-      stream = new FileInputStream(file);
-      String json = StructureGenRegister.instance.getResourceManager().loadText(name, stream);
-      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());
-      VillagerTemplate res = VillagerParser.parseVillagerTemplate(name, json);
-      if(res != null) {
-        tile.setExportDir(file.getParentFile().getAbsolutePath());
-        sendUpdatePacket();
-      }
-      return res;
+      stream = new FileInputStream(file);      
+      String uid = getUidFromFileName(file);
+      String json = StructureGenRegister.instance.getResourceManager().loadText(uid, stream);
+      StructureGenRegister.instance.getResourceManager().addResourceDirectory(file.getParentFile());      
+      return VillagerParser.parseVillagerTemplate(uid, json);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
