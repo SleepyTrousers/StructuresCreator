@@ -99,9 +99,11 @@ public class EditorTreeControl {
     }
 
     NodeData nd = (NodeData) userObj;
+    IAttributeAccessor aa = nd.getAttributeAccessor();
     IAttributeEditor ed;
-    if(nd.aa != null) {
-      ed = AttributeEditors.INSTANCE.getEditor(nd.aa);
+    
+    if(aa != null) {
+      ed = AttributeEditors.INSTANCE.getEditor(aa);
     } else {
       ed = AttributeEditors.INSTANCE.getEditor(nd.getType());
     }
@@ -109,12 +111,12 @@ public class EditorTreeControl {
     if(ed != null) {
       res = ed.getComponent(dialog.getTile(), resource, nd);
     }
-    if(nd.getAttributeAccessor() instanceof ListElementAccessor) {
+    if(aa instanceof ListElementAccessor) {
       JPanel p = new JPanel(new BorderLayout());
       if(res != null) {
         p.add(res, BorderLayout.CENTER);
       }
-      Component remEd = removeEditor.getComponent(nd, (ListElementAccessor) nd.getAttributeAccessor());
+      Component remEd = removeEditor.getComponent(nd, (ListElementAccessor) aa);
       p.add(remEd, BorderLayout.EAST);
       res = p;
     }

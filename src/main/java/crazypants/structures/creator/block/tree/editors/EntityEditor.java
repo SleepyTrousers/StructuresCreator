@@ -23,8 +23,7 @@ public class EntityEditor extends ComboEditor<String> {
       }
       
     }
-    Collections.sort(res);
-    System.out.println("EntityEditor.getValues: ");
+    Collections.sort(res);    
     return res.toArray(new String[res.size()]);
   }
 

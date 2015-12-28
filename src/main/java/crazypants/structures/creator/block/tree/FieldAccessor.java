@@ -2,12 +2,17 @@ package crazypants.structures.creator.block.tree;
 
 import java.lang.reflect.Field;
 
+import crazypants.structures.api.AttributeDoc;
+import crazypants.structures.api.AttributeEditor;
+
 public class FieldAccessor implements IAttributeAccessor {
 
-  protected final String attribuiteName;  
+  protected final String attribuiteName;
   protected final Class<?> attributeType;
   protected final Field field;
   protected final Class<?> declaringClass;
+  protected final String editorType;
+  protected final String attributeDoc;
 
   public FieldAccessor(Class<?> ownersClass, Class<?> attributeClass, String attribuiteName) {
     this.declaringClass = ownersClass;
@@ -26,10 +31,27 @@ public class FieldAccessor implements IAttributeAccessor {
       e.printStackTrace();
     }
     field = f;
+    
+    String ed = null;
+    String doc = null;
+    if(f != null) {
+      AttributeEditor edAn = f.getAnnotation(AttributeEditor.class);
+      if(edAn != null) {
+        ed = edAn.name();
+      }
+      AttributeDoc docAn = f.getAnnotation(AttributeDoc.class);
+      if(docAn != null) {
+        doc = docAn.text();
+      }
+    } 
+      
+    editorType = ed;
+    attributeDoc = doc;
+    
   }
 
   public FieldAccessor(Field field) {
-    this.field = field;    
+    this.field = field;
     if(field != null) {
       field.setAccessible(true);
       attribuiteName = field.getName();
@@ -38,8 +60,23 @@ public class FieldAccessor implements IAttributeAccessor {
     } else {
       attribuiteName = null;
       attributeType = null;
-      declaringClass = null;
+      declaringClass = null;      
     }
+    
+    String ed = null;
+    String doc = null;
+    if(field != null) {
+      AttributeEditor edAn = field.getAnnotation(AttributeEditor.class);
+      if(edAn != null) {
+        ed = edAn.name();
+      }
+      AttributeDoc docAn = field.getAnnotation(AttributeDoc.class);
+      if(docAn != null) {
+        doc = docAn.text();
+      }
+    }       
+    editorType = ed;
+    attributeDoc = doc;
   }
 
   @Override
@@ -51,11 +88,9 @@ public class FieldAccessor implements IAttributeAccessor {
   public Class<?> getType() {
     return attributeType;
   }
-  
-  
-  
+
   @Override
-  public Class<?> getDeclaringClass() {  
+  public Class<?> getDeclaringClass() {
     return declaringClass;
   }
 
@@ -82,6 +117,16 @@ public class FieldAccessor implements IAttributeAccessor {
       e.printStackTrace();
     }
     return null;
+  }
+
+  @Override
+  public String getEditorType() {
+    return editorType;
+  }
+
+  @Override
+  public String getDocumentation() { 
+    return attributeDoc;
   }
 
   @Override
@@ -120,7 +165,5 @@ public class FieldAccessor implements IAttributeAccessor {
       return false;
     return true;
   }
-  
-  
 
 }

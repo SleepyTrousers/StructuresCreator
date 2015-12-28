@@ -1,6 +1,10 @@
 package crazypants.structures.creator.block.tree;
 
+import java.lang.reflect.Field;
 import java.util.List;
+
+import crazypants.structures.api.AttributeDoc;
+import crazypants.structures.api.AttributeEditor;
 
 public class ListElementAccessor implements IAttributeAccessor {
 
@@ -8,12 +12,37 @@ public class ListElementAccessor implements IAttributeAccessor {
   private final Class<?> type;
   private final String attributeName;
   private final Class<?> declaringClass;
+  
+  private final String editorType;
+  private final String attributeDoc;
 
   public ListElementAccessor(Class<?> declaringClass, String attributeName, int index, Class<?> type) {
     this.declaringClass = declaringClass;
     this.index = index;
     this.type = type;
     this.attributeName = attributeName;
+    
+    Field f = null;
+    try {
+      f = declaringClass.getDeclaredField(attributeName);      
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    String ed = null;
+    String doc = null;
+    if(f != null) {
+      AttributeEditor edAn = f.getAnnotation(AttributeEditor.class);
+      if(edAn != null) {
+        ed = edAn.name();
+      }
+      AttributeDoc docAn = f.getAnnotation(AttributeDoc.class);
+      if(docAn != null) {
+        doc = docAn.text();
+      }
+    }       
+    editorType = ed;
+    attributeDoc = doc;    
   }
 
   @Override
@@ -73,6 +102,16 @@ public class ListElementAccessor implements IAttributeAccessor {
     return attributeName;
   }
 
+  @Override
+  public String getEditorType() {
+    return editorType;
+  }
+
+  @Override
+  public String getDocumentation() { 
+    return attributeDoc;
+  }
+  
   @Override
   public int hashCode() {
     final int prime = 31;

@@ -13,5 +13,9 @@ public interface IAttributeAccessor {
   Class<?> getDeclaringClass();
 
   String getAttribuiteName();
+  
+  String getEditorType();
+  
+  String getDocumentation();
 
 }

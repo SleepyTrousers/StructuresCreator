@@ -1,6 +1,7 @@
 package crazypants.structures.creator.block.tree;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,52 +32,70 @@ import crazypants.structures.creator.block.tree.editors.TemplateEditor;
 import crazypants.structures.creator.block.tree.editors.TemplateNameEditor;
 import crazypants.structures.creator.block.tree.editors.TextureResourceEditor;
 import crazypants.structures.creator.block.tree.editors.TypedEditor;
-import crazypants.structures.gen.structure.decorator.LootTableDecorator;
-import crazypants.structures.gen.structure.loot.LootCategory;
-import crazypants.structures.gen.structure.validator.SpacingValidator;
-import crazypants.structures.gen.structure.validator.biome.AbstractBiomeFilter;
-import crazypants.structures.gen.villager.VillagerTemplate;
-import crazypants.structures.runtime.PositionedType;
-import crazypants.structures.runtime.behaviour.ResidentSpawner;
-import crazypants.structures.runtime.behaviour.vspawner.VirtualSpawnerBehaviour;
 
 public class AttributeEditors {
 
   public static final AttributeEditors INSTANCE = new AttributeEditors();
 
-  private final Map<Class<?>, IAttributeEditor> editors = new HashMap<Class<?>, IAttributeEditor>();
-  private final Map<IAttributeAccessor, IAttributeEditor> atrAditors = new HashMap<IAttributeAccessor, IAttributeEditor>();
+  private final Map<Class<?>, IAttributeEditor> typeEditors = new HashMap<Class<?>, IAttributeEditor>();
+  private final Map<IAttributeAccessor, IAttributeEditor> attributeEditors = new HashMap<IAttributeAccessor, IAttributeEditor>();
+  private final Map<String, IAttributeEditor> namedEditors = new HashMap<String, IAttributeEditor>();
 
+  private final AddElementEditor addEditor = new AddElementEditor();
+  
   public void registerEditor(IAttributeEditor ed) {
     if(ed == null) {
       return;
     }
-    editors.put(ed.getType(), ed);
+    typeEditors.put(ed.getType(), ed);
   }
   
   public void registerEditor(IAttributeAccessor attribue, IAttributeEditor ed) {    
     if(attribue == null) {
       return;
     }
-    atrAditors.put(attribue, ed);
+    attributeEditors.put(attribue, ed);
   }
+  
+  public void registerEditor(String name, IAttributeEditor ed) {    
+    if(name == null) {
+      return;
+    }
+    namedEditors.put(name, ed);
+  }  
 
   public IAttributeEditor getEditor(IAttributeAccessor attribue) {
     if(attribue == null) {
       return null;
     }    
-    IAttributeEditor res = atrAditors.get(attribue);
+    
+    if(List.class.isAssignableFrom(attribue.getType())) {
+      //TODO: I really hate this special case
+      //It is here as a named editor gets selected for this list, not just its
+      //contents
+      return addEditor;
+    }
+    
+    //Search from most specific to least specific typing:
+    //specific attribute binding, named editor binding, attribute type binding
+    IAttributeEditor res = attributeEditors.get(attribue);
     if(res == null) {
-      for (IAttributeAccessor registeredAcc : atrAditors.keySet()) {
+      for (IAttributeAccessor registeredAcc : attributeEditors.keySet()) {
         if(isParent(registeredAcc, attribue)) {
-          res = atrAditors.get(registeredAcc);          
+          res = attributeEditors.get(registeredAcc);          
           break;
         }
       }
       if(res == null) {      
-        res = getEditor(attribue.getType());
+        if(attribue.getEditorType() != null) {
+          res = namedEditors.get(attribue.getEditorType());  
+        }
+        if(res == null) {
+          res = getEditor(attribue.getType());
+        }
       }      
-      atrAditors.put(attribue, res);            
+      //Always put the result in the attribute editors so we don't search again
+      attributeEditors.put(attribue, res);            
     }
     return res;
   }
@@ -98,15 +117,15 @@ public class AttributeEditors {
   }
 
   public IAttributeEditor getEditor(Class<?> type) {
-    IAttributeEditor res = editors.get(type);
+    IAttributeEditor res = typeEditors.get(type);
     if(res == null) {
-      for (Class<?> cl : editors.keySet()) {
+      for (Class<?> cl : typeEditors.keySet()) {
         if(cl.isAssignableFrom(type)) {
-          res = editors.get(cl);
+          res = typeEditors.get(cl);
           break;
         }
       }
-      editors.put(type, res);
+      typeEditors.put(type, res);
     }
     return res;
   }
@@ -137,58 +156,13 @@ public class AttributeEditors {
     registerEditor(new TypedEditor<IChunkValidator>(IChunkValidator.class));
     registerEditor(new TypedEditor<ILocationSampler>(ILocationSampler.class));
     
-    //TODO: Specials, could use annotatins to ID then instead maybe?
-    IAttributeEditor ed = new LootCategoryEditor();
-    FieldAccessor aa = new FieldAccessor(LootTableDecorator.class, String.class, "category");
-    if(aa.isValid()) {      
-      registerEditor(aa, ed);
-    }    
-    aa = new FieldAccessor(LootCategory.class, String.class, "category");
-    if(aa.isValid()) {
-      registerEditor(aa, ed);
-    }  
-    
-    ed = new EntityEditor();
-    aa = new FieldAccessor(ResidentSpawner.class, String.class, "entity");
-    if(aa.isValid()) {
-      registerEditor(aa, ed);
-    } 
-    aa = new FieldAccessor(VirtualSpawnerBehaviour.class, String.class, "entity");
-    if(aa.isValid()) {
-      registerEditor(aa, ed);
-    } 
-    ed = new TextureResourceEditor();
-    aa = new FieldAccessor(VillagerTemplate.class, String.class, "texture");
-    if(aa.isValid()) {
-      registerEditor(aa, ed);
-    } 
-        
-    ed = new TaggedLocationEditor();
-    aa = new FieldAccessor(PositionedType.class, String.class, "taggedPosition");
-    if(aa.isValid()) {
-      registerEditor(aa, ed);
-    }   
-    ListElementAccessor lea = new ListElementAccessor(LootTableDecorator.class, "targets", 0, String.class);
-    if(lea.isValid()) {
-      registerEditor(lea, ed);
-    }
-    
-    ed = new TemplateNameEditor();    
-    lea = new ListElementAccessor(SpacingValidator.class, "templateFilter", 0, String.class);
-    if(lea.isValid()) {
-      registerEditor(lea, ed);
-    }
-    
-    ed = new BiomeNameEditor();
-    lea = new ListElementAccessor(AbstractBiomeFilter.class, "names", 0, String.class);
-    if(lea.isValid()) {
-      registerEditor(lea, ed);
-    }
-    lea = new ListElementAccessor(AbstractBiomeFilter.class, "nameExcludes", 0, String.class);
-    if(lea.isValid()) {
-      registerEditor(lea, ed);
-    }
-    
+    //Editors specified by AttributeEditor annotation        
+    registerEditor("lootCategory", new LootCategoryEditor());    
+    registerEditor("entity", new EntityEditor());
+    registerEditor("texture", new TextureResourceEditor());
+    registerEditor("taggedPosition", new TaggedLocationEditor());
+    registerEditor("templateUid", new TemplateNameEditor());
+    registerEditor("biomeName", new BiomeNameEditor());
     
   }
 

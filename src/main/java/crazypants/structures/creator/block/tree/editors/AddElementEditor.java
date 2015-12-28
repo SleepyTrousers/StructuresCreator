@@ -102,8 +102,7 @@ public class AddElementEditor extends AbstractAttributeEditor {
     if(ITyped.class.isAssignableFrom(type)) { //IType   
       @SuppressWarnings("unchecked")
       List<ITyped> vals = TypeRegister.INSTANCE.getTypesOfType((Class<ITyped>) type);      
-      if(vals != null) {
-        System.out.println("AddElementEditor.updateOptions: " + vals.size());
+      if(vals != null) {        
         Set<ITyped> copies = new HashSet<ITyped>(vals.size());
         for (ITyped val : vals) {
           if(val != null) {
@@ -126,14 +125,16 @@ public class AddElementEditor extends AbstractAttributeEditor {
       if(vals != null) {
         options.addAll(vals);
       }
-    } else { //Primitives / Basic types
-      try {
-        options.add(type.newInstance());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    if(options.size() > 1) {
+    } 
+    
+//    else { //Primitives / Basic types
+//      try {
+//        options.add(type.newInstance());
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//      }
+//    }
+    if(!options.isEmpty()) {
       cb.setModel(new DefaultComboBoxModel<Object>(options.toArray(new Object[options.size()])));
     }
 
