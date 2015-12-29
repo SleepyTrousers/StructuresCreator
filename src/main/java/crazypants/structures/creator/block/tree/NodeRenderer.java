@@ -41,12 +41,13 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
 
     EditorTreeNode node = (EditorTreeNode) value;
     NodeData nb = node.getData();
+    IAttributeAccessor aa = nb.getAttributeAccessor();
 
     String text = "";
     if(leaf) {
-      if(nb.getAttributeAccessor() != null) {
-        if(nb.getAttributeAccessor() instanceof FieldAccessor) {
-          text = nb.getAttributeAccessor().getAttribuiteName();
+      if(aa != null) {
+        if(aa instanceof FieldAccessor) {
+          text = aa.getAttribuiteName();
         }
         if(nb.getValue() != null) {
           if(text.length() > 0) {
@@ -58,8 +59,8 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
         text = getValueString(nb.getValue());
       }
     } else {
-      if(nb.getAttributeAccessor() != null) {
-        if(nb.getAttributeAccessor() instanceof FieldAccessor) {
+      if(aa != null) {
+        if(aa instanceof FieldAccessor) {
           text = nb.getAttributeAccessor().getAttribuiteName() + ": ";
         }
         if(nb.getValue() != null && !(nb.getValue() instanceof Collection)) {
@@ -70,15 +71,24 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
       }
     }    
     setText(text);
+    
     Icon icon = getIcon(nb);
     if(icon != null) {
       setIcon(icon);
     } else if(leaf) {
       setIcon(Icons.DOT);
     }
+    
+    if(aa != null && aa.getDocumentation() != null) {      
+      setToolTipText(aa.getDocumentation());
+      //setToolTipText("Hello ppoppole\nluts");
+    } else {
+      setToolTipText(null);
+    }
+    
     return this;
   }
-
+  
   private Icon getIcon(NodeData nd) {
     if(nd == null || nd.getType() == null) {
       return null;

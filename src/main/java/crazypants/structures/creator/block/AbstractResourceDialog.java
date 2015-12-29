@@ -1,5 +1,6 @@
 package crazypants.structures.creator.block;
 
+import java.awt.Font;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
@@ -8,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Enumeration;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -15,8 +17,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.FontUIResource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
@@ -30,9 +34,23 @@ import net.minecraft.client.Minecraft;
 public abstract class AbstractResourceDialog extends JDialog {
 
   private static final long serialVersionUID = 1L;
-    
-  private FileNameExtensionFilter filter;
 
+  static {          
+    setUIFont (new FontUIResource("Dialog.plain",Font.PLAIN, 14));    
+  }
+  
+  private static void setUIFont(javax.swing.plaf.FontUIResource f) {
+    Enumeration<Object> keys = UIManager.getDefaults().keys();
+    while (keys.hasMoreElements()) {
+      Object key = keys.nextElement();
+      Object value = UIManager.get(key);
+      if(value != null && value instanceof javax.swing.plaf.FontUIResource)
+        UIManager.put(key, f);
+    }
+  } 
+
+  private FileNameExtensionFilter filter;
+  
   protected AbstractResourceDialog() {
     setModal(false);
     setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);

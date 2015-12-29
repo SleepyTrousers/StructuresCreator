@@ -10,7 +10,9 @@ import java.util.Enumeration;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolTip;
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -143,7 +145,18 @@ public class EditorTreeControl {
 
     };
 
-    tree = new JTree(new DefaultMutableTreeNode());
+    tree = new JTree(new DefaultMutableTreeNode()) {
+     
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public JToolTip createToolTip() {
+        MultiLineToolTip tip = new MultiLineToolTip();
+        tip.setColumns(25);
+        tip.setComponent(this);
+        return tip;
+      }
+    };
     tree.setRootVisible(false);
     tree.setEditable(false);
     tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -156,7 +169,7 @@ public class EditorTreeControl {
     rootPan = new JPanel(new BorderLayout());
     rootPan.add(editorPan, BorderLayout.SOUTH);
     JScrollPane sp = new JScrollPane(tree);
-    sp.setPreferredSize(new Dimension(360, Math.min(Minecraft.getMinecraft().displayHeight - 20, 500)));
+    sp.setPreferredSize(new Dimension(400, Math.min(Minecraft.getMinecraft().displayHeight - 20, 500)));
     rootPan.add(sp, BorderLayout.CENTER);
 
   }
@@ -171,6 +184,8 @@ public class EditorTreeControl {
       }
 
     });
+    
+    ToolTipManager.sharedInstance().registerComponent(tree);
 
   }
 
