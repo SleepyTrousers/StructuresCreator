@@ -125,16 +125,14 @@ public class AddElementEditor extends AbstractAttributeEditor {
       if(vals != null) {
         options.addAll(vals);
       }
-    } 
-    
-//    else { //Primitives / Basic types
-//      try {
-//        options.add(type.newInstance());
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//    }
-    if(!options.isEmpty()) {
+    }  else { //Primitives / Basic types
+      try {
+        options.add(type.newInstance());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    if(options.size() > 1) {
       cb.setModel(new DefaultComboBoxModel<Object>(options.toArray(new Object[options.size()])));
     }
 

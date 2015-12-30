@@ -29,9 +29,7 @@ public class EditorTreeNode extends DefaultMutableTreeNode {
     this.treeModel = treeModel;
     data = new NodeData(owner, aa, currentValue, this);
     setUserObject(data);    
-    if( addChildrenOfResources || !(currentValue instanceof IResource) || (currentValue instanceof LootCategories)) {
-      addChildren(currentValue);
-    }
+    addChildren(currentValue, addChildrenOfResources);
   }
 
   public NodeData getData() {
@@ -46,9 +44,20 @@ public class EditorTreeNode extends DefaultMutableTreeNode {
   }
 
   public void addChildren(Object obj) {
+    addChildren(obj, false);
+  }
+  
+  public void addChildren(Object obj, boolean addChildrenOfResources) {
     if(obj == null) {
       return;
+    }   
+    
+    
+    if( !addChildrenOfResources && obj instanceof IResource && !(obj instanceof LootCategories)) {
+      return;
     }
+    
+    
     if(obj instanceof List<?>) {
       addChildren((List<?>) obj, treeModel);
       return;
