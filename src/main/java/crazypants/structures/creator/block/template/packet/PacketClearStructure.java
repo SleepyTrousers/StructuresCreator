@@ -1,17 +1,16 @@
 package crazypants.structures.creator.block.template.packet;
 
-import com.enderio.core.common.network.MessageTileEntity;
-
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.StructureUtils;
 import crazypants.structures.api.gen.ISitePreperation;
 import crazypants.structures.api.gen.IStructure;
+import crazypants.structures.creator.block.MessageTileEntity;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketClearStructure extends MessageTileEntity<TileTemplateEditor> implements IMessageHandler<PacketClearStructure, IMessage> {
 

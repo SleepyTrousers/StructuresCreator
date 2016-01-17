@@ -1,23 +1,23 @@
 package crazypants.structures.creator.block.template.packet;
 
-import com.enderio.core.common.network.MessageTileEntity;
-
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.StructureUtils;
 import crazypants.structures.api.gen.ISitePreperation;
 import crazypants.structures.api.gen.IStructure;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
+import crazypants.structures.creator.block.MessageTileEntity;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
 import crazypants.structures.gen.StructureGenRegister;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketBuildStructure extends MessageTileEntity<TileTemplateEditor> implements IMessageHandler<PacketBuildStructure, IMessage> {
 
@@ -86,8 +86,8 @@ public class PacketBuildStructure extends MessageTileEntity<TileTemplateEditor> 
       tile.setOffsetY(yOffset);
       tile.setOffsetZ(zOffset);
       
-      
-      str.setOrigin(new Point3i(tile.xCoord + xOffset, tile.yCoord + yOffset, tile.zCoord + zOffset));
+      BlockPos p = tile.getPos();
+      str.setOrigin(new Point3i(p.getX() + xOffset, p.getY() + yOffset, p.getZ() + zOffset));
       str.getTemplate().build(str, player.worldObj, player.worldObj.rand, null); 
       str.onGenerated( player.worldObj);     
     }

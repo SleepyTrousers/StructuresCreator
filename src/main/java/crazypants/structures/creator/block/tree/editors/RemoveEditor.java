@@ -9,10 +9,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.tree.TreeNode;
 
+import crazypants.structures.creator.block.tree.EditorTreeNode;
 import crazypants.structures.creator.block.tree.Icons;
 import crazypants.structures.creator.block.tree.ListElementAccessor;
 import crazypants.structures.creator.block.tree.NodeData;
-import crazypants.structures.creator.block.tree.EditorTreeNode;
 
 public class RemoveEditor {
 

@@ -39,7 +39,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
   private static Map<Point3i, DialogVillagerEditor> openDialogs = new HashMap<Point3i, DialogVillagerEditor>();
 
   public static void openDialog(TileVillagerEditor tile) {
-    Point3i key = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    Point3i key = new Point3i(tile.getPos());
     DialogVillagerEditor res = openDialogs.get(key);
     if(res == null) {
       res = new DialogVillagerEditor(tile);
@@ -57,7 +57,7 @@ public class DialogVillagerEditor extends AbstractResourceDialog {
 
   public DialogVillagerEditor(TileVillagerEditor tile) {
     this.tile = tile;
-    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    position = new Point3i(tile.getPos());
     setIconImage(Icons.GENERATOR.getImage());
     setTitle("Generator Editor");
 

@@ -48,7 +48,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
   private static Map<Point3i, DialogComponentEditor> openDialogs = new HashMap<Point3i, DialogComponentEditor>();
 
   public static void openDialog(TileComponentEditor tile) {
-    Point3i key = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    Point3i key = new Point3i(tile.getPos());
     DialogComponentEditor res = openDialogs.get(key);
     if(res == null) {
       res = new DialogComponentEditor(tile);
@@ -71,7 +71,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
 
   public DialogComponentEditor(TileComponentEditor tile) {
     this.tile = tile;
-    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    position = new Point3i(tile.getPos());
 
     initComponents();
     addComponents();
@@ -223,7 +223,7 @@ public class DialogComponentEditor extends AbstractResourceDialog {
       nameTF.setText(uid);
 
     }
-    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorldObj(), tile.getStructureBounds(), tile.getSurfaceOffset());
+    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorld(), tile.getStructureBounds(), tile.getSurfaceOffset());
     comp.setTags(tile.getTaggedLocations());
     if(ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer)) {
       StructureGenRegister.instance.registerStructureComponent(comp);

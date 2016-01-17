@@ -7,8 +7,6 @@ import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import crazypants.structures.api.ITyped;
 import crazypants.structures.api.gen.IChunkValidator;
 import crazypants.structures.api.gen.IDecorator;
@@ -25,6 +23,8 @@ import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class NodeRenderer extends DefaultTreeCellRenderer {
 

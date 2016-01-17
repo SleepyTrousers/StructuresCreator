@@ -1,14 +1,13 @@
 package crazypants.structures.creator.block.template.packet;
 
-import com.enderio.core.common.network.MessageTileEntity;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import crazypants.structures.creator.block.AbstractResourceTile;
+import crazypants.structures.creator.block.MessageTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketResourceTileGui extends MessageTileEntity<AbstractResourceTile> implements IMessageHandler<PacketResourceTileGui, IMessage> {
 
@@ -16,7 +15,7 @@ public class PacketResourceTileGui extends MessageTileEntity<AbstractResourceTil
   private String name;
   private String exportDir;
   
-  public PacketResourceTileGui() {        
+  public PacketResourceTileGui() {            
   }
   
   public PacketResourceTileGui(AbstractResourceTile tile) {

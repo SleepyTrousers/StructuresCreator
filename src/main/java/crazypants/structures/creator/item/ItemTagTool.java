@@ -4,19 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.enderio.core.common.util.Util;
-import com.enderio.core.common.vecmath.Vector3d;
-
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.common.registry.GameRegistry;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.PacketHandler;
-import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.EmptyContainer;
 import crazypants.structures.creator.block.component.EditorRegister;
+import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.gui.GuiTagEditor;
 import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
 import net.minecraft.block.Block;
@@ -28,6 +23,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ItemTagTool extends Item implements IGuiHandler {
 

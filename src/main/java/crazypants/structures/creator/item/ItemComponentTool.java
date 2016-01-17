@@ -2,7 +2,6 @@ package crazypants.structures.creator.item;
 
 import java.util.Iterator;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
@@ -15,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ItemComponentTool extends Item {
 

@@ -1,15 +1,14 @@
 package crazypants.structures.creator.block.component.packet;
 
-import com.enderio.core.common.network.MessageTileEntity;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import crazypants.structures.creator.block.MessageTileEntity;
 import crazypants.structures.creator.block.component.TileComponentEditor;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketComponentEditorGui extends MessageTileEntity<TileComponentEditor> implements IMessageHandler<PacketComponentEditorGui, IMessage> {
 
@@ -46,8 +45,7 @@ public class PacketComponentEditorGui extends MessageTileEntity<TileComponentEdi
       return null;
     }
     tile.readCustomNBT(message.data);
-    return null;
-    
+    return null;    
   }
 
 }

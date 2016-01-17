@@ -1,10 +1,8 @@
 package crazypants.structures.creator.block;
 
-import com.enderio.core.common.TileEntityEnder;
-
 import net.minecraft.nbt.NBTTagCompound;
 
-public class AbstractResourceTile extends TileEntityEnder {
+public class AbstractResourceTile extends TileEntityBase {
 
   protected String name;
   protected String exportDir;

@@ -10,7 +10,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 
@@ -35,7 +35,7 @@ public class ItemStackEditor extends ComboEditor<ItemStack> {
 
   @Override
   protected ItemStack[] getValues() {
-    EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
     InventoryPlayer inv = player.inventory;
     if(inv == null || inv.mainInventory == null || inv.mainInventory.length < 9) {
       return new ItemStack[] { null };

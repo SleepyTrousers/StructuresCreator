@@ -1,15 +1,13 @@
 package crazypants.structures.creator.block;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockClearMarker extends Block {
 

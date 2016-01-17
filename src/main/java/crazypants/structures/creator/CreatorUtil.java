@@ -4,10 +4,12 @@ import crazypants.structures.api.util.Point3i;
 import crazypants.structures.gen.structure.StructureBlock;
 import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -16,7 +18,7 @@ public class CreatorUtil {
   
   public static StructureComponentNBT createComponent(String name, IBlockAccess world, AxisAlignedBB worldBnds, int surfaceOffset) {
     
-    AxisAlignedBB bb = worldBnds.getOffsetBoundingBox(-worldBnds.minX, -worldBnds.minY, -worldBnds.minZ);
+    AxisAlignedBB bb = worldBnds.offset(-worldBnds.minX, -worldBnds.minY, -worldBnds.minZ);
 
     Point3i size = new Point3i((int) Math.abs(worldBnds.maxX - worldBnds.minX), (int) Math.abs(worldBnds.maxY - worldBnds.minY), (int) Math.abs(worldBnds.maxZ
         - worldBnds.minZ));
@@ -27,7 +29,7 @@ public class CreatorUtil {
     StructureBlock fb = null;
     StructureBlock sufb = null;
     if(markBiomeFillerForMerge) {
-      BiomeGenBase biome = world.getBiomeGenForCoords((int) worldBnds.minX, (int) worldBnds.minZ);
+      BiomeGenBase biome = world.getBiomeGenForCoords(new BlockPos((int) worldBnds.minX, 64, (int) worldBnds.minZ));
       if(biome != null) {
         if(biome.topBlock != null) {
           sufb = new StructureBlock(biome.fillerBlock);
@@ -53,8 +55,9 @@ public class CreatorUtil {
           x = origin.x + xIndex;
           y = origin.y + yIndex;
           z = origin.z + zIndex;
-          Block blk = world.getBlock(x, y, z);
-          StructureBlock sb = new StructureBlock(blk, world.getBlockMetadata(x, y, z), world.getTileEntity(x, y, z));
+          BlockPos pos = new BlockPos(x, y, z);
+          IBlockState blk = world.getBlockState(pos);
+          StructureBlock sb = new StructureBlock(blk, world.getTileEntity(pos));
           if(!sb.isAir()) {
             //Only store air blocks if they must be cleared
             if(blk == EnderStructuresCreator.blockClearMarker) {
@@ -81,7 +84,7 @@ public class CreatorUtil {
     Point3i tst = new Point3i(x, y, z);
     do {
       tst.add(axis);
-      if(world.getBlock(tst.x, tst.y, tst.z) == blk) {
+      if(world.getBlockState(new BlockPos(tst.x, tst.y, tst.z)).getBlock() == blk) {
         return tst;
       }
       steps++;

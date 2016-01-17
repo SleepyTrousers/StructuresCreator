@@ -4,16 +4,6 @@ import static crazypants.structures.creator.EnderStructuresCreator.MODID;
 import static crazypants.structures.creator.EnderStructuresCreator.MOD_NAME;
 import static crazypants.structures.creator.EnderStructuresCreator.VERSION;
 
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
-import cpw.mods.fml.common.event.FMLServerStoppedEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import crazypants.structures.creator.block.BlockClearMarker;
 import crazypants.structures.creator.block.BlockComponentEditor;
 import crazypants.structures.creator.block.BlockGeneratorEditor;
@@ -26,6 +16,16 @@ import crazypants.structures.creator.item.ItemComponentTool;
 import crazypants.structures.creator.item.ItemDebugTool;
 import crazypants.structures.creator.item.ItemTagTool;
 import crazypants.structures.creator.item.ItemTemplateTool;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 @Mod(modid = MODID, name = MOD_NAME, version = VERSION, dependencies = "required-after:Forge@10.13.0.1150,);required-after:EnderStructures")
 public class EnderStructuresCreator {

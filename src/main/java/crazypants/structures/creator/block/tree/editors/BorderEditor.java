@@ -15,7 +15,7 @@ import crazypants.structures.api.gen.IResource;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import crazypants.structures.creator.block.tree.NodeData;
 import crazypants.structures.gen.structure.Border;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class BorderEditor extends AbstractAttributeEditor {
   
@@ -102,12 +102,12 @@ public class BorderEditor extends AbstractAttributeEditor {
     Object val = data.getValue();
     if(val instanceof Border) {
       Border b = (Border)val;
-      nf.setText(b.get(ForgeDirection.NORTH) + "");
-      sf.setText(b.get(ForgeDirection.SOUTH) + "");
-      ef.setText(b.get(ForgeDirection.EAST) + "");
-      wf.setText(b.get(ForgeDirection.WEST) + "");
-      uf.setText(b.get(ForgeDirection.UP) + "");
-      df.setText(b.get(ForgeDirection.DOWN) + "");
+      nf.setText(b.get(EnumFacing.NORTH) + "");
+      sf.setText(b.get(EnumFacing.SOUTH) + "");
+      ef.setText(b.get(EnumFacing.EAST) + "");
+      wf.setText(b.get(EnumFacing.WEST) + "");
+      uf.setText(b.get(EnumFacing.UP) + "");
+      df.setText(b.get(EnumFacing.DOWN) + "");
       nf.setBackground(Color.white);
       sf.setBackground(Color.white);
       ef.setBackground(Color.white);

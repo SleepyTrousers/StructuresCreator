@@ -39,7 +39,7 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
   private static Map<Point3i, DialogLootCategeoryEditor> openDialogs = new HashMap<Point3i, DialogLootCategeoryEditor>();
 
   public static void openDialog(TileLootCategory tile) {
-    Point3i key = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    Point3i key = new Point3i(tile.getPos());
     DialogLootCategeoryEditor res = openDialogs.get(key);
     if(res == null) {
       res = new DialogLootCategeoryEditor(tile);
@@ -59,8 +59,8 @@ public class DialogLootCategeoryEditor extends AbstractResourceDialog {
   private EditorTreeControl treeControl;
 
   public DialogLootCategeoryEditor(TileLootCategory tile) {
-    this.tile = tile;
-    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    this.tile = tile;    
+    position = new Point3i(tile.getPos());
     setIconImage(Icons.LOOT_EDITOR.getImage());    
     setTitle("Loot Category Editor");
 

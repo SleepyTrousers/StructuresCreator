@@ -3,11 +3,11 @@ package crazypants.structures.creator.block.component;
 import java.util.HashSet;
 import java.util.Set;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 public class EditorRegister {
 
@@ -18,14 +18,14 @@ public class EditorRegister {
     if(tile == null) {
       return;
     }
-    getTooleRegister(tile.getWorldObj()).addTile(tile);
+    getTooleRegister(tile.getWorld()).addTile(tile);
   }
 
   public static void onUnload(TileComponentEditor tile) {
     if(tile == null) {
       return;
     }
-    getTooleRegister(tile.getWorldObj()).removeTile(tile);
+    getTooleRegister(tile.getWorld()).removeTile(tile);
   }
   
   public static void reset() {
@@ -44,9 +44,8 @@ public class EditorRegister {
   private Set<TileComponentEditor> tiles = new HashSet<TileComponentEditor>();
 
   public EditorRegister(boolean isClient) {
-    if(isClient) {
-      FMLCommonHandler.instance().bus().register(this);
-//      MinecraftForge.EVENT_BUS.register(this);
+    if(isClient) {      
+      MinecraftForge.EVENT_BUS.register(this);
     }
   }
 
@@ -61,8 +60,8 @@ public class EditorRegister {
   public TileComponentEditor getClosestTileInBounds(World world, int x, int y, int z) {   
     TileComponentEditor res = null;
     for(TileComponentEditor tile: tiles) {
-      if(tile.hasWorldObj() && world.provider.dimensionId == tile.getWorldObj().provider.dimensionId) {                
-        if(tile.getStructureBounds().isVecInside(Vec3.createVectorHelper(x + 0.5, y + 0.5, z + 0.5))) {               
+      if(tile.hasWorldObj() && world.provider.getDimensionId() == tile.getWorld().provider.getDimensionId()) {                
+        if(tile.getStructureBounds().isVecInside(new Vec3(x + 0.5, y + 0.5, z + 0.5))) {               
           return tile;
         }
       }

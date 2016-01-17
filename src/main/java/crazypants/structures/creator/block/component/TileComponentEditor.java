@@ -37,12 +37,7 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   @Override
-  protected boolean shouldUpdate() {
-    return !doneInit;
-  }
-
-  @Override
-  protected void doUpdate() {
+  public void update() {
     if(!doneInit) {
       doneInit = true;
       EditorRegister.onLoad(this);
@@ -57,13 +52,13 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   @Override
-  public AxisAlignedBB getRenderBoundingBox() {
-    return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord + width + offsetX, yCoord + height + offsetY, zCoord + length + offsetZ);
+  public AxisAlignedBB getRenderBoundingBox() {    
+    return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX()+ width + offsetX, pos.getY()+ height + offsetY, pos.getZ() + length + offsetZ);
   }
 
   public AxisAlignedBB getStructureBounds() {
-    return AxisAlignedBB.getBoundingBox(xCoord + offsetX, yCoord + offsetY, zCoord + offsetZ, xCoord + width + offsetX, yCoord + height + offsetY,
-        zCoord + length + offsetZ);
+    return new AxisAlignedBB(pos.getX() + offsetX, pos.getY()+ offsetY, pos.getZ()+ offsetZ, pos.getX() + width + offsetX, pos.getY() + height + offsetY,
+        pos.getZ() + length + offsetZ);
   }
 
   @Override
@@ -252,9 +247,9 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   public Point3i getStructureLocalPosition(Point3i blockCoord) {
-    int localX = blockCoord.x - xCoord - getOffsetX();
-    int localY = blockCoord.y - yCoord - getOffsetY();
-    int localZ = blockCoord.z - zCoord - getOffsetZ();
+    int localX = blockCoord.x - pos.getX() - getOffsetX();
+    int localY = blockCoord.y - pos.getY() - getOffsetY();
+    int localZ = blockCoord.z - pos.getZ() - getOffsetZ();
     return new Point3i(localX, localY, localZ);
   }
 

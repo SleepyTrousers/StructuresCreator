@@ -53,7 +53,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
   private static Map<Point3i, DialogTemplateEditor> openDialogs = new HashMap<Point3i, DialogTemplateEditor>();
 
   public static void openDialog(TileTemplateEditor tile) {
-    Point3i key = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    Point3i key = new Point3i(tile.getPos());
     DialogTemplateEditor res = openDialogs.get(key);
     if(res == null) {
       res = new DialogTemplateEditor(tile);
@@ -75,7 +75,7 @@ public class DialogTemplateEditor extends AbstractResourceDialog {
 
   public DialogTemplateEditor(TileTemplateEditor tile) {
     this.tile = tile;
-    position = new Point3i(tile.xCoord, tile.yCoord, tile.zCoord);
+    position = new Point3i(tile.getPos());
     setIconImage(Icons.TEMPLATE.getImage());
     setTitle("Template Editor");
 

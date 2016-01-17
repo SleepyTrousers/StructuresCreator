@@ -1,10 +1,5 @@
 package crazypants.structures.creator.block;
 
-import com.enderio.core.common.BlockEnder;
-
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
@@ -16,11 +11,12 @@ import crazypants.structures.creator.block.component.packet.PacketAddRemoveTagge
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
 import crazypants.structures.creator.block.component.packet.PacketComponentEditorGui;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockComponentEditor extends BlockEnder implements IGuiHandler {
 

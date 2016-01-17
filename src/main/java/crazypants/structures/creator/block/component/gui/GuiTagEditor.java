@@ -3,10 +3,7 @@ package crazypants.structures.creator.block.component.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.enderio.core.client.gui.GuiContainerBase;
-import com.enderio.core.client.gui.button.IconButton;
-import com.enderio.core.client.gui.widget.TextFieldEnder;
-import com.enderio.core.client.render.EnderWidget;
+import com.sun.java.swing.plaf.motif.MotifDesktopIconUI.IconButton;
 
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.PacketHandler;

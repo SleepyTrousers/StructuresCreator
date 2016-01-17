@@ -11,13 +11,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class BlockEditor extends ComboEditor<Block> {
 
@@ -30,7 +30,7 @@ public class BlockEditor extends ComboEditor<Block> {
 
   @Override
   protected Block[] getValues() {
-    EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
     InventoryPlayer inv = player.inventory;
     if(inv == null || inv.mainInventory == null || inv.mainInventory.length < 9) {
       return new Block[0];

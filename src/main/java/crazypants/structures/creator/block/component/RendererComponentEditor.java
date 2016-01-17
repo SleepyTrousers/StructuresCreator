@@ -8,13 +8,6 @@ import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
-import com.enderio.core.client.render.BoundingBox;
-import com.enderio.core.client.render.ColorUtil;
-import com.enderio.core.client.render.CubeRenderer;
-import com.enderio.core.client.render.RenderUtil;
-import com.enderio.core.common.util.Util;
-import com.enderio.core.common.vecmath.Vector3d;
-import com.enderio.core.common.vecmath.Vector3f;
 import com.google.common.collect.Multimap;
 
 import crazypants.structures.api.util.Point3i;
@@ -23,20 +16,17 @@ import crazypants.structures.api.util.VecUtil;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.item.ItemTagTool;
 import crazypants.structures.creator.item.ItemTagTool.Hit;
+import javafx.geometry.BoundingBox;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 
-public class RendererComponentEditor extends TileEntitySpecialRenderer {
+public class RendererComponentEditor extends TileEntitySpecialRenderer<TileComponentEditor> {
 
   @Override
-  public void renderTileEntityAt(TileEntity te, double x, double y, double z, float partialTick) {
-
-    TileComponentEditor ct = (TileComponentEditor) te;
+  public void renderTileEntityAt(TileComponentEditor ct, double x, double y, double z, float partialTicks, int destroyStage) {
 
     RenderUtil.bindBlockTexture();
 
@@ -199,5 +189,8 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer {
     }
 
   }
+
+
+ 
 
 }
