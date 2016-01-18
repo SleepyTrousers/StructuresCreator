@@ -1,5 +1,6 @@
 package crazypants.structures.creator.block;
 
+import crazypants.structures.creator.endercore.TileEntityBase;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class AbstractResourceTile extends TileEntityBase {

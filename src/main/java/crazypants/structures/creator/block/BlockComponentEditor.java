@@ -11,14 +11,18 @@ import crazypants.structures.creator.block.component.packet.PacketAddRemoveTagge
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
 import crazypants.structures.creator.block.component.packet.PacketComponentEditorGui;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
+import crazypants.structures.creator.endercore.BlockEnder;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
 
-public class BlockComponentEditor extends BlockEnder implements IGuiHandler {
+public class BlockComponentEditor extends BlockEnder<TileComponentEditor> implements IGuiHandler {
 
   public static final String NAME = "blockComponentEditor";
 
@@ -42,28 +46,17 @@ public class BlockComponentEditor extends BlockEnder implements IGuiHandler {
   }
 
   @Override
-  public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_, int p_149668_3_, int p_149668_4_) {
+  public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {    
     return null;
   }
 
   @Override
-  public int getRenderBlockPass() {
-    return 0;
-  }
-
-  @Override
-  @SideOnly(Side.CLIENT)
-  public void registerBlockIcons(IIconRegister iIconRegister) {
-    blockIcon = iIconRegister.registerIcon(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
-  }
-
-  @Override
-  protected boolean openGui(World world, int x, int y, int z, EntityPlayer entityPlayer, int side) {
+  protected boolean openGui(World world, BlockPos pos, EntityPlayer entityPlayer, EnumFacing side) {
     if(!world.isRemote) {
-      entityPlayer.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_COMPONENT_EDITOR, world, x, y, z);
+      entityPlayer.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_COMPONENT_EDITOR, world, pos.getX(), pos.getY(), pos.getZ());
     }
     if(world.isRemote) {
-      TileEntity te = world.getTileEntity(x, y, z);
+      TileEntity te = world.getTileEntity(pos);
       if(te instanceof TileComponentEditor) {
         DialogComponentEditor.openDialog((TileComponentEditor) te);
       }
@@ -79,7 +72,7 @@ public class BlockComponentEditor extends BlockEnder implements IGuiHandler {
 
   @Override
   public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {    
-    TileEntity te = world.getTileEntity(x, y, z);
+    TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
     if(te instanceof TileComponentEditor) {
       return new EmptyContainer();
     }
@@ -88,9 +81,9 @@ public class BlockComponentEditor extends BlockEnder implements IGuiHandler {
 
   @Override
   public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-    TileEntity te = world.getTileEntity(x, y, z);
+    TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
     if(te instanceof TileComponentEditor) {
-      return new GuiComponentEditor(player, player.inventory, te);
+      return new GuiComponentEditor();
     }
     return null;
   }

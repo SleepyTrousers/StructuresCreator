@@ -6,14 +6,15 @@ import crazypants.structures.api.gen.IStructure;
 import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.util.Point3i;
-import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.gen.StructureGenRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -29,8 +30,7 @@ public class ItemTemplateTool extends Item {
 
   private ItemTemplateTool() {
     setUnlocalizedName(NAME);
-    setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
-    setTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
+    setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);    
     setHasSubtypes(false);
   }
 
@@ -52,27 +52,26 @@ public class ItemTemplateTool extends Item {
   }
 
   @Override
-  public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-    
+  public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {    
     if (world.isRemote) {
       return true;
     }
 
     String uid = getGenUid(stack, true);    
     if (uid != null) {
-      buildComponent(world, x, y, z, side, uid);
+      buildComponent(world, pos, side, uid);
     }
     return true;
   }
 
-  private void buildComponent(World world, int x, int y, int z, int side, String uid) {
+  private void buildComponent(World world, BlockPos pos, EnumFacing side, String uid) {
     IStructureTemplate st = StructureGenRegister.instance.getStructureTemplate(uid, true);
     if(st != null) {
-      ForgeDirection dir = ForgeDirection.getOrientation(side);
-      Point3i origin = new Point3i(x + dir.offsetX, y + dir.offsetY - 1, z + dir.offsetZ);
-      origin.y -= st.getSurfaceOffset();
+      BlockPos origin = pos.offset(side);
+      origin = origin.down(st.getSurfaceOffset() + 1);        
+            
       IStructure structure = st.createInstance();
-      structure.setOrigin(origin);
+      structure.setOrigin(new Point3i(origin));
       structure.build(world, world.rand, null);                  
     }
   }
@@ -104,8 +103,9 @@ public class ItemTemplateTool extends Item {
 
   private String getGenUid(ItemStack stack, boolean setDefaultIfNull) {   
     String result = null;
-    if (stack.stackTagCompound != null && stack.stackTagCompound.hasKey("genUid")) {      
-      result = stack.stackTagCompound.getString("genUid");
+    NBTTagCompound stackTagCompound = stack.getTagCompound();
+    if (stackTagCompound != null && stackTagCompound.hasKey("genUid")) {      
+      result = stackTagCompound.getString("genUid");
     }
     if(setDefaultIfNull && result == null) {
       result = setDefaultUid(stack);
@@ -114,14 +114,16 @@ public class ItemTemplateTool extends Item {
   }
   
   private void setGenUid(ItemStack stack, String uid) {
-    if (stack.stackTagCompound == null) {      
-      stack.stackTagCompound = new NBTTagCompound();
+    NBTTagCompound stackTagCompound = stack.getTagCompound();
+    if (stackTagCompound == null) {      
+      stackTagCompound = new NBTTagCompound();
     }
     if(uid == null) {
-      stack.stackTagCompound.removeTag("genUid");
+      stackTagCompound.removeTag("genUid");
     } else {
-      stack.stackTagCompound.setString("genUid", uid);
+      stackTagCompound.setString("genUid", uid);
     }
+    stack.setTagCompound(stackTagCompound);
   }
   
   private String getFirstTemplateUid() {

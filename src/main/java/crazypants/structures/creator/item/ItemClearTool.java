@@ -1,11 +1,12 @@
 package crazypants.structures.creator.item;
 
-import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -22,7 +23,6 @@ public class ItemClearTool extends Item {
   private ItemClearTool() {
     setUnlocalizedName(NAME);
     setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
-    setTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
     setHasSubtypes(false);
   }
 
@@ -31,37 +31,33 @@ public class ItemClearTool extends Item {
   }
 
   @Override
-  public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
-
+  public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
     if (world.isRemote) {
       return true;
     }
 
-    ForgeDirection dir = ForgeDirection.getOrientation(side);
-    Point3i bc = new Point3i(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
-    int filled = floodFill(world, bc, 0);
-    System.out.println("ItemClearTool.onItemUse: filled " + filled + " with blocks of air");
+    BlockPos bc = pos.offset(side);
+    floodFill(world, bc, 0);
     return true;
   }
 
-  private int floodFill(World world, Point3i bc, int filled) {
-    if (!world.isAirBlock(bc.x, bc.y, bc.z)) {
+  private int floodFill(World world, BlockPos bc, int filled) {
+    if (!world.isAirBlock(bc)) {
       return filled;
     }
     if (filled >= 100) {
       return filled;
     }
-    
-    world.setBlock(bc.x, bc.y, bc.z, EnderStructuresCreator.blockClearMarker);
+
+    world.setBlockState(bc, EnderStructuresCreator.blockClearMarker.getDefaultState());
     filled++;
     if (filled >= 100) {
       return filled;
     }
 
-    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-      if (dir != ForgeDirection.UP) {
-        Point3i next = new Point3i(bc.x + dir.offsetX, bc.y + dir.offsetY, bc.z + dir.offsetZ);
-        filled = floodFill(world, next, filled);
+    for (EnumFacing dir : EnumFacing.VALUES) {
+      if (dir != EnumFacing.UP) {
+        filled = floodFill(world, bc.offset(dir), filled);
       }
     }
     return filled;

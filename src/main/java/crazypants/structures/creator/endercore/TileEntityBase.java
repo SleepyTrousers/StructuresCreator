@@ -1,5 +1,5 @@
 
-package crazypants.structures.creator.block;
+package crazypants.structures.creator.endercore;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,6 +15,9 @@ import net.minecraft.world.World;
 public abstract class TileEntityBase extends TileEntity implements ITickable {
 
   public TileEntityBase() {
+  }
+  
+  public void init() {    
   }
 
   @Override

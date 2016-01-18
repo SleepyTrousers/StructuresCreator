@@ -1,12 +1,13 @@
 package crazypants.structures.creator.item;
 
-import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
@@ -23,8 +24,7 @@ public class ItemDebugTool extends Item {
 
   private ItemDebugTool() {
     setUnlocalizedName(NAME);
-    setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
-    setTextureName(EnderStructuresCreator.MODID.toLowerCase() + ":" + NAME);
+    setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);    
     setHasSubtypes(false);
   }
 
@@ -33,26 +33,29 @@ public class ItemDebugTool extends Item {
   }
 
   @Override
-  public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ) {
+  public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
 
     if (world.isRemote) {
       return true;
     }
 
     String name;
-    Block blk = world.getBlock(x, y, z);
+    IBlockState blk = world.getBlockState(pos);
     if(blk == null) {
       name = "none";
     } else {
-      UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(blk);
+      UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(blk.getBlock());
       if(uid == null) {
-        name = blk.getUnlocalizedName();
+        name = blk.getBlock().getUnlocalizedName();
       } else {
         name = uid.modId + ":" + uid.name;
       }
     }
     
-    int meta = world.getBlockMetadata(x, y, z);
+    int meta = 0;
+    if(blk != null) {
+      meta = blk.getBlock().getMetaFromState(blk);
+    }
         
     player.addChatComponentMessage(new ChatComponentText("Block: " + name + " meta=" + meta + " metaBits=" + toBitString(meta)));
     

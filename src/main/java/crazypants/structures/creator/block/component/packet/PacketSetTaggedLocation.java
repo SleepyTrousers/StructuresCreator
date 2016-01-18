@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import crazypants.structures.api.util.Point3i;
-import crazypants.structures.creator.block.MessageTileEntity;
 import crazypants.structures.creator.block.component.TileComponentEditor;
+import crazypants.structures.creator.endercore.MessageTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
