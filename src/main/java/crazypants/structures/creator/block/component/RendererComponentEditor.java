@@ -12,6 +12,7 @@ import com.google.common.collect.Multimap;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.api.util.VecUtil;
+import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.endercore.BoundingBox;
 import crazypants.structures.creator.endercore.RenderUtil;
 import crazypants.structures.creator.endercore.Util;
@@ -24,10 +25,12 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.BlockPos;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 
 public class RendererComponentEditor extends TileEntitySpecialRenderer<TileComponentEditor> {
@@ -126,6 +129,10 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
     bb = bb.translate(tagOffset.x, tagOffset.y, tagOffset.z);
     GlStateManager.color(1, 1, 1, 1);
     // EnderStructuresCreator.blockComponentTool.getIcon(0, 0)    
+    //TODO
+    TextureAtlasSprite tex = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(EnderStructuresCreator.blockComponentTool.getDefaultState());
+    
+    
     RenderUtil.renderBoundingBox(bb);
 
     EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;

@@ -121,26 +121,15 @@ public class RenderUtil {
     float width = fnt.getStringWidth(toRender);
     float height = fnt.FONT_HEIGHT;
     float padding = 2f;
-    
-//    Tessellator tessellator = Tessellator.instance;
-//    tessellator.startDrawingQuads();
-//    tessellator.setColorRGBA_F(color.x, color.y, color.z, color.w);
-//    tessellator.addVertex(-padding, -padding, 0);
-//    tessellator.addVertex(-padding, height + padding, 0);
-//    tessellator.addVertex(width + padding, height + padding, 0);
-//    tessellator.addVertex(width + padding, -padding, 0);
-//    tessellator.draw();
 
     GlStateManager.color(color.x, color.y, color.z, color.w);
     
     WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-
     tes.pos(-padding, -padding, 0).endVertex();
     tes.pos(-padding, height + padding, 0).endVertex();
     tes.pos(width + padding, height + padding, 0).endVertex();
-    tes.pos(width + padding, -padding, 0).endVertex();
-    
+    tes.pos(width + padding, -padding, 0).endVertex();    
     Tessellator.getInstance().draw();
     
     glPopAttrib();
