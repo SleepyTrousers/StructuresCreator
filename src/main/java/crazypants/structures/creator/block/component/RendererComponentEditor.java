@@ -13,8 +13,10 @@ import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.api.util.VecUtil;
 import crazypants.structures.creator.endercore.BoundingBox;
+import crazypants.structures.creator.endercore.RenderUtil;
 import crazypants.structures.creator.endercore.Util;
 import crazypants.structures.creator.endercore.Vector3d;
+import crazypants.structures.creator.endercore.Vector3f;
 import crazypants.structures.creator.item.ItemTagTool;
 import crazypants.structures.creator.item.ItemTagTool.Hit;
 import net.minecraft.client.Minecraft;
@@ -25,6 +27,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
 public class RendererComponentEditor extends TileEntitySpecialRenderer<TileComponentEditor> {
@@ -48,7 +51,7 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
     BoundingBox bb = new BoundingBox(te.getStructureBounds());
     bb = bb.translate(-bb.minX, -bb.minY, -bb.minZ);
     GlStateManager.color(1, 1, 0, 1);
-    renderBoundingBox(bb);
+    RenderUtil.renderBoundingBox(bb);
 
     double width = (bb.maxX - bb.minX);
     double height = bb.maxY - bb.minY;
@@ -74,10 +77,10 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
     tes.pos(in, height - in, 0).endVertex();
     Tessellator.getInstance().draw();
 
-    // TAGS
-    renderTags(te, x, y, z);
-
     GlStateManager.popMatrix();
+    
+    // TAGS
+    renderTags(te, x + te.getOffsetX(), y + te.getOffsetY(), z + te.getOffsetZ());    
 
     GL11.glEnable(GL11.GL_CULL_FACE);
     GL11.glEnable(GL11.GL_LIGHTING);
@@ -86,43 +89,11 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
 
   }
 
-  private void renderBoundingBox(BoundingBox bb) {
-
-    double x = bb.minX;
-    double y = bb.minY;
-    double z = bb.minZ;
-    double width = (bb.maxX - bb.minX);
-    double height = bb.maxY - bb.minY;
-    double depth = (bb.maxZ - bb.minZ);
-
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
-    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-
-    tes.pos(x, y, z).endVertex();
-    tes.pos(x + width, y, z).endVertex();
-    tes.pos(x + width, y + height, z).endVertex();
-    tes.pos(x, y + height, z).endVertex();
-
-    tes.pos(x, y, z + depth).endVertex();
-    tes.pos(x + width, y, z + depth).endVertex();
-    tes.pos(x + width, y + height, z + depth).endVertex();
-    tes.pos(x, y + height, z + depth).endVertex();
-
-    tes.pos(x, y, z).endVertex();
-    tes.pos(x, y, z + depth).endVertex();
-    tes.pos(x, y + height, z + depth).endVertex();
-    tes.pos(x, y + height, z).endVertex();
-
-    tes.pos(x + width, y, z).endVertex();
-    tes.pos(x + width, y, z + depth).endVertex();
-    tes.pos(x + width, y + height, z + depth).endVertex();
-    tes.pos(x + width, y + height, z).endVertex();
-
-    Tessellator.getInstance().draw();
-  }
-
   private void renderTags(TileComponentEditor ct, double wldX, double wldY, double wldZ) {
 
+    GlStateManager.pushMatrix();
+    GlStateManager.translate(wldX, wldY,wldZ);
+    
     List<TagsAtLoc> taggedLocations = new ArrayList<TagsAtLoc>();
     Multimap<Point3i, String> tags = ct.getTagsAtLocations();
     for (Entry<Point3i, Collection<String>> e : tags.asMap().entrySet()) {
@@ -132,7 +103,9 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
         taggedLocations.add(tag);
       }
     }
+    GlStateManager.popMatrix();
 
+    GL11.glEnable(GL11.GL_TEXTURE_2D);
     GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
     GL11.glDisable(GL11.GL_DEPTH_TEST);
     for (TagsAtLoc tagsAtLoc : taggedLocations) {
@@ -141,9 +114,7 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
         tag += txt + ", ";
       }
       tag = tag.substring(0, tag.length() - 2);
-      // RenderUtil.drawBillboardedText(new Vector3f(wldX + tagsAtLoc.pos.x +
-      // 0.5, wldY + tagsAtLoc.pos.y + 0.5, wldZ + tagsAtLoc.pos.z + 0.5), tag,
-      // 0.25f);
+      RenderUtil.drawBillboardedText(new Vector3f(wldX + tagsAtLoc.pos.x + 0.5, wldY + tagsAtLoc.pos.y + 0.65, wldZ + tagsAtLoc.pos.z + 0.5), tag, 0.25f);
     }
     GL11.glEnable(GL11.GL_DEPTH_TEST);
 
@@ -154,20 +125,21 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
     BoundingBox bb = BoundingBox.UNIT_CUBE.scale(1.02, 1.02, 1.02);
     bb = bb.translate(tagOffset.x, tagOffset.y, tagOffset.z);
     GlStateManager.color(1, 1, 1, 1);
-    // EnderStructuresCreator.blockComponentTool.getIcon(0, 0)
-    renderBoundingBox(bb);
+    // EnderStructuresCreator.blockComponentTool.getIcon(0, 0)    
+    RenderUtil.renderBoundingBox(bb);
 
     EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
     Vec3 start = Util.getEyePosition(player);
+    
     Vector3d end3d = Util.getLookVecEio(player);
     end3d.scale(6);
     end3d.add(start.xCoord, start.yCoord, start.zCoord);
 
     // update to world pos for vis testing
     Point3i worldPos = new Point3i(tagOffset);
-    worldPos.add(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
+    worldPos.add(te.getPos().getX() + te.getOffsetX(), te.getPos().getY() + te.getOffsetY(), te.getPos().getZ() + te.getOffsetZ());
 
-    List<Hit> hits = ItemTagTool.getBlocksInPath(te.getWorld(), start, new Vec3(end3d.x, end3d.y, end3d.z), false, true);
+    List<Hit> hits = ItemTagTool.getBlocksInPath(te.getWorld(), start, new Vec3(end3d.x, end3d.y, end3d.z), false, false, true, true);    
     if (hits != null) {
       for (Hit hit : hits) {
         if (hit != null && (hit.blockCoord.x == worldPos.x && hit.blockCoord.y == worldPos.y && hit.blockCoord.z == worldPos.z)) {

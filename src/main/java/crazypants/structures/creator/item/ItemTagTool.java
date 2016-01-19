@@ -16,6 +16,7 @@ import crazypants.structures.creator.block.component.gui.GuiTagEditor;
 import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
 import crazypants.structures.creator.endercore.Util;
 import crazypants.structures.creator.endercore.Vector3d;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -34,7 +35,7 @@ public class ItemTagTool extends Item implements IGuiHandler {
 
   private static final String NAME = "itemTagTool";
 
-  //dont like this, but need to pass info from onItemFirstUsed to getClientGui
+  // dont like this, but need to pass info from onItemFirstUsed to getClientGui
   private TileComponentEditor currentTile;
 
   public static ItemTagTool create() {
@@ -45,7 +46,7 @@ public class ItemTagTool extends Item implements IGuiHandler {
 
   private ItemTagTool() {
     setUnlocalizedName(NAME);
-    setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);    
+    setCreativeTab(EnderStructuresCreatorTab.tabEnderStructures);
     setHasSubtypes(false);
   }
 
@@ -56,7 +57,7 @@ public class ItemTagTool extends Item implements IGuiHandler {
 
   @Override
   public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-    if(currentTile == null) {
+    if (currentTile == null) {
       return null;
     }
     return new EmptyContainer();
@@ -64,45 +65,45 @@ public class ItemTagTool extends Item implements IGuiHandler {
 
   @Override
   public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-    if(currentTile == null) {
+    if (currentTile == null) {
       return null;
     }
     return new GuiTagEditor(player, player.inventory, currentTile, new Point3i(x, y, z));
   }
 
   @Override
-  public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {    
+  public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
     return true;
   }
 
   @Override
   public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 
-    if(world.isRemote) {
+    if (world.isRemote) {
       player.swingItem();
     }
-    
-    //Catch the editing of tagged 'air' blocks
+
+    // Catch the editing of tagged 'air' blocks
     Vec3 startVec = Util.getEyePosition(player);
     Vector3d end3d = Util.getLookVecEio(player);
     end3d.scale(6);
     end3d.add(startVec.xCoord, startVec.yCoord, startVec.zCoord);
     Vec3 endVec = new Vec3(end3d.x, end3d.y, end3d.z);
 
-    List<Hit> coordsInSight = getBlocksInPath(world, startVec, endVec, true, true);
+    List<Hit> coordsInSight = getBlocksInPath(world, startVec, endVec, false, false, true, true);
     for (Hit hit : coordsInSight) {
       currentTile = EditorRegister.getTooleRegister(world).getClosestTileInBounds(world, hit.blockCoord.x, hit.blockCoord.y, hit.blockCoord.z);
-      if(currentTile != null) {
-        if(hit.isSolid) {
+      if (currentTile != null) {
+        if (hit.isSolid) {
           return stack;
         }
         Point3i localPos = currentTile.getStructureLocalPosition(hit.blockCoord);
         Collection<String> tags = currentTile.getTagsAtLocation(localPos);
-        if(!tags.isEmpty()) {          
-          if(world.isRemote) {
+        if (!tags.isEmpty()) {
+          if (world.isRemote) {
             player.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_TAG_EDITOR, world, localPos.x, localPos.y, localPos.z);
           }
-          
+
           return stack;
         }
       }
@@ -111,13 +112,11 @@ public class ItemTagTool extends Item implements IGuiHandler {
     return stack;
   }
 
-  
-  
   @Override
   public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
 
     currentTile = EditorRegister.getTooleRegister(world).getClosestTileInBounds(world, pos.getX(), pos.getY(), pos.getZ());
-    if(currentTile == null) {
+    if (currentTile == null) {
       return true;
     }
 
@@ -128,28 +127,27 @@ public class ItemTagTool extends Item implements IGuiHandler {
 
     Point3i offset = new Point3i(localX, localY, localZ);
 
-    if(!currentTile.hasTagAt(offset)) {      
+    if (!currentTile.hasTagAt(offset)) {
       String tag = "Tag";
       currentTile.addTag(tag, offset);
       PacketHandler.INSTANCE.sendToServer(new PacketAddRemoveTaggedLocation(currentTile, tag, offset, true));
     }
 
-    if(world.isRemote) {
+    if (world.isRemote) {
       player.openGui(EnderStructuresCreator.instance, GuiHandler.GUI_ID_TAG_EDITOR, world, localX, localY, localZ);
     }
 
     return true;
   }
 
-  //Code adapted from World.func_147447_a (rayTraceBlocks) to return all collided blocks
-  public static List<Hit> getBlocksInPath(World world, Vec3 startVec, Vec3 endVec, boolean includeLiquids, boolean includeAir) {
+  //code adapted from World#rayTraceBlocks to continue past the first hit
+  public static List<Hit> getBlocksInPath(World world, Vec3 startVec, Vec3 endVec, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox,
+      boolean returnLastUncollidableBlock, boolean includeAir) {
 
     List<Hit> result = new ArrayList<Hit>();
-    boolean p_147447_4_ = false;
-    boolean p_147447_5_ = false;
 
-    if(!Double.isNaN(startVec.xCoord) && !Double.isNaN(startVec.yCoord) && !Double.isNaN(startVec.zCoord)) {
-      if(!Double.isNaN(endVec.xCoord) && !Double.isNaN(endVec.yCoord) && !Double.isNaN(endVec.zCoord)) {
+    if (!Double.isNaN(startVec.xCoord) && !Double.isNaN(startVec.yCoord) && !Double.isNaN(startVec.zCoord)) {
+      if (!Double.isNaN(endVec.xCoord) && !Double.isNaN(endVec.yCoord) && !Double.isNaN(endVec.zCoord)) {
 
         int endX = MathHelper.floor_double(endVec.xCoord);
         int endY = MathHelper.floor_double(endVec.yCoord);
@@ -157,63 +155,63 @@ public class ItemTagTool extends Item implements IGuiHandler {
         int startX = MathHelper.floor_double(startVec.xCoord);
         int startY = MathHelper.floor_double(startVec.yCoord);
         int startZ = MathHelper.floor_double(startVec.zCoord);
-        BlockPos startPos = new BlockPos(startX, startY, startZ);
-        IBlockState blockSt = world.getBlockState(startPos);        
-       
-        if(includeAir && blockSt.getBlock() == Blocks.air) {
-          result.add(new Hit(startPos, false));
-        } else if((!p_147447_4_ || blockSt.getBlock().getCollisionBoundingBox(world, startPos, blockSt) != null) && blockSt.getBlock().canCollideCheck(blockSt, includeLiquids)) {          
-          MovingObjectPosition movingobjectposition1 = blockSt.getBlock().collisionRayTrace(world, startPos, startVec, endVec);
-          if(movingobjectposition1 != null) {
-            result.add(new Hit(startPos, true));
+        BlockPos blockpos = new BlockPos(startX, startY, startZ);
+        IBlockState iblockstate = world.getBlockState(blockpos);
+        Block block = iblockstate.getBlock();
+
+        if (includeAir && block == Blocks.air) {
+          result.add(new Hit(blockpos, false));
+        } else if ((!ignoreBlockWithoutBoundingBox || block.getCollisionBoundingBox(world, blockpos, iblockstate) != null)
+            && block.canCollideCheck(iblockstate, stopOnLiquid)) {
+          MovingObjectPosition movingobjectposition = block.collisionRayTrace(world, blockpos, startVec, endVec);
+          if (movingobjectposition != null) {
+            result.add(new Hit(blockpos, true));
           }
         }
 
-        Point3i movingobjectposition2 = null;
         int k1 = 200;
 
         while (k1-- >= 0) {
-          if(Double.isNaN(startVec.xCoord) || Double.isNaN(startVec.yCoord) || Double.isNaN(startVec.zCoord)) {
-            return null;
+          if (Double.isNaN(startVec.xCoord) || Double.isNaN(startVec.yCoord) || Double.isNaN(startVec.zCoord)) {
+            return result;
           }
 
-          if(startX == endX && startY == endY && startZ == endZ) {
-            if(p_147447_5_) {
-              result.add(new Hit(movingobjectposition2, true));
-            } else {
-              return result;
+          if (startX == endX && startY == endY && startZ == endZ) {
+            if (returnLastUncollidableBlock) {
+              result.add(new Hit(blockpos, true));
             }
+            return result;
           }
 
-          boolean flag6 = true;
-          boolean flag3 = true;
-          boolean flag4 = true;
+          boolean flag2 = true;
+          boolean flag = true;
+          boolean flag1 = true;
           double d0 = 999.0D;
           double d1 = 999.0D;
           double d2 = 999.0D;
 
-          if(endX > startX) {
-            d0 = startX + 1.0D;
-          } else if(endX < startX) {
-            d0 = startX + 0.0D;
+          if (endX > startX) {
+            d0 = (double) startX + 1.0D;
+          } else if (endX < startX) {
+            d0 = (double) startX + 0.0D;
           } else {
-            flag6 = false;
+            flag2 = false;
           }
 
-          if(endY > startY) {
-            d1 = startY + 1.0D;
-          } else if(endY < startY) {
-            d1 = startY + 0.0D;
+          if (endY > startY) {
+            d1 = (double) startY + 1.0D;
+          } else if (endY < startY) {
+            d1 = (double) startY + 0.0D;
           } else {
-            flag3 = false;
+            flag = false;
           }
 
-          if(endZ > startZ) {
-            d2 = startZ + 1.0D;
-          } else if(endZ < startZ) {
-            d2 = startZ + 0.0D;
+          if (endZ > startZ) {
+            d2 = (double) startZ + 1.0D;
+          } else if (endZ < startZ) {
+            d2 = (double) startZ + 0.0D;
           } else {
-            flag4 = false;
+            flag1 = false;
           }
 
           double d3 = 999.0D;
@@ -223,107 +221,96 @@ public class ItemTagTool extends Item implements IGuiHandler {
           double d7 = endVec.yCoord - startVec.yCoord;
           double d8 = endVec.zCoord - startVec.zCoord;
 
-          if(flag6) {
+          if (flag2) {
             d3 = (d0 - startVec.xCoord) / d6;
           }
-          if(flag3) {
+
+          if (flag) {
             d4 = (d1 - startVec.yCoord) / d7;
           }
-          if(flag4) {
+
+          if (flag1) {
             d5 = (d2 - startVec.zCoord) / d8;
           }
 
-          byte b0;
-          if(d3 < d4 && d3 < d5) {
-            if(endX > startX) {
-              b0 = 4;
-            } else {
-              b0 = 5;
-            }
+          if (d3 == -0.0D) {
+            d3 = -1.0E-4D;
+          }
+
+          if (d4 == -0.0D) {
+            d4 = -1.0E-4D;
+          }
+
+          if (d5 == -0.0D) {
+            d5 = -1.0E-4D;
+          }
+
+          EnumFacing enumfacing;
+
+          if (d3 < d4 && d3 < d5) {
+            enumfacing = endX > startX ? EnumFacing.WEST : EnumFacing.EAST;
             startVec = new Vec3(d0, startVec.yCoord + d7 * d3, startVec.zCoord + d8 * d3);
-                        
-          } else if(d4 < d5) {
-            if(endY > startY) {
-              b0 = 0;
-            } else {
-              b0 = 1;
-            }
+          } else if (d4 < d5) {
+            enumfacing = endY > startY ? EnumFacing.DOWN : EnumFacing.UP;
             startVec = new Vec3(startVec.xCoord + d6 * d4, d1, startVec.zCoord + d8 * d4);
-            
           } else {
-            if(endZ > startZ) {
-              b0 = 2;
-            } else {
-              b0 = 3;
-            }
-            startVec = new Vec3(startVec.xCoord + d6 * d5, startVec.yCoord + d7 * d5, d2);            
+            enumfacing = endZ > startZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
+            startVec = new Vec3(startVec.xCoord + d6 * d5, startVec.yCoord + d7 * d5, d2);
           }
 
-          Vec3 vec32 = new Vec3(MathHelper.floor_double(startVec.xCoord), MathHelper.floor_double(startVec.yCoord), MathHelper.floor_double(startVec.zCoord));
-          startX = (int) vec32.xCoord;
-          if(b0 == 5) {
-            --startX;            
-          }
-
-          startY = (int)vec32.yCoord;
-          if(b0 == 1) {
-            --startY;            
-          }
-
-          startZ = (int)vec32.zCoord;
-          if(b0 == 3) {
-            --startZ;
-          }
-
-          startPos = new BlockPos(startX, startY, startZ);
-          IBlockState bs1 = world.getBlockState(startPos);                    
-
-          if(includeAir && blockSt == Blocks.air) {
-            result.add(new Hit(startPos, false));
-          } else if(!p_147447_4_ || bs1.getBlock().getCollisionBoundingBox(world, startPos,bs1) != null) {
-            if(bs1.getBlock().canCollideCheck(bs1, includeLiquids)) {
-              MovingObjectPosition movingobjectposition1 = bs1.getBlock().collisionRayTrace(world, startPos, startVec, endVec);
-              if(movingobjectposition1 != null) {
-                result.add(new Hit(startPos, true));
+          startX = MathHelper.floor_double(startVec.xCoord) - (enumfacing == EnumFacing.EAST ? 1 : 0);
+          startY = MathHelper.floor_double(startVec.yCoord) - (enumfacing == EnumFacing.UP ? 1 : 0);
+          startZ = MathHelper.floor_double(startVec.zCoord) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
+          blockpos = new BlockPos(startX, startY, startZ);
+          IBlockState iblockstate1 = world.getBlockState(blockpos);
+          Block block1 = iblockstate1.getBlock();
+          
+          if (includeAir && block1 == Blocks.air) {
+            result.add(new Hit(blockpos, false));
+          } else if (!ignoreBlockWithoutBoundingBox || block1.getCollisionBoundingBox(world, blockpos, iblockstate1) != null) {            
+            if (block1.canCollideCheck(iblockstate1, stopOnLiquid)) {
+              MovingObjectPosition movingobjectposition1 = block1.collisionRayTrace(world, blockpos, startVec, endVec);
+              if (movingobjectposition1 != null) {
+                result.add(new Hit(blockpos, true));                
               }
-            } else {
-              movingobjectposition2 = new Point3i(startX, startY, startZ);
-            }
+            } 
           }
         }
-        if(p_147447_5_) {
-          result.add(new Hit(movingobjectposition2, true));
-        } else {
-          return result;
+
+        if (returnLastUncollidableBlock) {
+          result.add(new Hit(blockpos, true));
         }
+        return result;        
       } else {
         return result;
       }
     } else {
       return result;
     }
-    return result;
   }
   
-  
-
-
   public static class Hit {
+    
     public final Point3i blockCoord = new Point3i();
     public final boolean isSolid;
 
     public Hit(Point3i blockCoord, boolean isSolid) {
-      if(blockCoord != null) {
+      if (blockCoord != null) {
         this.blockCoord.set(blockCoord.x, blockCoord.y, blockCoord.z);
       }
       this.isSolid = isSolid;
     }
 
     public Hit(BlockPos pos, boolean isSolid) {
-      if(pos != null) {
+      if (pos != null) {
         this.blockCoord.set(pos.getX(), pos.getY(), pos.getZ());
       }
       this.isSolid = isSolid;
+    }
+
+    @Override
+    public String toString() {
+      return "Hit [blockCoord=" + blockCoord + ", isSolid=" + isSolid + "]";
     }
 
   }
