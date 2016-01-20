@@ -1,4 +1,4 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.common.vecmath;
 
 import net.minecraft.util.Vec3;
 
@@ -24,13 +24,9 @@ public class Vector3d {
     this(other.x, other.y, other.z);
   }
 
-//  public Vector3d(Vector3f corner) {
-//    this(corner.x, corner.y, corner.z);
-//  }
-//
-//  public Vector3d(Vertex vert) {
-//    this(vert.x, vert.y, vert.z);
-//  }
+  public Vector3d(Vector3f corner) {
+    this(corner.x, corner.y, corner.z);
+  }
 
   public void set(double x, double y, double z) {
     this.x = x;
@@ -38,9 +34,9 @@ public class Vector3d {
     this.z = z;
   }
 
-//  public void set(Vector3f v) {
-//    set(v.x, v.y, v.z);
-//  }
+  public void set(Vector3f v) {
+    set(v.x, v.y, v.z);
+  }
 
   public void set(Vector3d vec) {
     x = vec.x;
@@ -55,12 +51,12 @@ public class Vector3d {
     return this;
   }
 
-//  public Vector3d add(Vector3f vec) {
-//    x += vec.x;
-//    y += vec.y;
-//    z += vec.z;
-//    return this;
-//  }
+  public Vector3d add(Vector3f vec) {
+    x += vec.x;
+    y += vec.y;
+    z += vec.z;
+    return this;
+  }
 
   public Vector3d add(double x2, double y2, double z2) {
     x += x2;
@@ -75,11 +71,11 @@ public class Vector3d {
     z -= vec.z;
   }
 
-//  public void sub(Vector3f vec) {
-//    x -= vec.x;
-//    y -= vec.y;
-//    z -= vec.z;
-//  }
+  public void sub(Vector3f vec) {
+    x -= vec.x;
+    y -= vec.y;
+    z -= vec.z;
+  }
 
   public Vector3d negate() {
     x = -x;

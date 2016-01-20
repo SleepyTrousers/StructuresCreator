@@ -1,7 +1,7 @@
 package crazypants.structures.creator.block.component.packet;
 
 import crazypants.structures.creator.block.component.TileComponentEditor;
-import crazypants.structures.creator.endercore.MessageTileEntity;
+import crazypants.structures.creator.endercore.common.network.MessageTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;

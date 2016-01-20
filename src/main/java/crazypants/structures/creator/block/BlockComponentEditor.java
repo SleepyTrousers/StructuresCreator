@@ -11,7 +11,7 @@ import crazypants.structures.creator.block.component.packet.PacketAddRemoveTagge
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
 import crazypants.structures.creator.block.component.packet.PacketComponentEditorGui;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
-import crazypants.structures.creator.endercore.BlockEnder;
+import crazypants.structures.creator.endercore.common.BlockEnder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

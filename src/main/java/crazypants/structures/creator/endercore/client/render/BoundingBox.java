@@ -1,7 +1,11 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.client.render;
 import java.util.ArrayList;
 import java.util.List;
 
+import crazypants.structures.creator.endercore.common.vecmath.Vector2f;
+import crazypants.structures.creator.endercore.common.vecmath.Vector3d;
+import crazypants.structures.creator.endercore.common.vecmath.Vector3f;
+import crazypants.structures.creator.endercore.common.vecmath.Vertex;
 import net.minecraft.block.Block;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;

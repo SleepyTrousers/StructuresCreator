@@ -1,4 +1,4 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.client.render;
 
 import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
 import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
@@ -17,11 +17,19 @@ import static org.lwjgl.opengl.GL11.glPopAttrib;
 import static org.lwjgl.opengl.GL11.glPushAttrib;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 
+import java.lang.reflect.Field;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
+import crazypants.structures.Log;
 import crazypants.structures.creator.EnderStructuresCreator;
+import crazypants.structures.creator.endercore.common.vecmath.Vector3d;
+import crazypants.structures.creator.endercore.common.vecmath.Vector3f;
+import crazypants.structures.creator.endercore.common.vecmath.Vector4f;
+import crazypants.structures.creator.endercore.common.vecmath.Vertex;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -36,6 +44,8 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Timer;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class RenderUtil {
 
@@ -55,6 +65,32 @@ public class RenderUtil {
 
   public static int BRIGHTNESS_MAX = 15 << 20 | 15 << 4;
 
+  private static Field timerField = initTimer();
+
+  private static Field initTimer() {
+      Field f = null;
+      try {
+          f = ReflectionHelper.findField(Minecraft.class, "field_71428_T", "timer", "Q");
+          f.setAccessible(true);
+      } catch (Exception e) {
+          Log.error("Failed to initialize timer reflection for IO config.");
+      }
+      return f;
+  }
+
+  @Nullable
+  public static Timer getTimer() {
+      if (timerField == null) {
+          return null;
+      }
+      try {
+          return (Timer) timerField.get(Minecraft.getMinecraft());
+      } catch (Exception e) {
+          e.printStackTrace();
+          return null;
+      }
+  }
+  
   public static TextureManager engine() {
     return Minecraft.getMinecraft().renderEngine;
   }

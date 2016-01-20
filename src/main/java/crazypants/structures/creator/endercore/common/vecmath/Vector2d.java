@@ -1,39 +1,25 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.common.vecmath;
 
-public class Vector2f {
+public class Vector2d {
 
-  public float x;
-  public float y;
+  public double x;
+  public double y;
 
-  public Vector2f() {
+  public Vector2d() {
     x = 0;
     y = 0;
   }
 
-  public Vector2f(double x, double y) {
-    this.x = (float) x;
-    this.y = (float) y;
-  }
-
-  public Vector2f(float x, float y) {
+  public Vector2d(double x, double y) {
     this.x = x;
     this.y = y;
   }
 
-//  public Vector2f(Vector2d other) {
-//    this(other.x, other.y);
-//  }
-
-  public Vector2f(Vector2f other) {
+  public Vector2d(Vector2d other) {
     this(other.x, other.y);
   }
 
   public void set(double x, double y) {
-    this.x = (float) x;
-    this.y = (float) y;
-  }
-
-  public void set(float x, float y) {
     this.x = x;
     this.y = y;
   }
@@ -41,6 +27,21 @@ public class Vector2f {
   public void set(Vector2f vec) {
     x = vec.x;
     y = vec.y;
+  }
+
+  public void set(Vector2d vec) {
+    x = vec.x;
+    y = vec.y;
+  }
+
+  public void add(Vector2d vec) {
+    x += vec.x;
+    y += vec.y;
+  }
+
+  public void sub(Vector2d vec) {
+    x -= vec.x;
+    y -= vec.y;
   }
 
   public void add(Vector2f vec) {
@@ -76,21 +77,20 @@ public class Vector2f {
     return Math.sqrt(lengthSquared());
   }
 
-  public double distanceSquared(Vector2f v) {
+  public double distanceSquared(Vector2d v) {
     double dx, dy;
     dx = x - v.x;
     dy = y - v.y;
     return (dx * dx + dy * dy);
   }
 
-  public double distance(Vector2f v) {
+  public double distance(Vector2d v) {
     return Math.sqrt(distanceSquared(v));
   }
 
   @Override
   public String toString() {
-    return "Vector2f(" + x + ", " + y + ")";
+    return "Vector2d(" + x + ", " + y + ")";
   }
 
 }
-

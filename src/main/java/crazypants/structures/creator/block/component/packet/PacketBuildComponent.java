@@ -10,7 +10,7 @@ import crazypants.structures.api.util.Rotation;
 import crazypants.structures.api.util.VecUtil;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.block.component.TileComponentEditor;
-import crazypants.structures.creator.endercore.MessageTileEntity;
+import crazypants.structures.creator.endercore.common.network.MessageTileEntity;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.structure.StructureBlock;
 import crazypants.structures.gen.structure.StructureComponentNBT;

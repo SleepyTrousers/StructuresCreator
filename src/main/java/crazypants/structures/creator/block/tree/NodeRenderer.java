@@ -81,7 +81,6 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
     
     if(aa != null && aa.getDocumentation() != null) {      
       setToolTipText(aa.getDocumentation());
-      //setToolTipText("Hello ppoppole\nluts");
     } else {
       setToolTipText(null);
     }

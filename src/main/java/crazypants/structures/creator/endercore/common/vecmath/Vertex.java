@@ -1,4 +1,4 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.common.vecmath;
 
 public class Vertex {
 
@@ -84,10 +84,10 @@ public class Vertex {
     this.color = color;
   }
 
-//  public void transform(Matrix4d xform) {
-//    xform.transform(xyz);
-//    xform.transformNormal(normal);
-//  }
+  public void transform(Matrix4d xform) {
+    xform.transform(xyz);
+    xform.transformNormal(normal);
+  }
 
   public void translate(Vector3d trans) {
     xyz.add(trans);

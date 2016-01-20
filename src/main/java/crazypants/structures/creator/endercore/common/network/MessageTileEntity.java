@@ -1,4 +1,4 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.common.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;

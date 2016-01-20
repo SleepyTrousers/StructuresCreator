@@ -6,7 +6,7 @@ import crazypants.structures.creator.GuiHandler;
 import crazypants.structures.creator.block.villager.DialogVillagerEditor;
 import crazypants.structures.creator.block.villager.GuiVillagerEditor;
 import crazypants.structures.creator.block.villager.TileVillagerEditor;
-import crazypants.structures.creator.endercore.BlockEnder;
+import crazypants.structures.creator.endercore.common.BlockEnder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;

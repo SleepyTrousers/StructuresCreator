@@ -21,7 +21,7 @@ public class TileTemplateEditor extends AbstractResourceTile {
   }
 
   @Override
-  public void update() {
+  public void doUpdate() {
     if(!doneInit) {
       doneInit = true;
       if(structure != null) {        

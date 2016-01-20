@@ -7,7 +7,7 @@ import crazypants.structures.api.gen.IStructureTemplate;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
-import crazypants.structures.creator.endercore.MessageTileEntity;
+import crazypants.structures.creator.endercore.common.network.MessageTileEntity;
 import crazypants.structures.gen.StructureGenRegister;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;

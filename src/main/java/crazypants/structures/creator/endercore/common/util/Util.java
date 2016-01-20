@@ -1,5 +1,6 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.common.util;
 
+import crazypants.structures.creator.endercore.common.vecmath.Vector3d;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Vec3;
 

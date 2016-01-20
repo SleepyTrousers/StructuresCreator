@@ -1,4 +1,4 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.common.vecmath;
 
 public class Vector3f {
 

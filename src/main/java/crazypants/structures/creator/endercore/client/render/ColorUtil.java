@@ -1,8 +1,11 @@
-package crazypants.structures.creator.endercore;
+package crazypants.structures.creator.endercore.client.render;
 
 import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
+
+import crazypants.structures.creator.endercore.common.vecmath.Vector3f;
+import crazypants.structures.creator.endercore.common.vecmath.Vector4f;
 
 public class ColorUtil {
 

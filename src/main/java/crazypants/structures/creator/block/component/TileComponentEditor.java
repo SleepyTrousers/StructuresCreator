@@ -37,7 +37,7 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   @Override
-  public void update() {
+  public void doUpdate() {
     if(!doneInit) {
       doneInit = true;
       EditorRegister.onLoad(this);
