@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class ItemDebugTool extends Item {
 
-  private static final String NAME = "itemDebugTool";
+  public static final String NAME = "itemDebugTool";
 
   public static ItemDebugTool create() {
     ItemDebugTool res = new ItemDebugTool();

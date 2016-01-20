@@ -33,7 +33,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ItemTagTool extends Item implements IGuiHandler {
 
-  private static final String NAME = "itemTagTool";
+  public static final String NAME = "itemTagTool";
 
   // dont like this, but need to pass info from onItemFirstUsed to getClientGui
   private TileComponentEditor currentTile;

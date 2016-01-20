@@ -25,12 +25,9 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 
 public class RendererComponentEditor extends TileEntitySpecialRenderer<TileComponentEditor> {
@@ -42,7 +39,7 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
 
     GL11.glDisable(GL11.GL_CULL_FACE);
     GL11.glDisable(GL11.GL_LIGHTING);
-    GL11.glDisable(GL11.GL_TEXTURE_2D);
+    
     GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 
     GlStateManager.pushMatrix();
@@ -54,12 +51,15 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
     BoundingBox bb = new BoundingBox(te.getStructureBounds());
     bb = bb.translate(-bb.minX, -bb.minY, -bb.minZ);
     GlStateManager.color(1, 1, 0, 1);
-    RenderUtil.renderBoundingBox(bb);
+        
+    RenderUtil.renderBoundingBox(bb, EnderStructuresCreator.blockComponentTool.getDefaultState());
 
     double width = (bb.maxX - bb.minX);
     double height = bb.maxY - bb.minY;
     double depth = (bb.maxZ - bb.minZ);
 
+    GL11.glDisable(GL11.GL_TEXTURE_2D);
+    
     // Ground Level
     GlStateManager.color(0, 1, 0, 1);
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
@@ -128,11 +128,7 @@ public class RendererComponentEditor extends TileEntitySpecialRenderer<TileCompo
     BoundingBox bb = BoundingBox.UNIT_CUBE.scale(1.02, 1.02, 1.02);
     bb = bb.translate(tagOffset.x, tagOffset.y, tagOffset.z);
     GlStateManager.color(1, 1, 1, 1);
-    // EnderStructuresCreator.blockComponentTool.getIcon(0, 0)    
-    //TODO
-    TextureAtlasSprite tex = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(EnderStructuresCreator.blockComponentTool.getDefaultState());
-    
-    
+
     RenderUtil.renderBoundingBox(bb);
 
     EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;

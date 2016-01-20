@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ItemComponentTool extends Item {
 
-  private static final String NAME = "itemComponentTool";
+  public static final String NAME = "itemComponentTool";
 
   public static ItemComponentTool create() {
     ItemComponentTool res = new ItemComponentTool();

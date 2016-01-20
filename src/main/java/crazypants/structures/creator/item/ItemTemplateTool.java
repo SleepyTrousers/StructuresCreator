@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ItemTemplateTool extends Item {
 
-  private static final String NAME = "itemTemplateTool";
+  public static final String NAME = "itemTemplateTool";
 
   public static ItemTemplateTool create() {
     ItemTemplateTool res = new ItemTemplateTool();

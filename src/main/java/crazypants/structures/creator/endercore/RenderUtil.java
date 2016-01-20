@@ -17,8 +17,12 @@ import static org.lwjgl.opengl.GL11.glPopAttrib;
 import static org.lwjgl.opengl.GL11.glPushAttrib;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
+import crazypants.structures.creator.EnderStructuresCreator;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -26,9 +30,11 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
 public class RenderUtil {
@@ -38,7 +44,7 @@ public class RenderUtil {
   public static final Vector4f DEFAULT_TXT_COL = new Vector4f(1, 1, 1, 1);
 
   public static final Vector4f DEFAULT_TEXT_BG_COL = new Vector4f(0.275f, 0.08f, 0.4f, 0.75f);
-  
+
   public static final Vector3d UP_V = new Vector3d(0, 1, 0);
 
   public static final Vector3d ZERO_V = new Vector3d(0, 0, 0);
@@ -48,11 +54,11 @@ public class RenderUtil {
   public static final ResourceLocation GLINT_TEX = new ResourceLocation("textures/misc/enchanted_item_glint.png");
 
   public static int BRIGHTNESS_MAX = 15 << 20 | 15 << 4;
-  
+
   public static TextureManager engine() {
     return Minecraft.getMinecraft().renderEngine;
   }
-  
+
   public static void bindBlockTexture() {
     engine().bindTexture(BLOCK_TEX);
   }
@@ -69,7 +75,6 @@ public class RenderUtil {
     engine().bindTexture(tex);
   }
 
-  
   public static void drawBillboardedText(Vector3f pos, String text, float size) {
     drawBillboardedText(pos, text, size, DEFAULT_TXT_COL, true, DEFAULT_TEXT_SHADOW_COL, true, DEFAULT_TEXT_BG_COL);
   }
@@ -78,10 +83,9 @@ public class RenderUtil {
     drawBillboardedText(pos, text, size, DEFAULT_TXT_COL, true, DEFAULT_TEXT_SHADOW_COL, true, bgCol);
   }
 
-  public static void drawBillboardedText(Vector3f pos, String text, float size, Vector4f txtCol, boolean drawShadow, Vector4f shadowCol,
-      boolean drawBackground, Vector4f bgCol) {
-    
-    
+  public static void drawBillboardedText(Vector3f pos, String text, float size, Vector4f txtCol, boolean drawShadow, Vector4f shadowCol, boolean drawBackground,
+      Vector4f bgCol) {
+
     GL11.glPushMatrix();
     GL11.glTranslatef(pos.x, pos.y, pos.z);
     GL11.glRotatef(180, 1, 0, 0);
@@ -116,59 +120,93 @@ public class RenderUtil {
     glDisable(GL_CULL_FACE);
     glDepthMask(false);
     RenderHelper.disableStandardItemLighting();
-    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop random disappearing
+    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop
+                                                                                     // random
+                                                                                     // disappearing
 
     float width = fnt.getStringWidth(toRender);
     float height = fnt.FONT_HEIGHT;
     float padding = 2f;
 
     GlStateManager.color(color.x, color.y, color.z, color.w);
-    
+
     WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(-padding, -padding, 0).endVertex();
     tes.pos(-padding, height + padding, 0).endVertex();
     tes.pos(width + padding, height + padding, 0).endVertex();
-    tes.pos(width + padding, -padding, 0).endVertex();    
+    tes.pos(width + padding, -padding, 0).endVertex();
     Tessellator.getInstance().draw();
-    
+
     glPopAttrib();
   }
   
+  public static TextureAtlasSprite getTexture(IBlockState state) {
+    return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(EnderStructuresCreator.blockComponentTool.getDefaultState());  
+  }
+
   public static void renderBoundingBox(BoundingBox bb) {
 
-    double x = bb.minX;
-    double y = bb.minY;
-    double z = bb.minZ;
-    double width = (bb.maxX - bb.minX);
-    double height = bb.maxY - bb.minY;
-    double depth = (bb.maxZ - bb.minZ);
-
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+//    double x = bb.minX;
+//    double y = bb.minY;
+//    double z = bb.minZ;
+//    double width = (bb.maxX - bb.minX);
+//    double height = bb.maxY - bb.minY;
+//    double depth = (bb.maxZ - bb.minZ);
+//
+//    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+//    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+//
+//    tes.pos(x, y, z).endVertex();
+//    tes.pos(x + width, y, z).endVertex();
+//    tes.pos(x + width, y + height, z).endVertex();
+//    tes.pos(x, y + height, z).endVertex();
+//
+//    tes.pos(x, y, z + depth).endVertex();
+//    tes.pos(x + width, y, z + depth).endVertex();
+//    tes.pos(x + width, y + height, z + depth).endVertex();
+//    tes.pos(x, y + height, z + depth).endVertex();
+//
+//    tes.pos(x, y, z).endVertex();
+//    tes.pos(x, y, z + depth).endVertex();
+//    tes.pos(x, y + height, z + depth).endVertex();
+//    tes.pos(x, y + height, z).endVertex();
+//
+//    tes.pos(x + width, y, z).endVertex();
+//    tes.pos(x + width, y, z + depth).endVertex();
+//    tes.pos(x + width, y + height, z + depth).endVertex();
+//    tes.pos(x + width, y + height, z).endVertex();
+//
+//    Tessellator.getInstance().draw();
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();    
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-
-    tes.pos(x, y, z).endVertex();
-    tes.pos(x + width, y, z).endVertex();
-    tes.pos(x + width, y + height, z).endVertex();
-    tes.pos(x, y + height, z).endVertex();
-
-    tes.pos(x, y, z + depth).endVertex();
-    tes.pos(x + width, y, z + depth).endVertex();
-    tes.pos(x + width, y + height, z + depth).endVertex();
-    tes.pos(x, y + height, z + depth).endVertex();
-
-    tes.pos(x, y, z).endVertex();
-    tes.pos(x, y, z + depth).endVertex();
-    tes.pos(x, y + height, z + depth).endVertex();
-    tes.pos(x, y + height, z).endVertex();
-
-    tes.pos(x + width, y, z).endVertex();
-    tes.pos(x + width, y, z + depth).endVertex();
-    tes.pos(x + width, y + height, z + depth).endVertex();
-    tes.pos(x + width, y + height, z).endVertex();
-
+    List<Vector3f> corners;
+    for (EnumFacing face : EnumFacing.VALUES) {
+      corners = bb.getCornersForFace(face);
+      for (Vector3f v : corners) {
+        tes.pos(v.x, v.y, v.z).endVertex();
+      }
+    }
     Tessellator.getInstance().draw();
   }
 
+  public static void renderBoundingBox(BoundingBox bb,IBlockState state) {
+    renderBoundingBox(bb, getTexture(state));
+  }
   
+  public static void renderBoundingBox(BoundingBox bb, TextureAtlasSprite tex) {
+
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();    
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+    List<Vertex> corners;
+    for (EnumFacing face : EnumFacing.VALUES) {
+      corners = bb.getCornersWithUvForFace(face, tex.getMinU(), tex.getMaxU(), tex.getMinV(), tex.getMaxV());
+      for (Vertex v : corners) {
+        tes.pos(v.x(), v.y(), v.z()).tex(v.u(), v.v()).endVertex();
+      }
+    }
+    Tessellator.getInstance().draw();
+
+  }
+
 }

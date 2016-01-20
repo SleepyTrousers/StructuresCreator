@@ -8,6 +8,11 @@ import crazypants.structures.creator.block.BlockTemplateEditor;
 import crazypants.structures.creator.block.BlockVillagerEditor;
 import crazypants.structures.creator.block.component.RendererComponentEditor;
 import crazypants.structures.creator.block.component.TileComponentEditor;
+import crazypants.structures.creator.item.ItemClearTool;
+import crazypants.structures.creator.item.ItemComponentTool;
+import crazypants.structures.creator.item.ItemDebugTool;
+import crazypants.structures.creator.item.ItemTagTool;
+import crazypants.structures.creator.item.ItemTemplateTool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -25,6 +30,12 @@ public class ClientProxy extends CommonProxy {
     regRenderer(Item.getItemFromBlock(EnderStructuresCreator.blockVillagerEditor), BlockVillagerEditor.NAME);
     regRenderer(Item.getItemFromBlock(EnderStructuresCreator.blockLootCategoryEditor), BlockLootCategoryEditor.NAME);
     regRenderer(Item.getItemFromBlock(EnderStructuresCreator.blockClearMarker), BlockClearMarker.NAME);
+    
+    regRenderer(EnderStructuresCreator.itemComponentTool, ItemComponentTool.NAME);
+    regRenderer(EnderStructuresCreator.itemDebugTool, ItemDebugTool.NAME);
+    regRenderer(EnderStructuresCreator.itemClearTool, ItemClearTool.NAME);
+    regRenderer(EnderStructuresCreator.itemTagTool, ItemTagTool.NAME);
+    regRenderer(EnderStructuresCreator.itemTemplateTool, ItemTemplateTool.NAME);
   }
 
   private void regRenderer(Item item, String name) {

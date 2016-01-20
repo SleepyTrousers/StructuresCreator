@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ItemClearTool extends Item {
 
-  private static final String NAME = "itemClearTool";
+  public static final String NAME = "itemClearTool";
 
   public static ItemClearTool create() {
     ItemClearTool res = new ItemClearTool();
