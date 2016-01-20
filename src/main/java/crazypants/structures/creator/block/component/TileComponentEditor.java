@@ -15,6 +15,8 @@ import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.block.AbstractResourceTile;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileComponentEditor extends AbstractResourceTile {
 
@@ -35,9 +37,8 @@ public class TileComponentEditor extends AbstractResourceTile {
   public boolean shouldRenderInPass(int pass) {
     return pass == 1;
   }
-
-  @Override
-  public void doUpdate() {
+  
+  public void onLoad() {
     if(!doneInit) {
       doneInit = true;
       EditorRegister.onLoad(this);
@@ -51,9 +52,11 @@ public class TileComponentEditor extends AbstractResourceTile {
     doneInit = false;
   }
 
+  @SideOnly(Side.CLIENT)
   @Override
-  public AxisAlignedBB getRenderBoundingBox() {    
-    return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX()+ width + offsetX, pos.getY()+ height + offsetY, pos.getZ() + length + offsetZ);
+  public AxisAlignedBB getRenderBoundingBox() { 
+    return INFINITE_EXTENT_AABB;
+    //return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX()+ width + offsetX, pos.getY()+ height + offsetY, pos.getZ() + length + offsetZ);
   }
 
   public AxisAlignedBB getStructureBounds() {

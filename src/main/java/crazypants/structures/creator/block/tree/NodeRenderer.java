@@ -22,7 +22,10 @@ import crazypants.structures.api.runtime.ICondition;
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
 
@@ -139,9 +142,15 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
       if(val instanceof String) {
         return val.toString();
       }
-      if(val instanceof Block) {
-        UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor((Block) val);
-        return uid == null ? "Unknown block" : uid.toString();
+      if(val instanceof IBlockState) {
+        IBlockState blockState = (IBlockState)val;
+        Block blk = blockState.getBlock();
+        Item item = GameData.getBlockItemMap().get(blk);
+        if(item == null) {
+          return "Unknown";
+        }    
+        ItemStack is = new ItemStack(blk, 1, blk.getMetaFromState(blockState));    
+        return is.getDisplayName();                   
       }
       if(val instanceof IStructureComponent) {
         return ((IStructureComponent) val).getUid();

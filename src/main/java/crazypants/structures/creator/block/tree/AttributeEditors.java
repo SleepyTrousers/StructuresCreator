@@ -16,7 +16,7 @@ import crazypants.structures.api.runtime.IBehaviour;
 import crazypants.structures.api.runtime.ICondition;
 import crazypants.structures.creator.block.tree.editors.AddElementEditor;
 import crazypants.structures.creator.block.tree.editors.BiomeNameEditor;
-import crazypants.structures.creator.block.tree.editors.BlockEditor;
+import crazypants.structures.creator.block.tree.editors.BlockStateEditor;
 import crazypants.structures.creator.block.tree.editors.BooleanEditor;
 import crazypants.structures.creator.block.tree.editors.BorderEditor;
 import crazypants.structures.creator.block.tree.editors.ComponentEditor;
@@ -139,7 +139,7 @@ public class AttributeEditors {
     registerEditor(new BorderEditor());
     registerEditor(new EnumEditor());
     registerEditor(new AddElementEditor());
-    registerEditor(new BlockEditor());
+    registerEditor(new BlockStateEditor());
     registerEditor(new ItemStackEditor());    
     
     //Resources
