@@ -8,9 +8,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameData;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public class ItemDebugTool extends Item {
 
@@ -34,32 +35,32 @@ public class ItemDebugTool extends Item {
 
   @Override
   public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-
     if (world.isRemote) {
       return true;
-    }
+    }   
+    printBlockInfo(player, world, pos);    
+    return true;
+  }
 
+  private void printBlockInfo(EntityPlayer player, World world, BlockPos pos) {
     String name;
     IBlockState blk = world.getBlockState(pos);
     if(blk == null) {
       name = "none";
     } else {
-      UniqueIdentifier uid = GameRegistry.findUniqueIdentifierFor(blk.getBlock());
+      ResourceLocation uid = GameData.getBlockRegistry().getNameForObject(blk.getBlock());      
       if(uid == null) {
         name = blk.getBlock().getUnlocalizedName();
       } else {
-        name = uid.modId + ":" + uid.name;
+        name = uid.toString();
       }
-    }
-    
+    }    
     int meta = 0;
     if(blk != null) {
       meta = blk.getBlock().getMetaFromState(blk);
     }
         
     player.addChatComponentMessage(new ChatComponentText("Block: " + name + " meta=" + meta + " metaBits=" + toBitString(meta)));
-    
-    return true;
   }
   
   public static String toBitString(int meta) {

@@ -11,6 +11,7 @@ import crazypants.structures.creator.endercore.common.network.MessageTileEntity;
 import crazypants.structures.gen.StructureGenRegister;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -22,18 +23,18 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public class PacketBuildStructure extends MessageTileEntity<TileTemplateEditor> implements IMessageHandler<PacketBuildStructure, IMessage> {
 
   private Rotation rotation;
-  
+
   public PacketBuildStructure() {
     super();
   }
 
   public PacketBuildStructure(TileTemplateEditor tile, Rotation rotation) {
     super(tile);
-    this.rotation = rotation != null ? rotation : Rotation.DEG_0; 
+    this.rotation = rotation != null ? rotation : Rotation.DEG_0;
   }
 
   @Override
-  public void toBytes(ByteBuf buf) {  
+  public void toBytes(ByteBuf buf) {
     super.toBytes(buf);
     buf.writeShort(rotation.ordinal());
   }
@@ -45,59 +46,67 @@ public class PacketBuildStructure extends MessageTileEntity<TileTemplateEditor> 
     rotation = Rotation.values()[ord];
   }
 
-  //@Override
   @Override
-  public IMessage onMessage(PacketBuildStructure message, MessageContext ctx) {
+  public IMessage onMessage(final PacketBuildStructure message, final MessageContext ctx) {
+    MinecraftServer.getServer().addScheduledTask(new Runnable() {
+      @Override
+      public void run() {
+        doProcesssPacket(message, ctx);
+      }
+    });
+    return null;
+  }
+
+  private void doProcesssPacket(PacketBuildStructure message, MessageContext ctx) {
     EntityPlayer player = ctx.getServerHandler().playerEntity;
-    TileTemplateEditor tile = message.getTileEntity(player.worldObj);
-    if(tile == null) {
-      return null;
+    World world = player.worldObj;
+    TileTemplateEditor tile = message.getTileEntity(world);
+    if (tile == null) {
+      return;
     }
 
-    if(tile.getName() == null) {
-      return null;
+    if (tile.getName() == null) {
+      return;
     }
-    IStructure str = createStructure(player.worldObj, tile, message.rotation);
+    final IStructure str = createStructure(world, tile, message.rotation);
+
     tile.setStructure(str);
-    
-    if(str != null) {
 
+    if (str != null) {
 
-      AxisAlignedBB effectedBounds = str.getBounds();      
+      AxisAlignedBB effectedBounds = str.getBounds();
       ISitePreperation prep = str.getTemplate().getSitePreperation();
-      if(prep != null) {    
-        StructureBoundingBox prepBounds = prep.getEffectedBounds(str);      
-        if(prepBounds != null) {        
+      if (prep != null) {
+        StructureBoundingBox prepBounds = prep.getEffectedBounds(str);
+        if (prepBounds != null) {
           effectedBounds = StructureUtils.growBounds(effectedBounds, prepBounds);
         }
       }
-      
-      
+
       int xOffset = 1;
-      if(effectedBounds.minX < 0) {
+      if (effectedBounds.minX < 0) {
         xOffset += -(effectedBounds.minX);
       }
       int yOffset = 0;
       int zOffset = 1;
-      if(effectedBounds.minZ < 0) {
+      if (effectedBounds.minZ < 0) {
         zOffset += -(effectedBounds.minZ);
       }
       tile.setOffsetX(xOffset);
       tile.setOffsetY(yOffset);
       tile.setOffsetZ(zOffset);
-      
+
       BlockPos p = tile.getPos();
       str.setOrigin(new Point3i(p.getX() + xOffset, p.getY() + yOffset, p.getZ() + zOffset));
-      str.getTemplate().build(str, player.worldObj, player.worldObj.rand, null); 
-      str.onGenerated( player.worldObj);     
-    }
 
-    return null;
+      str.getTemplate().build(str, world, world.rand, null);
+      str.onGenerated(world);
+    }
   }
 
   protected IStructure createStructure(World world, TileTemplateEditor tile, Rotation rot) {
     IStructureTemplate tmpl = StructureGenRegister.instance.getStructureTemplate(tile.getName(), true);
-    if(tmpl != null) {
+    if (tmpl != null) {
       IStructure res = tmpl.createInstance(rot);
       res.setOrigin(new Point3i());
       return res;
