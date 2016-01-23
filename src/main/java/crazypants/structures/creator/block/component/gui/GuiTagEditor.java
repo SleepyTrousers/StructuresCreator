@@ -3,15 +3,16 @@ package crazypants.structures.creator.block.component.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.enderio.core.client.gui.GuiContainerBase;
+import com.enderio.core.client.gui.button.IconButton;
+import com.enderio.core.client.gui.widget.TextFieldEnder;
+import com.enderio.core.client.render.EnderWidget;
+
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.EmptyContainer;
 import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
-import crazypants.structures.creator.endercore.client.gui.GuiContainerBase;
-import crazypants.structures.creator.endercore.client.gui.button.IconButton;
-import crazypants.structures.creator.endercore.client.gui.widget.TextFieldEnder;
-import crazypants.structures.creator.endercore.client.render.EnderWidget;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

@@ -23,6 +23,7 @@ public class ClientProxy extends CommonProxy {
 
   @Override
   public void load() {
+    
     ClientRegistry.bindTileEntitySpecialRenderer(TileComponentEditor.class, new RendererComponentEditor());
     regRenderer(Item.getItemFromBlock(EnderStructuresCreator.blockComponentTool), BlockComponentEditor.NAME);
     regRenderer(Item.getItemFromBlock(EnderStructuresCreator.blockTemplateEditor), BlockTemplateEditor.NAME);

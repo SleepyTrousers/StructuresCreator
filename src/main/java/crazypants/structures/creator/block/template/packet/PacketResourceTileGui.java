@@ -1,7 +1,8 @@
 package crazypants.structures.creator.block.template.packet;
 
+import com.enderio.core.common.network.MessageTileEntity;
+
 import crazypants.structures.creator.block.AbstractResourceTile;
-import crazypants.structures.creator.endercore.common.network.MessageTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;

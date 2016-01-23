@@ -7,17 +7,17 @@ import java.util.Map.Entry;
 
 import org.lwjgl.opengl.GL11;
 
+import com.enderio.core.client.render.BoundingBox;
+import com.enderio.core.client.render.RenderUtil;
+import com.enderio.core.common.util.Util;
+import com.enderio.core.common.vecmath.Vector3d;
+import com.enderio.core.common.vecmath.Vector3f;
 import com.google.common.collect.Multimap;
 
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.api.util.Rotation;
 import crazypants.structures.api.util.VecUtil;
 import crazypants.structures.creator.EnderStructuresCreator;
-import crazypants.structures.creator.endercore.client.render.BoundingBox;
-import crazypants.structures.creator.endercore.client.render.RenderUtil;
-import crazypants.structures.creator.endercore.common.util.Util;
-import crazypants.structures.creator.endercore.common.vecmath.Vector3d;
-import crazypants.structures.creator.endercore.common.vecmath.Vector3f;
 import crazypants.structures.creator.item.ItemTagTool;
 import crazypants.structures.creator.item.ItemTagTool.Hit;
 import net.minecraft.client.Minecraft;

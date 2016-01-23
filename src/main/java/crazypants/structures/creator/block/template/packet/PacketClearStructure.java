@@ -1,10 +1,11 @@
 package crazypants.structures.creator.block.template.packet;
 
+import com.enderio.core.common.network.MessageTileEntity;
+
 import crazypants.structures.StructureUtils;
 import crazypants.structures.api.gen.ISitePreperation;
 import crazypants.structures.api.gen.IStructure;
 import crazypants.structures.creator.block.template.TileTemplateEditor;
-import crazypants.structures.creator.endercore.common.network.MessageTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.gen.structure.StructureBoundingBox;

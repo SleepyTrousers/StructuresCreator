@@ -1,5 +1,7 @@
 package crazypants.structures.creator.block;
 
+import com.enderio.core.common.BlockEnder;
+
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
 import crazypants.structures.creator.GuiHandler;
@@ -10,7 +12,6 @@ import crazypants.structures.creator.block.template.TileTemplateEditor;
 import crazypants.structures.creator.block.template.packet.PacketBuildStructure;
 import crazypants.structures.creator.block.template.packet.PacketClearStructure;
 import crazypants.structures.creator.block.template.packet.PacketResourceTileGui;
-import crazypants.structures.creator.endercore.common.BlockEnder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

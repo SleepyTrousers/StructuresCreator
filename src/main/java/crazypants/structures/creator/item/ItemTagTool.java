@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.enderio.core.common.util.Util;
+import com.enderio.core.common.vecmath.Vector3d;
+
 import crazypants.structures.api.util.Point3i;
 import crazypants.structures.creator.EnderStructuresCreator;
 import crazypants.structures.creator.EnderStructuresCreatorTab;
@@ -14,8 +17,6 @@ import crazypants.structures.creator.block.component.EditorRegister;
 import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.gui.GuiTagEditor;
 import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
-import crazypants.structures.creator.endercore.common.util.Util;
-import crazypants.structures.creator.endercore.common.vecmath.Vector3d;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
