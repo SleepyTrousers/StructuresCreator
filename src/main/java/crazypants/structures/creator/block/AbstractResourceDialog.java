@@ -162,12 +162,16 @@ public abstract class AbstractResourceDialog extends JDialog {
   protected void save() {
     String uid = getResourceUid();
     AbstractResourceTile tile = getTile();
+    boolean sendUpdate = false;
     if(tile.getExportDir() == null) {
       tile.setExportDir(ExportManager.instance.getDefaultDirectory().getAbsolutePath());
-      sendUpdatePacket();
+      sendUpdate = true;     
     }
     if(!StringUtils.equals(uid, tile.getName())) {
       tile.setName(uid);
+      sendUpdate = true;     
+    }
+    if(sendUpdate) {
       sendUpdatePacket();
     }
     if(uid == null || uid.trim().length() == 0) {

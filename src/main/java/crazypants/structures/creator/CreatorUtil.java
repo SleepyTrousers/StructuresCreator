@@ -6,8 +6,6 @@ import crazypants.structures.gen.structure.StructureComponentNBT;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -43,8 +41,7 @@ public class CreatorUtil {
       }
     }
     StructureComponentNBT res = new StructureComponentNBT(bb, size, name,  surfaceOffset, fb, sufb);
-    
-    int invNo = 0;
+        
     int x;
     int y;
     int z;
@@ -63,14 +60,7 @@ public class CreatorUtil {
             if(blk == EnderStructuresCreator.blockClearMarker) {
               sb = new StructureBlock(Blocks.air);
             }            
-            res.addBlock(sb, xIndex, yIndex, zIndex);
-            if(sb.getTileEntity() != null) {
-              TileEntity te = TileEntity.createAndLoadEntity(sb.getTileEntity());
-              if(te instanceof IInventory) {
-                res.addTagForLocation("inv" + invNo, new Point3i(xIndex, yIndex, zIndex));
-                invNo++;
-              }
-            }
+            res.addBlock(sb, xIndex, yIndex, zIndex);            
           }
         }
       }

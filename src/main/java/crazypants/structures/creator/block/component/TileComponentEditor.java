@@ -37,9 +37,9 @@ public class TileComponentEditor extends AbstractResourceTile {
   public boolean shouldRenderInPass(int pass) {
     return pass == 1;
   }
-  
+
   public void onLoad() {
-    if(!doneInit) {
+    if (!doneInit) {
       doneInit = true;
       EditorRegister.onLoad(this);
     }
@@ -54,18 +54,17 @@ public class TileComponentEditor extends AbstractResourceTile {
 
   @SideOnly(Side.CLIENT)
   @Override
-  public AxisAlignedBB getRenderBoundingBox() { 
-    return INFINITE_EXTENT_AABB;
-    //return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX()+ width + offsetX, pos.getY()+ height + offsetY, pos.getZ() + length + offsetZ);
+  public AxisAlignedBB getRenderBoundingBox() {
+    return INFINITE_EXTENT_AABB;    
   }
 
   public AxisAlignedBB getStructureBounds() {
-    return new AxisAlignedBB(pos.getX() + offsetX, pos.getY()+ offsetY, pos.getZ()+ offsetZ, pos.getX() + width + offsetX, pos.getY() + height + offsetY,
+    return new AxisAlignedBB(pos.getX() + offsetX, pos.getY() + offsetY, pos.getZ() + offsetZ, pos.getX() + width + offsetX, pos.getY() + height + offsetY,
         pos.getZ() + length + offsetZ);
   }
 
   @Override
-  public void writeCustomNBT(NBTTagCompound root) {
+  public void writeCustomNBT(NBTTagCompound root) {    
     super.writeCustomNBT(root);
     root.setInteger("width", width);
     root.setInteger("height", height);
@@ -76,12 +75,11 @@ public class TileComponentEditor extends AbstractResourceTile {
     root.setInteger("offsetY", offsetY);
     root.setInteger("offsetZ", offsetZ);
 
-    if(!taggedLocations.isEmpty()) {
+    if (!taggedLocations.isEmpty()) {
       StructureUtils.writeTaggedLocationToNBT(taggedLocations, root);
     }
   }
 
-  @Override
   public void readCustomNBT(NBTTagCompound root) {
     super.readCustomNBT(root);
     width = root.getInteger("width");
@@ -94,7 +92,7 @@ public class TileComponentEditor extends AbstractResourceTile {
     offsetZ = root.getInteger("offsetZ");
 
     taggedLocations.clear();
-    StructureUtils.readTaggedLocations(taggedLocations, root);
+    StructureUtils.readTaggedLocations(taggedLocations, root);    
   }
 
   public int getWidth() {
@@ -161,7 +159,7 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   public void addTag(String tag, Point3i loc) {
-    if(tag == null || loc == null) {
+    if (tag == null || loc == null) {
       return;
     }
     taggedLocations.put(tag, loc);
@@ -169,7 +167,7 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   public void removeTag(String tag, Point3i loc) {
-    if(tag == null) {
+    if (tag == null) {
       return;
     }
     taggedLocations.remove(tag, loc);
@@ -177,7 +175,7 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   public void removeTags(String tag) {
-    if(tag != null && taggedLocations.containsKey(tag)) {
+    if (tag != null && taggedLocations.containsKey(tag)) {
       taggedLocations.put(tag, null);
       markDirty();
     }
@@ -202,7 +200,7 @@ public class TileComponentEditor extends AbstractResourceTile {
 
     taggedLocations.clear();
     taggedLocations.putAll(component.getTaggedLocations());
-    
+
   }
 
   public boolean hasTagAt(Point3i loc) {
@@ -217,7 +215,7 @@ public class TileComponentEditor extends AbstractResourceTile {
     Multimap<Point3i, String> res = ArrayListMultimap.create();
     Set<Point3i> uniqueLocs = new HashSet<Point3i>(taggedLocations.values());
     for (Point3i loc : uniqueLocs) {
-      if(loc != null) {
+      if (loc != null) {
         Collection<String> tags = getTagsAtLocation(loc);
         res.putAll(loc, tags);
       }
@@ -226,18 +224,18 @@ public class TileComponentEditor extends AbstractResourceTile {
   }
 
   public void setTagsAtPosition(Point3i loc, List<String> tags) {
-    //Clear current tags
-    Collection<String> curTags = getTagsAtLocation(loc);    
-    for(String tag : curTags) {
+    // Clear current tags
+    Collection<String> curTags = getTagsAtLocation(loc);
+    for (String tag : curTags) {
       removeTag(tag, loc);
     }
-    //set new ones
-    if(tags == null) {
+    // set new ones
+    if (tags == null) {
       return;
     }
-    for(String tag : tags) {
+    for (String tag : tags) {
       addTag(tag, loc);
-    }    
+    }
     curTags = getTagsAtLocation(loc);
   }
 

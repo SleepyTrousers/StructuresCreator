@@ -12,6 +12,7 @@ import crazypants.structures.creator.block.component.gui.GuiComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketAddRemoveTaggedLocation;
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
 import crazypants.structures.creator.block.component.packet.PacketComponentEditorGui;
+import crazypants.structures.creator.block.component.packet.PacketSaveComponent;
 import crazypants.structures.creator.block.component.packet.PacketSetTaggedLocation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,7 +34,8 @@ public class BlockComponentEditor extends BlockEnder<TileComponentEditor> implem
     PacketHandler.INSTANCE.registerMessage(PacketBuildComponent.class, PacketBuildComponent.class, PacketHandler.nextID(), Side.SERVER);
     PacketHandler.INSTANCE.registerMessage(PacketAddRemoveTaggedLocation.class, PacketAddRemoveTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
     PacketHandler.INSTANCE.registerMessage(PacketSetTaggedLocation.class, PacketSetTaggedLocation.class, PacketHandler.nextID(), Side.SERVER);
-
+    PacketHandler.INSTANCE.registerMessage(PacketSaveComponent.class, PacketSaveComponent.class, PacketHandler.nextID(), Side.SERVER);
+    
     BlockComponentEditor res = new BlockComponentEditor();
     res.init();
     return res;

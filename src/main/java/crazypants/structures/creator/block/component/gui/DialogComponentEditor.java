@@ -26,7 +26,6 @@ import org.apache.commons.io.IOUtils;
 
 import crazypants.structures.api.gen.IStructureComponent;
 import crazypants.structures.api.util.Point3i;
-import crazypants.structures.creator.CreatorUtil;
 import crazypants.structures.creator.PacketHandler;
 import crazypants.structures.creator.block.AbstractResourceDialog;
 import crazypants.structures.creator.block.AbstractResourceTile;
@@ -34,12 +33,11 @@ import crazypants.structures.creator.block.FileControls;
 import crazypants.structures.creator.block.component.TileComponentEditor;
 import crazypants.structures.creator.block.component.packet.PacketBuildComponent;
 import crazypants.structures.creator.block.component.packet.PacketComponentEditorGui;
+import crazypants.structures.creator.block.component.packet.PacketSaveComponent;
 import crazypants.structures.creator.block.tree.Icons;
-import crazypants.structures.creator.item.ExportManager;
 import crazypants.structures.gen.StructureGenRegister;
 import crazypants.structures.gen.io.resource.StructureResourceManager;
 import crazypants.structures.gen.structure.StructureComponentNBT;
-import net.minecraft.client.Minecraft;
 
 public class DialogComponentEditor extends AbstractResourceDialog {
 
@@ -221,14 +219,8 @@ public class DialogComponentEditor extends AbstractResourceDialog {
     String name = nameTF.getText().trim();
     if(!uid.equals(name)) {
       nameTF.setText(uid);
-
-    }
-    StructureComponentNBT comp = CreatorUtil.createComponent(uid, tile.getWorld(), tile.getStructureBounds(), tile.getSurfaceOffset());
-    comp.setTags(tile.getTaggedLocations());
-    if(ExportManager.writeToFile(file, comp, Minecraft.getMinecraft().thePlayer)) {
-      StructureGenRegister.instance.registerStructureComponent(comp);
-    }
-    sendUpdatePacket();
+    }            
+    PacketHandler.INSTANCE.sendToServer(new PacketSaveComponent(tile, file, uid));    
   }
 
   private void openComponent(IStructureComponent component) {

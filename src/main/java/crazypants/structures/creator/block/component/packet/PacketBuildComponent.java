@@ -56,7 +56,6 @@ public class PacketBuildComponent extends MessageTileEntity<TileComponentEditor>
     }
   }
 
-  //@Override
   @Override
   public IMessage onMessage(PacketBuildComponent message, MessageContext ctx) {
     EntityPlayer player = ctx.getServerHandler().playerEntity;
